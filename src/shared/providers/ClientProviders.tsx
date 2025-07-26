@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -33,13 +33,11 @@ export function ClientProviders({ children }: ClientProvidersProps) {
       <I18nextProvider i18n={i18n}>
         <I18nProvider>
           <ThemeProvider>
-            <HydrationWrapper>
-              {children}
-            </HydrationWrapper>
+            <HydrationWrapper>{children}</HydrationWrapper>
           </ThemeProvider>
         </I18nProvider>
       </I18nextProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
-} 
+}

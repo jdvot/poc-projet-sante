@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Card, Title, Group, Badge, Button, Text, Box } from '@mantine/core';
@@ -11,15 +11,15 @@ export function AuthStoreDemo() {
     login({
       id: '1',
       name: 'John Doe',
-      email: 'john@example.com'
+      email: 'john@example.com',
     });
   };
 
   return (
-    <Card 
-      shadow="lg" 
-      padding="xl" 
-      radius="lg" 
+    <Card
+      shadow="lg"
+      padding="xl"
+      radius="lg"
       withBorder
       style={{
         background: 'var(--mantine-color-body)',
@@ -32,7 +32,8 @@ export function AuthStoreDemo() {
       <Group gap="lg" align="center" justify="space-between">
         <Group gap="md" align="center">
           <Box>
-            Status: <Badge 
+            Status:{' '}
+            <Badge
               color={isAuthenticated ? 'green' : 'red'}
               size="lg"
               style={{ fontWeight: 600 }}
@@ -48,7 +49,7 @@ export function AuthStoreDemo() {
         </Group>
         <Group gap="sm">
           {!isAuthenticated ? (
-            <Button 
+            <Button
               onClick={handleLogin}
               variant="filled"
               color="blue"
@@ -57,12 +58,7 @@ export function AuthStoreDemo() {
               Login
             </Button>
           ) : (
-            <Button 
-              onClick={logout}
-              variant="outline"
-              color="red"
-              size="sm"
-            >
+            <Button onClick={logout} variant="outline" color="red" size="sm">
               Logout
             </Button>
           )}
@@ -70,4 +66,4 @@ export function AuthStoreDemo() {
       </Group>
     </Card>
   );
-} 
+}

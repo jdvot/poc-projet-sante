@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Card, Text, Stack } from '@mantine/core';
@@ -13,11 +13,13 @@ export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
   return (
     <Card withBorder p="md">
       <Stack gap="sm">
-        <Text size="sm" fw={500}>Utilisateur connecté:</Text>
+        <Text size="sm" fw={500}>
+          Utilisateur connecté:
+        </Text>
         <Text size="sm" c="dimmed">
           {user.name} ({user.email})
         </Text>
       </Stack>
     </Card>
   );
-}; 
+};

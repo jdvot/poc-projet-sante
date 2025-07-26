@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Card, Title, Group, Button, Text, Badge, Stack } from '@mantine/core';
 import { useProfileStore } from '../../stores/profileStore';
 
 export function ProfileStoreDemo() {
-  const { profile, setProfile, updateProfile, clearProfile } = useProfileStore();
+  const { profile, setProfile, updateProfile, clearProfile } =
+    useProfileStore();
 
   const handleCreateProfile = () => {
     setProfile({
@@ -16,7 +17,7 @@ export function ProfileStoreDemo() {
       activityLevel: 'moderate',
       medicalConditions: [],
       allergies: [],
-      medications: []
+      medications: [],
     });
   };
 
@@ -25,20 +26,24 @@ export function ProfileStoreDemo() {
   };
 
   return (
-    <Card 
-      shadow="lg" 
-      padding="xl" 
-      radius="lg" 
+    <Card
+      shadow="lg"
+      padding="xl"
+      radius="lg"
       withBorder
       style={{
         background: 'var(--mantine-color-body)',
         border: '1px solid var(--mantine-color-gray-3)',
       }}
     >
-      <Title order={3} mb="lg" style={{ color: 'var(--mantine-color-purple-6)' }}>
+      <Title
+        order={3}
+        mb="lg"
+        style={{ color: 'var(--mantine-color-purple-6)' }}
+      >
         Profile Store
       </Title>
-      
+
       {profile ? (
         <Stack gap="md">
           <Group gap="md" wrap="wrap">
@@ -58,9 +63,9 @@ export function ProfileStoreDemo() {
               Activity: {profile.activityLevel}
             </Badge>
           </Group>
-          
+
           <Group gap="sm">
-            <Button 
+            <Button
               onClick={handleUpdateProfile}
               variant="outline"
               color="purple"
@@ -68,7 +73,7 @@ export function ProfileStoreDemo() {
             >
               Update Age
             </Button>
-            <Button 
+            <Button
               onClick={clearProfile}
               variant="outline"
               color="red"
@@ -81,7 +86,7 @@ export function ProfileStoreDemo() {
       ) : (
         <Group gap="sm">
           <Text c="dimmed">No profile data</Text>
-          <Button 
+          <Button
             onClick={handleCreateProfile}
             variant="filled"
             color="purple"
@@ -93,4 +98,4 @@ export function ProfileStoreDemo() {
       )}
     </Card>
   );
-} 
+}

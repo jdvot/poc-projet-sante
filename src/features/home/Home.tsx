@@ -8,20 +8,26 @@ const Home = () => {
         <Title order={1} ta="center">
           🏥 Limitless Health
         </Title>
-        
+
         <Text size="lg" ta="center" c="dimmed">
-          POC HealthTech - Dashboard santé moderne avec toutes les technologies d&apos;entreprise
+          POC HealthTech - Dashboard santé moderne avec toutes les technologies
+          d&apos;entreprise
         </Text>
 
         <Stack gap="md" align="center">
           <Text size="md" ta="center">
-            ✅ Next.js 15 + TypeScript + React 19<br/>
-            ✅ Mantine UI + Dark/Light Mode<br/>
-            ✅ i18next (FR/EN) + Zustand<br/>
-            ✅ TanStack Query + React Hook Form<br/>
-            ✅ Vitest + Cypress + Storybook<br/>
-            ✅ ESLint + Prettier + Husky<br/>
-            ✅ Sentry + Docker
+            ✅ Next.js 15 + TypeScript + React 19
+            <br />
+            ✅ Mantine UI + Dark/Light Mode
+            <br />
+            ✅ i18next (FR/EN) + Zustand
+            <br />
+            ✅ TanStack Query + React Hook Form
+            <br />
+            ✅ Vitest + Cypress + Storybook
+            <br />
+            ✅ ESLint + Prettier + Husky
+            <br />✅ Sentry + Docker
           </Text>
         </Stack>
 

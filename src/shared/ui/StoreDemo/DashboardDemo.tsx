@@ -10,25 +10,23 @@ const DashboardDemo: React.FC = () => {
     isLoading,
     error,
     refetch,
-    isRefetching
-  } = useApiCall(
-    ['dashboard-demo'],
-    fetchDashboardData,
-    {
-      staleTime: 2 * 60 * 1000, // 2 minutes pour la démo
-    }
-  );
+    isRefetching,
+  } = useApiCall(['dashboard-demo'], fetchDashboardData, {
+    staleTime: 2 * 60 * 1000, // 2 minutes pour la démo
+  });
 
   if (error) {
     return (
       <Card withBorder p="md">
-        <Title order={3} mb="md">🚨 Erreur Dashboard</Title>
+        <Title order={3} mb="md">
+          🚨 Erreur Dashboard
+        </Title>
         <Text size="sm" c="red">
           Impossible de charger les données: {error.message}
         </Text>
-        <Button 
-          mt="sm" 
-          size="xs" 
+        <Button
+          mt="sm"
+          size="xs"
           onClick={() => refetch()}
           loading={isRefetching}
         >
@@ -42,8 +40,8 @@ const DashboardDemo: React.FC = () => {
     <Card withBorder p="md">
       <Group justify="space-between" align="center" mb="md">
         <Title order={3}>📊 Dashboard Demo</Title>
-        <Button 
-          size="xs" 
+        <Button
+          size="xs"
           variant="light"
           leftSection={<IconRefresh size="0.875rem" />}
           onClick={() => refetch()}
@@ -55,10 +53,16 @@ const DashboardDemo: React.FC = () => {
 
       {isLoading ? (
         <Stack gap="sm">
-          <Text size="sm" c="dimmed">Chargement des données...</Text>
+          <Text size="sm" c="dimmed">
+            Chargement des données...
+          </Text>
           <Group gap="xs">
-            <Badge size="sm" variant="light">Glucose: --</Badge>
-            <Badge size="sm" variant="light">Cholestérol: --</Badge>
+            <Badge size="sm" variant="light">
+              Glucose: --
+            </Badge>
+            <Badge size="sm" variant="light">
+              Cholestérol: --
+            </Badge>
           </Group>
         </Stack>
       ) : (
@@ -68,9 +72,9 @@ const DashboardDemo: React.FC = () => {
           </Text>
           <Group gap="xs" wrap="wrap">
             {dashboardData?.biomarkers.slice(0, 3).map((biomarker, index) => (
-              <Badge 
+              <Badge
                 key={`${biomarker.name}-${index}`}
-                size="sm" 
+                size="sm"
                 variant="light"
                 color={index === 2 ? 'yellow' : 'green'}
               >
@@ -87,4 +91,4 @@ const DashboardDemo: React.FC = () => {
   );
 };
 
-export default DashboardDemo; 
+export default DashboardDemo;

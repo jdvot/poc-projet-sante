@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Stack, TextInput, NumberInput, Select, Group } from '@mantine/core';
@@ -6,7 +6,10 @@ import { ProfileData, GENDER_OPTIONS } from '../../../shared/types/profile';
 
 interface ProfileFormFieldsProps {
   formData: ProfileData;
-  onFieldChange: (field: keyof ProfileData, value: ProfileData[keyof ProfileData]) => void;
+  onFieldChange: (
+    field: keyof ProfileData,
+    value: ProfileData[keyof ProfileData]
+  ) => void;
   fieldErrors: Record<string, string[]>;
 }
 
@@ -51,7 +54,9 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           label="Genre"
           placeholder="Sélectionnez votre genre"
           value={formData.gender}
-          onChange={(value) => onFieldChange('gender', value as ProfileData['gender'])}
+          onChange={(value) =>
+            onFieldChange('gender', value as ProfileData['gender'])
+          }
           data={GENDER_OPTIONS}
           required
         />
@@ -81,4 +86,4 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
       </Group>
     </Stack>
   );
-}; 
+};

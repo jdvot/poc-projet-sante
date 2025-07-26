@@ -1,7 +1,14 @@
-"use client";
+'use client';
 
 import React, { useMemo, useCallback } from 'react';
-import { Group, Anchor, Stack, Container, Box, Transition } from '@mantine/core';
+import {
+  Group,
+  Anchor,
+  Stack,
+  Container,
+  Box,
+  Transition,
+} from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -59,39 +66,46 @@ interface NavLinkProps {
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => {
   const { t } = useTranslation();
 
-  const linkStyles = useMemo(() => ({
-    padding: '0.5rem 1rem',
-    borderRadius: '0.5rem',
-    textDecoration: 'none',
-    fontWeight: 500,
-    transition: 'all 0.2s ease',
-    position: 'relative' as const,
-    color: isActive 
-      ? 'var(--mantine-color-blue-6)' 
-      : 'var(--mantine-color-gray-7)',
-    background: isActive 
-      ? 'var(--mantine-color-blue-0)' 
-      : 'transparent',
-    border: isActive 
-      ? '1px solid var(--mantine-color-blue-3)' 
-      : '1px solid transparent',
-  }), [isActive]);
+  const linkStyles = useMemo(
+    () => ({
+      padding: '0.5rem 1rem',
+      borderRadius: '0.5rem',
+      textDecoration: 'none',
+      fontWeight: 500,
+      transition: 'all 0.2s ease',
+      position: 'relative' as const,
+      color: isActive
+        ? 'var(--mantine-color-blue-6)'
+        : 'var(--mantine-color-gray-7)',
+      background: isActive ? 'var(--mantine-color-blue-0)' : 'transparent',
+      border: isActive
+        ? '1px solid var(--mantine-color-blue-3)'
+        : '1px solid transparent',
+    }),
+    [isActive]
+  );
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!isActive) {
-      e.currentTarget.style.background = 'var(--mantine-color-gray-0)';
-      e.currentTarget.style.color = 'var(--mantine-color-gray-9)';
-      e.currentTarget.style.transform = 'translateY(-1px)';
-    }
-  }, [isActive]);
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!isActive) {
+        e.currentTarget.style.background = 'var(--mantine-color-gray-0)';
+        e.currentTarget.style.color = 'var(--mantine-color-gray-9)';
+        e.currentTarget.style.transform = 'translateY(-1px)';
+      }
+    },
+    [isActive]
+  );
 
-  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!isActive) {
-      e.currentTarget.style.background = 'transparent';
-      e.currentTarget.style.color = 'var(--mantine-color-gray-7)';
-      e.currentTarget.style.transform = 'translateY(0)';
-    }
-  }, [isActive]);
+  const handleMouseLeave = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!isActive) {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.color = 'var(--mantine-color-gray-7)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }
+    },
+    [isActive]
+  );
 
   return (
     <Anchor
@@ -127,19 +141,25 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => {
 const Logo: React.FC = () => {
   const { t } = useTranslation();
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.transform = navbarStyles.logoHover.transform;
-    e.currentTarget.style.color = navbarStyles.logoHover.color;
-  }, []);
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.currentTarget.style.transform = navbarStyles.logoHover.transform;
+      e.currentTarget.style.color = navbarStyles.logoHover.color;
+    },
+    []
+  );
 
-  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.transform = navbarStyles.logoNormal.transform;
-    e.currentTarget.style.color = navbarStyles.logoNormal.color;
-  }, []);
+  const handleMouseLeave = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.currentTarget.style.transform = navbarStyles.logoNormal.transform;
+      e.currentTarget.style.color = navbarStyles.logoNormal.color;
+    },
+    []
+  );
 
   return (
-    <Anchor 
-      component={Link} 
+    <Anchor
+      component={Link}
       href="/"
       style={navbarStyles.logo}
       onMouseEnter={handleMouseEnter}
@@ -156,14 +176,17 @@ export function AppNavbar() {
   const pathname = usePathname();
 
   // Utilisation de useMemo pour éviter les recalculs inutiles
-  const navItems = useMemo<NavItem[]>(() => [
-    { href: '/', label: t('welcome') },
-    { href: '/dashboard', label: t('dashboard') },
-    { href: '/ai-doctor', label: t('aiDoctor') },
-    { href: '/profile', label: t('profile') },
-    { href: '/settings', label: t('settings') },
-    { href: '/auth', label: t('auth') },
-  ], [t]);
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { href: '/', label: t('welcome') },
+      { href: '/dashboard', label: t('dashboard') },
+      { href: '/ai-doctor', label: t('aiDoctor') },
+      { href: '/profile', label: t('profile') },
+      { href: '/settings', label: t('settings') },
+      { href: '/auth', label: t('auth') },
+    ],
+    [t]
+  );
 
   // Filtrage des éléments de navigation (exclure la page d'accueil de la navigation principale)
   const mainNavItems = useMemo(() => navItems.slice(1), [navItems]);
@@ -182,14 +205,14 @@ export function AppNavbar() {
           {/* Navigation Links */}
           <Group gap="xs" style={navbarStyles.navContainer}>
             {mainNavItems.map((item) => (
-              <NavLink 
-                key={item.href} 
-                item={item} 
-                isActive={pathname === item.href} 
+              <NavLink
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
               />
             ))}
           </Group>
-          
+
           {/* Controls */}
           <Group gap="sm" style={navbarStyles.controls}>
             <LanguageSwitcher />

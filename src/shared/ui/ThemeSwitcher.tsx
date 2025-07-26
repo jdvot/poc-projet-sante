@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useMemo, useCallback } from 'react';
 import { ActionIcon, Group, Tooltip, Box } from '@mantine/core';
@@ -51,41 +51,49 @@ interface ThemeButtonProps {
   onThemeChange: (mode: ThemeMode) => void;
 }
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ theme, isActive, onThemeChange }) => {
+const ThemeButton: React.FC<ThemeButtonProps> = ({
+  theme,
+  isActive,
+  onThemeChange,
+}) => {
   const { t } = useTranslation();
 
-  const buttonStyles = useMemo(() => ({
-    ...themeStyles.base,
-    ...(isActive ? themeStyles.active : themeStyles.inactive),
-  }), [isActive]);
+  const buttonStyles = useMemo(
+    () => ({
+      ...themeStyles.base,
+      ...(isActive ? themeStyles.active : themeStyles.inactive),
+    }),
+    [isActive]
+  );
 
   const handleClick = useCallback(() => {
     onThemeChange(theme.mode);
   }, [theme.mode, onThemeChange]);
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isActive) {
-      e.currentTarget.style.background = themeStyles.hover.background;
-      e.currentTarget.style.transform = themeStyles.hover.transform;
-      e.currentTarget.style.boxShadow = themeStyles.hover.boxShadow;
-    }
-  }, [isActive]);
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!isActive) {
+        e.currentTarget.style.background = themeStyles.hover.background;
+        e.currentTarget.style.transform = themeStyles.hover.transform;
+        e.currentTarget.style.boxShadow = themeStyles.hover.boxShadow;
+      }
+    },
+    [isActive]
+  );
 
-  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isActive) {
-      e.currentTarget.style.background = themeStyles.inactive.background;
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = 'none';
-    }
-  }, [isActive]);
+  const handleMouseLeave = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!isActive) {
+        e.currentTarget.style.background = themeStyles.inactive.background;
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = 'none';
+      }
+    },
+    [isActive]
+  );
 
   return (
-    <Tooltip 
-      label={theme.label} 
-      position="bottom"
-      withArrow
-      offset={8}
-    >
+    <Tooltip label={theme.label} position="bottom" withArrow offset={8}>
       <ActionIcon
         variant={isActive ? 'filled' : 'light'}
         color={theme.mode === 'dark' ? 'dark' : 'gray'}
@@ -108,39 +116,49 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ theme, isActive, onThemeChang
 export function ThemeSwitcher() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { t } = useTranslation();
-  
-  // Utilisation de useMemo pour éviter les recréations d'objets
-  const themeOptions = useMemo<ThemeOption[]>(() => [
-    { 
-      mode: 'light', 
-      icon: themeIcons.light, 
-      label: t('theme.light', 'Clair') 
-    },
-    { 
-      mode: 'dark', 
-      icon: themeIcons.dark, 
-      label: t('theme.dark', 'Sombre') 
-    },
-    { 
-      mode: 'auto', 
-      icon: themeIcons.auto, 
-      label: t('theme.auto', 'Automatique') 
-    },
-  ], [t]);
 
-  const handleThemeChange = useCallback((mode: ThemeMode) => {
-    try {
-      setColorScheme(mode);
-    } catch (error) {
-      console.error('Erreur lors du changement de thème:', error);
-      // Ici on pourrait ajouter une notification d'erreur pour l'utilisateur
-    }
-  }, [setColorScheme]);
+  // Utilisation de useMemo pour éviter les recréations d'objets
+  const themeOptions = useMemo<ThemeOption[]>(
+    () => [
+      {
+        mode: 'light',
+        icon: themeIcons.light,
+        label: t('theme.light', 'Clair'),
+      },
+      {
+        mode: 'dark',
+        icon: themeIcons.dark,
+        label: t('theme.dark', 'Sombre'),
+      },
+      {
+        mode: 'auto',
+        icon: themeIcons.auto,
+        label: t('theme.auto', 'Automatique'),
+      },
+    ],
+    [t]
+  );
+
+  const handleThemeChange = useCallback(
+    (mode: ThemeMode) => {
+      try {
+        setColorScheme(mode);
+      } catch (error) {
+        console.error('Erreur lors du changement de thème:', error);
+        // Ici on pourrait ajouter une notification d'erreur pour l'utilisateur
+      }
+    },
+    [setColorScheme]
+  );
 
   return (
-    <Group gap="xs" role="group" aria-label={t('theme.switcher', 'Sélecteur de thème')}>
+    <Group
+      gap="xs"
+      role="group"
+      aria-label={t('theme.switcher', 'Sélecteur de thème')}
+    >
       {themeOptions.map((theme) => (
-        <ThemeButton 
+        <ThemeButton
           key={theme.mode}
           theme={theme}
           isActive={colorScheme === theme.mode}

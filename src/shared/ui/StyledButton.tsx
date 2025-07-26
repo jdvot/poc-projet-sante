@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Button, ButtonProps } from '@mantine/core';
 import { ReactNode } from 'react';
@@ -8,11 +8,11 @@ interface StyledButtonProps extends ButtonProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
 }
 
-export function StyledButton({ 
-  children, 
-  variant = 'primary', 
-  style, 
-  ...props 
+export function StyledButton({
+  children,
+  variant = 'primary',
+  style,
+  ...props
 }: StyledButtonProps) {
   const baseStyles = {
     transition: 'all 0.2s ease',
@@ -26,7 +26,8 @@ export function StyledButton({
 
   const variantStyles = {
     primary: {
-      background: 'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-blue-7))',
+      background:
+        'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-blue-7))',
       color: 'white',
       boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
     },
@@ -89,4 +90,4 @@ export function StyledButton({
       {children}
     </Button>
   );
-} 
+}

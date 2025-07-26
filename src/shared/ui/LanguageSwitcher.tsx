@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Menu, Button, Group, Text, Box } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { useLanguageStore } from '../stores/languageStore';
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const { language, setLanguage } = useLanguageStore();
-  
+
   const handleLanguageChange = (newLanguage: 'en' | 'fr') => {
     setLanguage(newLanguage);
     i18n.changeLanguage(newLanguage);
@@ -19,7 +19,8 @@ export function LanguageSwitcher() {
     { code: 'en', name: 'English', flag: '🇺🇸' },
   ];
 
-  const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
+  const currentLanguage =
+    languages.find((lang) => lang.code === language) || languages[0];
 
   return (
     <Menu shadow="md" width={200} position="bottom-end">
@@ -49,11 +50,13 @@ export function LanguageSwitcher() {
         >
           <Group gap="xs" align="center">
             <Text size="lg">{currentLanguage.flag}</Text>
-            <Text size="sm" fw={500}>{currentLanguage.name}</Text>
+            <Text size="sm" fw={500}>
+              {currentLanguage.name}
+            </Text>
           </Group>
         </Button>
       </Menu.Target>
-      
+
       <Menu.Dropdown
         style={{
           border: '1px solid var(--mantine-color-gray-3)',
@@ -69,16 +72,19 @@ export function LanguageSwitcher() {
               padding: '0.75rem 1rem',
               fontWeight: 500,
               transition: 'all 0.2s ease',
-              color: language === lang.code 
-                ? 'var(--mantine-color-blue-6)' 
-                : 'var(--mantine-color-gray-7)',
-              background: language === lang.code 
-                ? 'var(--mantine-color-blue-0)' 
-                : 'transparent',
+              color:
+                language === lang.code
+                  ? 'var(--mantine-color-blue-6)'
+                  : 'var(--mantine-color-gray-7)',
+              background:
+                language === lang.code
+                  ? 'var(--mantine-color-blue-0)'
+                  : 'transparent',
             }}
             onMouseEnter={(e) => {
               if (language !== lang.code) {
-                e.currentTarget.style.background = 'var(--mantine-color-gray-0)';
+                e.currentTarget.style.background =
+                  'var(--mantine-color-gray-0)';
                 e.currentTarget.style.color = 'var(--mantine-color-gray-9)';
               }
             }}
@@ -91,7 +97,9 @@ export function LanguageSwitcher() {
           >
             <Group gap="sm" align="center">
               <Text size="lg">{lang.flag}</Text>
-              <Text size="sm" fw={500}>{lang.name}</Text>
+              <Text size="sm" fw={500}>
+                {lang.name}
+              </Text>
               {language === lang.code && (
                 <Box
                   style={{

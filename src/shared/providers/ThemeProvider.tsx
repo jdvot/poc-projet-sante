@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { MantineProvider, createTheme } from '@mantine/core';
 import { ReactNode } from 'react';
@@ -14,11 +14,8 @@ const theme = createTheme({
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   return (
-    <MantineProvider 
-      theme={theme}
-      defaultColorScheme="auto"
-    >
+    <MantineProvider theme={theme} defaultColorScheme="auto">
       {children}
     </MantineProvider>
   );
-} 
+}

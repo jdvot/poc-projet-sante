@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,7 @@ export function I18nProvider({ children }: I18nProviderProps) {
   // Sync language store with i18n after initialization
   useEffect(() => {
     if (!isInitialized) return;
-    
+
     if (i18n.language !== language) {
       i18n.changeLanguage(language);
     }

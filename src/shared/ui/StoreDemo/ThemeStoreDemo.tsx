@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Card, Title, Group, Button, Badge, Select } from '@mantine/core';
@@ -8,10 +8,10 @@ export function ThemeStoreDemo() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   return (
-    <Card 
-      shadow="lg" 
-      padding="xl" 
-      radius="lg" 
+    <Card
+      shadow="lg"
+      padding="xl"
+      radius="lg"
       withBorder
       style={{
         background: 'var(--mantine-color-body)',
@@ -21,10 +21,10 @@ export function ThemeStoreDemo() {
       <Title order={3} mb="lg" style={{ color: 'var(--mantine-color-teal-6)' }}>
         Theme Store (Mantine)
       </Title>
-      
+
       <Group gap="lg" align="center" justify="space-between">
         <Group gap="md" align="center">
-          <Badge 
+          <Badge
             color={colorScheme === 'dark' ? 'dark' : 'light'}
             size="lg"
             style={{ fontWeight: 600 }}
@@ -32,11 +32,13 @@ export function ThemeStoreDemo() {
             Current: {colorScheme || 'auto'}
           </Badge>
         </Group>
-        
+
         <Group gap="sm">
           <Select
             value={colorScheme || 'auto'}
-            onChange={(value) => setColorScheme(value as 'light' | 'dark' | 'auto')}
+            onChange={(value) =>
+              setColorScheme(value as 'light' | 'dark' | 'auto')
+            }
             data={[
               { value: 'light', label: 'Light' },
               { value: 'dark', label: 'Dark' },
@@ -49,4 +51,4 @@ export function ThemeStoreDemo() {
       </Group>
     </Card>
   );
-} 
+}

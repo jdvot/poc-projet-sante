@@ -1,6 +1,14 @@
-"use client";
+'use client';
 
-import { Container, Title, Text, Card, Stack, Group, Divider } from '@mantine/core';
+import {
+  Container,
+  Title,
+  Text,
+  Card,
+  Stack,
+  Group,
+  Divider,
+} from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useMantineColorScheme } from '@mantine/core';
 import { useLanguageStore } from '../shared/stores/languageStore';
@@ -19,7 +27,10 @@ export default function HomePage() {
             {t('welcome')}
           </Title>
           <Text size="lg" c="dimmed">
-            {t('home.description', 'A comprehensive health platform with AI-powered features')}
+            {t(
+              'home.description',
+              'A comprehensive health platform with AI-powered features'
+            )}
           </Text>
         </div>
 
@@ -30,7 +41,8 @@ export default function HomePage() {
             </Title>
             <Stack gap="xs">
               <Text>
-                <strong>{t('language')}:</strong> {language === 'fr' ? 'Français' : 'English'}
+                <strong>{t('language')}:</strong>{' '}
+                {language === 'fr' ? 'Français' : 'English'}
               </Text>
               <Text>
                 <strong>{t('theme.title', 'Theme')}:</strong> {colorScheme}
@@ -56,7 +68,10 @@ export default function HomePage() {
             {t('home.instructions', 'How to use')}
           </Title>
           <Text>
-            {t('home.instructionsText', 'Use the language and theme switchers in the navigation bar to change the interface language and appearance.')}
+            {t(
+              'home.instructionsText',
+              'Use the language and theme switchers in the navigation bar to change the interface language and appearance.'
+            )}
           </Text>
         </Card>
 

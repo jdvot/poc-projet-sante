@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import { Stack, Title } from '@mantine/core';
@@ -12,18 +12,22 @@ import DashboardDemo from './DashboardDemo';
 export function StoreDemo() {
   return (
     <Stack gap="xl">
-      <Title order={2} style={{ 
-        textAlign: 'center', 
-        background: 'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-purple-6))',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        fontSize: '2rem',
-        fontWeight: 700,
-      }}>
+      <Title
+        order={2}
+        style={{
+          textAlign: 'center',
+          background:
+            'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-purple-6))',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontSize: '2rem',
+          fontWeight: 700,
+        }}
+      >
         Zustand Stores Demo
       </Title>
-      
+
       <AuthStoreDemo />
       <ProfileStoreDemo />
       <ThemeStoreDemo />
@@ -32,4 +36,4 @@ export function StoreDemo() {
       <DashboardDemo />
     </Stack>
   );
-} 
+}

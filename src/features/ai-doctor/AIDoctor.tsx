@@ -1,5 +1,13 @@
 import React, { useMemo } from 'react';
-import { Container, Title, Card, Text, Stack, Progress, Badge } from '@mantine/core';
+import {
+  Container,
+  Title,
+  Card,
+  Text,
+  Stack,
+  Progress,
+  Badge,
+} from '@mantine/core';
 
 // Types pour une meilleure type safety
 interface AIRecommendation {
@@ -61,17 +69,17 @@ const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ confidence }) => {
       <Text size="sm" c="dimmed" id="confidence-label">
         Confiance de l&apos;IA
       </Text>
-      <Progress 
-        value={percentage} 
-        color="blue" 
+      <Progress
+        value={percentage}
+        color="blue"
         size="lg"
         aria-labelledby="confidence-label"
         aria-describedby="confidence-value"
       />
-      <Text 
-        size="xs" 
-        c="dimmed" 
-        ta="center" 
+      <Text
+        size="xs"
+        c="dimmed"
+        ta="center"
         id="confidence-value"
         aria-label={`Confiance: ${percentage}% - ${confidenceLabel}`}
       >
@@ -84,76 +92,84 @@ const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ confidence }) => {
 // Données mockées avec des IDs uniques
 const mockAIRecommendation: AIRecommendation = {
   id: 'rec-001',
-  recommendation: "Buvez plus d'eau et faites 30 min d'activité physique aujourd'hui !",
+  recommendation:
+    "Buvez plus d'eau et faites 30 min d'activité physique aujourd'hui !",
   confidence: 0.92,
-  category: "lifestyle",
-  urgency: "medium",
+  category: 'lifestyle',
+  urgency: 'medium',
   timestamp: new Date().toISOString(),
 };
 
 const AIDoctor: React.FC = () => {
   // Utilisation de useMemo pour éviter les recalculs inutiles
   const aiRecommendation = useMemo(() => mockAIRecommendation, []);
-  
-  const urgencyColor = useMemo(() => getUrgencyColor(aiRecommendation.urgency), [aiRecommendation.urgency]);
-  const urgencyLabel = useMemo(() => getUrgencyLabel(aiRecommendation.urgency), [aiRecommendation.urgency]);
-  const categoryLabel = useMemo(() => getCategoryLabel(aiRecommendation.category), [aiRecommendation.category]);
+
+  const urgencyColor = useMemo(
+    () => getUrgencyColor(aiRecommendation.urgency),
+    [aiRecommendation.urgency]
+  );
+  const urgencyLabel = useMemo(
+    () => getUrgencyLabel(aiRecommendation.urgency),
+    [aiRecommendation.urgency]
+  );
+  const categoryLabel = useMemo(
+    () => getCategoryLabel(aiRecommendation.category),
+    [aiRecommendation.category]
+  );
 
   return (
     <Container size="lg" py="xl">
       <Stack gap="xl">
-        <Title order={1} id="ai-doctor-title">🤖 AI Doctor</Title>
-        
-        <Card 
-          withBorder 
-          p="xl" 
-          role="region" 
-          aria-labelledby="ai-doctor-title"
-        >
+        <Title order={1} id="ai-doctor-title">
+          🤖 AI Doctor
+        </Title>
+
+        <Card withBorder p="xl" role="region" aria-labelledby="ai-doctor-title">
           <Stack gap="md">
-            <div 
-              style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center' 
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
               <Title order={2} size="h3" id="recommendation-title">
                 Recommandation IA
               </Title>
-              <Badge 
+              <Badge
                 color={urgencyColor}
                 aria-label={`Urgence: ${urgencyLabel}`}
               >
                 {urgencyLabel}
               </Badge>
             </div>
-            
-            <Text 
-              size="lg" 
+
+            <Text
+              size="lg"
               style={{ lineHeight: 1.6 }}
               aria-labelledby="recommendation-title"
               role="article"
             >
               {aiRecommendation.recommendation}
             </Text>
-            
+
             <ConfidenceBar confidence={aiRecommendation.confidence} />
-            
-            <Text 
-              size="sm" 
+
+            <Text
+              size="sm"
               c="dimmed"
               aria-label={`Catégorie de recommandation: ${categoryLabel}`}
             >
               Catégorie: {categoryLabel}
             </Text>
-            
-            <Text 
-              size="xs" 
+
+            <Text
+              size="xs"
               c="dimmed"
               aria-label={`Recommandation générée le ${new Date(aiRecommendation.timestamp).toLocaleString('fr-FR')}`}
             >
-              Généré le: {new Date(aiRecommendation.timestamp).toLocaleString('fr-FR')}
+              Généré le:{' '}
+              {new Date(aiRecommendation.timestamp).toLocaleString('fr-FR')}
             </Text>
           </Stack>
         </Card>

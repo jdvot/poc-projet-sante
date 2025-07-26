@@ -30,9 +30,7 @@ const renderWithProviders = (component: React.ReactElement) => {
   const testQueryClient = createTestQueryClient();
   return render(
     <QueryClientProvider client={testQueryClient}>
-      <MantineProvider>
-        {component}
-      </MantineProvider>
+      <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -85,13 +83,13 @@ describe('Dashboard', () => {
       // Utiliser getAllByText pour les éléments multiples
       const normalBadges = screen.getAllByText('Normal');
       expect(normalBadges.length).toBeGreaterThan(0);
-      
+
       const elevatedBadges = screen.getAllByText('Élevé');
       expect(elevatedBadges.length).toBeGreaterThan(0);
     });
   });
 
-  it('affiche le bouton d\'actualisation', () => {
+  it("affiche le bouton d'actualisation", () => {
     renderWithProviders(<Dashboard />);
     expect(screen.getByLabelText('Actualiser les données')).toBeInTheDocument();
   });
