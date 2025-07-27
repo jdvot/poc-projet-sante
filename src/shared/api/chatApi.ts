@@ -14,20 +14,6 @@ export interface ChatResponse {
   isNetworkError?: boolean;
 }
 
-// Fonction utilitaire pour convertir un fichier en base64
-async function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      const base64 = result.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = (error) => reject(error);
-  });
-}
-
 export async function postChatMessage(
   message: string,
   files: File[],
@@ -54,20 +40,10 @@ export async function postChatMessage(
     method: 'POST',
     headers: {
       ...headers,
-      'Content-Type': 'application/json',
+      // Remove Content-Type header to let the browser set it automatically for FormData
+      // This ensures the correct multipart/form-data boundary is set
     },
-    body: JSON.stringify({
-      message,
-      files: await Promise.all(
-        files.map(async (file) => ({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          content: await fileToBase64(file),
-        }))
-      ),
-      sessionId,
-    }),
+    body: formData,
   });
 
   if (!response.ok) {
