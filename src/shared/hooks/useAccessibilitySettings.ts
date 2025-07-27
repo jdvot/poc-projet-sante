@@ -1,46 +1,172 @@
-import { useEffect } from 'react';
-import { useUserPreferencesStore } from '../stores/userPreferencesStore';
+import { useState, useEffect } from 'react';
 
-export function useAccessibilitySettings() {
-  const { preferences } = useUserPreferencesStore();
+interface AccessibilitySettings {
+  prefersReducedMotion: boolean;
+  prefersHighContrast: boolean;
+  prefersDarkMode: boolean;
+  fontSize: 'small' | 'medium' | 'large';
+  lineHeight: 'tight' | 'normal' | 'relaxed';
+}
+
+export const useAccessibilitySettings = () => {
+  const [settings, setSettings] = useState<AccessibilitySettings>({
+    prefersReducedMotion: false,
+    prefersHighContrast: false,
+    prefersDarkMode: false,
+    fontSize: 'medium',
+    lineHeight: 'normal',
+  });
 
   useEffect(() => {
-    // Apply font size
-    const root = document.documentElement;
-    const fontSizeMap = {
-      small: '14px',
-      medium: '16px',
-      large: '18px',
+    // Détection des préférences système
+    const mediaQueries = {
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
+      highContrast: window.matchMedia('(prefers-contrast: high)'),
+      darkMode: window.matchMedia('(prefers-color-scheme: dark)'),
     };
 
-    root.style.fontSize = fontSizeMap[preferences.accessibility.fontSize];
+    // Fonction de mise à jour des paramètres
+    const updateSettings = () => {
+      setSettings((prev) => ({
+        ...prev,
+        prefersReducedMotion: mediaQueries.reducedMotion.matches,
+        prefersHighContrast: mediaQueries.highContrast.matches,
+        prefersDarkMode: mediaQueries.darkMode.matches,
+      }));
+    };
 
-    // Apply high contrast
-    if (preferences.accessibility.highContrast) {
-      root.style.setProperty('--mantine-color-text', '#000000');
-      root.style.setProperty('--mantine-color-body', '#ffffff');
-      root.style.setProperty('--mantine-color-gray-0', '#ffffff');
-      root.style.setProperty('--mantine-color-gray-9', '#000000');
+    // Écouteurs d'événements pour les changements de préférences
+    const listeners = [
+      () =>
+        mediaQueries.reducedMotion.addEventListener('change', updateSettings),
+      () =>
+        mediaQueries.highContrast.addEventListener('change', updateSettings),
+      () => mediaQueries.darkMode.addEventListener('change', updateSettings),
+    ];
+
+    // Initialisation
+    updateSettings();
+
+    // Ajout des écouteurs
+    listeners.forEach((listener) => listener());
+
+    // Nettoyage
+    return () => {
+      mediaQueries.reducedMotion.removeEventListener('change', updateSettings);
+      mediaQueries.highContrast.removeEventListener('change', updateSettings);
+      mediaQueries.darkMode.removeEventListener('change', updateSettings);
+    };
+  }, []);
+
+  // Application des paramètres d'accessibilité au DOM
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Application des préférences de mouvement réduit
+    if (settings.prefersReducedMotion) {
+      root.style.setProperty('--transition-duration', '0.1s');
+      root.style.setProperty('--animation-duration', '0.1s');
     } else {
-      // Reset to default values
-      root.style.removeProperty('--mantine-color-text');
-      root.style.removeProperty('--mantine-color-body');
-      root.style.removeProperty('--mantine-color-gray-0');
-      root.style.removeProperty('--mantine-color-gray-9');
+      root.style.setProperty('--transition-duration', '0.3s');
+      root.style.setProperty('--animation-duration', '0.3s');
     }
 
-    // Apply reduced motion
-    if (preferences.accessibility.reducedMotion) {
-      root.style.setProperty('--mantine-transition-duration', '0.1s');
-      root.style.setProperty(
-        '--mantine-transition-timing-function',
-        'ease-out'
-      );
-    } else {
-      root.style.removeProperty('--mantine-transition-duration');
-      root.style.removeProperty('--mantine-transition-timing-function');
+    // Application des préférences de contraste élevé
+    if (settings.prefersHighContrast) {
+      root.style.setProperty('--mantine-color-gray-1', '#f8f9fa');
+      root.style.setProperty('--mantine-color-gray-2', '#e9ecef');
+      root.style.setProperty('--mantine-color-gray-3', '#dee2e6');
+      root.style.setProperty('--mantine-color-gray-4', '#ced4da');
+      root.style.setProperty('--mantine-color-gray-5', '#adb5bd');
     }
-  }, [preferences.accessibility]);
 
-  return preferences.accessibility;
-}
+    // Application des préférences de taille de police
+    const fontSizeMap = {
+      small: '0.875rem',
+      medium: '1rem',
+      large: '1.125rem',
+    };
+
+    const lineHeightMap = {
+      tight: '1.4',
+      normal: '1.6',
+      relaxed: '1.8',
+    };
+
+    root.style.setProperty('--base-font-size', fontSizeMap[settings.fontSize]);
+    root.style.setProperty(
+      '--base-line-height',
+      lineHeightMap[settings.lineHeight]
+    );
+  }, [settings]);
+
+  // Fonctions pour modifier les paramètres
+  const updateFontSize = (size: AccessibilitySettings['fontSize']) => {
+    setSettings((prev) => ({ ...prev, fontSize: size }));
+  };
+
+  const updateLineHeight = (height: AccessibilitySettings['lineHeight']) => {
+    setSettings((prev) => ({ ...prev, lineHeight: height }));
+  };
+
+  // Fonction pour obtenir les classes CSS appropriées
+  const getAccessibilityClasses = () => {
+    const classes = [];
+
+    if (settings.prefersReducedMotion) {
+      classes.push('prefers-reduced-motion');
+    }
+
+    if (settings.prefersHighContrast) {
+      classes.push('prefers-high-contrast');
+    }
+
+    if (settings.fontSize !== 'medium') {
+      classes.push(`font-size-${settings.fontSize}`);
+    }
+
+    if (settings.lineHeight !== 'normal') {
+      classes.push(`line-height-${settings.lineHeight}`);
+    }
+
+    return classes.join(' ');
+  };
+
+  // Fonction pour obtenir les styles CSS appropriés
+  const getAccessibilityStyles = () => {
+    const styles: React.CSSProperties = {};
+
+    if (settings.prefersReducedMotion) {
+      styles.transition = 'none';
+      styles.animation = 'none';
+    }
+
+    if (settings.fontSize !== 'medium') {
+      const fontSizeMap = {
+        small: '0.875rem',
+        medium: '1rem',
+        large: '1.125rem',
+      };
+      styles.fontSize = fontSizeMap[settings.fontSize];
+    }
+
+    if (settings.lineHeight !== 'normal') {
+      const lineHeightMap = {
+        tight: '1.4',
+        normal: '1.6',
+        relaxed: '1.8',
+      };
+      styles.lineHeight = lineHeightMap[settings.lineHeight];
+    }
+
+    return styles;
+  };
+
+  return {
+    settings,
+    updateFontSize,
+    updateLineHeight,
+    getAccessibilityClasses,
+    getAccessibilityStyles,
+  };
+};

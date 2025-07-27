@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Local environment startup script
+# Script de démarrage local avec n8n Docker
+# Usage: ./scripts/start-local.sh [mode]
+
 set -e
 
 # Couleurs pour les messages
@@ -10,182 +12,175 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to display messages
-log() {
-    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+# Fonctions d'affichage
+print_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
 }
 
-warn() {
-    echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}"
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
 }
 
-error() {
-    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}"
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Vérifier si Docker est installé
+if ! command -v docker &> /dev/null; then
+    print_error "Docker n'est pas installé. Veuillez installer Docker d'abord."
     exit 1
-}
+fi
 
-info() {
-    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')] INFO: $1${NC}"
-}
+if ! command -v docker-compose &> /dev/null; then
+    print_error "Docker Compose n'est pas installé. Veuillez installer Docker Compose d'abord."
+    exit 1
+fi
 
-# Variables
-ENVIRONMENT=${1:-local}
-SERVICES=${2:-app}
+# Mode par défaut
+MODE=${1:-"full"}
 
-# Function to check prerequisites
-check_prerequisites() {
-    log "Checking prerequisites..."
-    
-    # Check Docker
-    if ! command -v docker &> /dev/null; then
-        error "Docker is not installed"
-    fi
-    
-    # Check Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
-        error "Docker Compose is not installed"
-    fi
-    
-    # Check if we are in the correct directory
-    if [ ! -f "package.json" ]; then
-        error "package.json file does not exist. Make sure you are in the project directory."
-    fi
-    
-    log "Prerequisites checked successfully"
-}
+print_info "🚀 Démarrage de l'environnement local Limitless Health"
+print_info "Mode: $MODE"
 
-# Function to setup environment
-setup_environment() {
-    log "Setting up environment..."
-    
-    # Create .env.local file if it doesn't exist
-    if [ ! -f ".env.local" ]; then
-        info "Creating .env.local file..."
-        ./scripts/setup-env.sh local
-    fi
-    
-    log "Environment configured"
-}
+# Vérifier si le fichier .env.local existe
+if [ ! -f ".env.local" ]; then
+    print_warning "Fichier .env.local non trouvé. Création depuis l'exemple..."
+    cp env.local.example .env.local
+    print_success "Fichier .env.local créé"
+fi
 
-# Function to start services
+# Fonction pour démarrer les services
 start_services() {
-    log "Starting services..."
+    local services=$1
+    print_info "Démarrage des services: $services"
     
-    case $SERVICES in
+    case $services in
         "app")
-            info "Starting application only..."
-            docker-compose -f docker-compose.local.yml up -d app
-            ;;
-        "full")
-            info "Starting all services..."
-            docker-compose -f docker-compose.local.yml up -d
-            ;;
-        "database")
-            info "Starting with database..."
-            docker-compose -f docker-compose.local.yml --profile database up -d
+            docker-compose -f docker-compose.local.yml up app -d
             ;;
         "n8n")
-            info "Starting with n8n..."
+            docker-compose -f docker-compose.local.yml --profile n8n up n8n -d
+            ;;
+        "full")
             docker-compose -f docker-compose.local.yml --profile n8n up -d
             ;;
-        "all")
-            info "Starting all services with profiles..."
-            docker-compose -f docker-compose.local.yml --profile database --profile cache --profile n8n up -d
+        "database")
+            docker-compose -f docker-compose.local.yml --profile database up postgres -d
+            ;;
+        "cache")
+            docker-compose -f docker-compose.local.yml --profile cache up redis -d
             ;;
         *)
-            error "Unknown service: $SERVICES"
+            print_error "Mode inconnu: $services"
+            print_info "Modes disponibles: app, n8n, full, database, cache"
+            exit 1
             ;;
     esac
-    
-    log "Services started"
 }
 
-# Function to check status
-check_status() {
-    log "Checking service status..."
+# Fonction pour vérifier les services
+check_services() {
+    print_info "Vérification des services..."
     
-    # Wait for application to be ready
-    info "Waiting for application to start..."
-    for i in {1..30}; do
-        if curl -f http://localhost:3000/api/health > /dev/null 2>&1; then
-            log "Application ready!"
-            break
-        fi
-        
-        if [ $i -eq 30 ]; then
-            warn "Application is not ready after 30 seconds"
-        else
-            info "Waiting... ($i/30)"
-            sleep 1
-        fi
-    done
-    
-    # Display URLs
-    echo ""
-    log "Available services:"
-    echo "  🌐 Application: http://localhost:3000"
-    echo "  📊 Health Check: http://localhost:3000/api/health"
-    echo "  📈 Metrics: http://localhost:3000/api/metrics"
-    
-    if [ "$SERVICES" = "database" ] || [ "$SERVICES" = "all" ]; then
-        echo "  🗄️  PostgreSQL: localhost:5432"
+    # Vérifier l'application Next.js
+    if curl -s http://localhost:3000/api/health > /dev/null 2>&1; then
+        print_success "✅ Application Next.js: http://localhost:3000"
+    else
+        print_warning "⚠️  Application Next.js: En cours de démarrage..."
     fi
     
-    if [ "$SERVICES" = "n8n" ] || [ "$SERVICES" = "all" ]; then
-        echo "  🔗 n8n: http://localhost:5678 (admin/admin123)"
+    # Vérifier n8n
+    if curl -s http://localhost:5678 > /dev/null 2>&1; then
+        print_success "✅ n8n: http://localhost:5678"
+        print_info "   Login: admin / admin123"
+    else
+        print_warning "⚠️  n8n: En cours de démarrage..."
     fi
-    
-    if [ "$SERVICES" = "all" ]; then
-        echo "  🔴 Redis: localhost:6379"
-    fi
-    
-    echo ""
 }
 
-# Function to display help
-show_help() {
-    echo "Usage: $0 [ENVIRONMENT] [SERVICES]"
+# Fonction pour afficher les URLs
+show_urls() {
     echo ""
-    echo "Environments:"
-    echo "  local       - Local environment (default)"
+    print_info "🌐 URLs d'accès:"
+    echo "   Application: http://localhost:3000"
+    echo "   AI Chat: http://localhost:3000/ai-chat"
+    echo "   n8n: http://localhost:5678"
+    echo "   n8n Login: admin / admin123"
     echo ""
-    echo "Services:"
-    echo "  app         - Application only (default)"
-    echo "  full        - All basic services"
-    echo "  database    - With PostgreSQL database"
-    echo "  n8n         - With n8n for webhooks"
-    echo "  all         - All services (app, db, redis, n8n)"
-    echo ""
-    echo "Examples:"
-    echo "  $0                    # Application only"
-    echo "  $0 local app          # Application only"
-    echo "  $0 local database     # With database"
-    echo "  $0 local n8n          # With n8n"
-    echo "  $0 local all          # All services"
+    print_info "📋 Prochaines étapes:"
+    echo "   1. Ouvrir n8n: http://localhost:5678"
+    echo "   2. Importer le workflow: n8n-workflow-ai-chat.json"
+    echo "   3. Activer le workflow"
+    echo "   4. Tester l'AI Chat: http://localhost:3000/ai-chat"
 }
 
-# Main function
-main() {
-    # Display help if requested
-    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-        show_help
+# Démarrage selon le mode
+case $MODE in
+    "app")
+        start_services "app"
+        ;;
+    "n8n")
+        start_services "n8n"
+        ;;
+    "full")
+        start_services "full"
+        ;;
+    "database")
+        start_services "database"
+        ;;
+    "cache")
+        start_services "cache"
+        ;;
+    "stop")
+        print_info "Arrêt des services..."
+        docker-compose -f docker-compose.local.yml down
+        print_success "Services arrêtés"
         exit 0
-    fi
-    
-    log "Starting local environment: $ENVIRONMENT, services: $SERVICES"
-    
-    check_prerequisites
-    setup_environment
-    start_services
-    check_status
-    
-    log "Local environment ready!"
-    info "Use 'docker-compose -f docker-compose.local.yml logs -f' to view logs"
-    info "Use 'docker-compose -f docker-compose.local.yml down' to stop"
-}
+        ;;
+    "restart")
+        print_info "Redémarrage des services..."
+        docker-compose -f docker-compose.local.yml down
+        docker-compose -f docker-compose.local.yml --profile n8n up -d
+        ;;
+    "logs")
+        docker-compose -f docker-compose.local.yml logs -f
+        exit 0
+        ;;
+    "status")
+        docker-compose -f docker-compose.local.yml ps
+        exit 0
+        ;;
+    *)
+        print_error "Mode inconnu: $MODE"
+        echo ""
+        print_info "Modes disponibles:"
+        echo "   app      - Application Next.js uniquement"
+        echo "   n8n      - n8n uniquement"
+        echo "   full     - Application + n8n (recommandé)"
+        echo "   database - Base de données PostgreSQL"
+        echo "   cache    - Cache Redis"
+        echo "   stop     - Arrêter tous les services"
+        echo "   restart  - Redémarrer tous les services"
+        echo "   logs     - Afficher les logs"
+        echo "   status   - Statut des services"
+        echo ""
+        print_info "Exemple: ./scripts/start-local.sh full"
+        exit 1
+        ;;
+esac
 
-# Error handling
-trap 'error "Startup interrupted"' INT TERM
+# Attendre que les services démarrent
+print_info "Attente du démarrage des services..."
+sleep 10
 
-# Execution
-main "$@" 
+# Vérifier les services
+check_services
+
+# Afficher les URLs
+show_urls
+
+print_success "🎉 Environnement local démarré avec succès!" 

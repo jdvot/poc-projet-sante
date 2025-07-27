@@ -15,6 +15,7 @@ import {
   Paper,
   Divider,
   useMantineColorScheme,
+  useMantineTheme,
 } from '@mantine/core';
 import {
   IconUser,
@@ -43,14 +44,29 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   const { profileT } = useProfileTranslations();
   const unitConversion = useUnitConversion();
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
 
   return (
-    <Stack gap="xl" data-testid="profile-form-fields">
+    <Stack
+      gap="xl"
+      data-testid="profile-form-fields"
+      role="group"
+      aria-labelledby="form-fields-title"
+    >
       {/* Personal Information Section */}
       <Box>
         <Group gap="xs" mb="md">
-          <IconUser size={20} color="var(--mantine-color-blue-6)" />
-          <Text fw={600} size="lg">
+          <IconUser
+            size={20}
+            style={{ color: theme.colors.blue[6] }}
+            aria-hidden="true"
+          />
+          <Text
+            id="form-fields-title"
+            fw={600}
+            size="lg"
+            style={{ color: theme.colors.blue[colorScheme === 'dark' ? 4 : 7] }}
+          >
             {profileT.personalInfo.title}
           </Text>
         </Group>
@@ -82,6 +98,10 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   leftSection={<IconUser size={16} />}
                   radius="md"
                   description={profileT.form.descriptions.name}
+                  aria-describedby={
+                    errors.name?.message ? 'name-error' : 'name-description'
+                  }
+                  aria-invalid={!!errors.name}
                 />
               )}
             />
@@ -111,6 +131,10 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   leftSection={<IconMail size={16} />}
                   radius="md"
                   description={profileT.form.descriptions.email}
+                  aria-describedby={
+                    errors.email?.message ? 'email-error' : 'email-description'
+                  }
+                  aria-invalid={!!errors.email}
                 />
               )}
             />
@@ -137,13 +161,17 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   error={errors.age?.message as string}
-                  min={0}
-                  max={150}
                   required
                   disabled={isLoading}
                   leftSection={<IconCalendar size={16} />}
                   radius="md"
+                  min={1}
+                  max={120}
                   description={profileT.form.descriptions.age}
+                  aria-describedby={
+                    errors.age?.message ? 'age-error' : 'age-description'
+                  }
+                  aria-invalid={!!errors.age}
                 />
               )}
             />
@@ -167,12 +195,19 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   value={field.value}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
-                  data={GENDER_OPTIONS}
+                  error={errors.gender?.message as string}
                   required
                   disabled={isLoading}
                   leftSection={<IconGenderMale size={16} />}
                   radius="md"
+                  data={GENDER_OPTIONS}
                   description="Utilisé pour les calculs de santé personnalisés"
+                  aria-describedby={
+                    errors.gender?.message
+                      ? 'gender-error'
+                      : 'gender-description'
+                  }
+                  aria-invalid={!!errors.gender}
                 />
               )}
             />
@@ -180,18 +215,23 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         </Stack>
       </Box>
 
-      <Divider />
-
       {/* Physical Measurements Section */}
       <Box>
         <Group gap="xs" mb="md">
-          <IconRuler size={20} color="var(--mantine-color-green-6)" />
-          <Text fw={600} size="lg">
+          <IconRuler
+            size={20}
+            style={{ color: theme.colors.green[6] }}
+            aria-hidden="true"
+          />
+          <Text
+            fw={600}
+            size="lg"
+            style={{
+              color: theme.colors.green[colorScheme === 'dark' ? 4 : 7],
+            }}
+          >
             Mesures physiques
           </Text>
-          <Tooltip label="Ces mesures sont utilisées pour calculer votre IMC et vos besoins caloriques">
-            <IconInfoCircle size={16} color="var(--mantine-color-dimmed)" />
-          </Tooltip>
         </Group>
 
         <Stack gap="md">
@@ -204,33 +244,42 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   label={
                     <Group gap="xs">
                       <Text size="sm" fw={500}>
-                        Taille
+                        {profileT.form.fields.height}
                       </Text>
-                      <Badge size="xs" variant="light" color="green">
-                        {unitConversion.height.unit === 'ft'
-                          ? 'Pieds'
-                          : 'Centimètres'}
-                      </Badge>
+                      <Tooltip label="Informations sur la taille">
+                        <IconInfoCircle
+                          size={14}
+                          style={{ color: theme.colors.gray[5] }}
+                        />
+                      </Tooltip>
                     </Group>
                   }
-                  placeholder={
-                    unitConversion.height.unit === 'ft' ? '5.7' : '170'
-                  }
+                  placeholder={profileT.form.placeholders.height}
                   value={field.value}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   error={errors.height?.message as string}
-                  min={unitConversion.height.unit === 'ft' ? 1.5 : 50}
-                  max={unitConversion.height.unit === 'ft' ? 10 : 300}
-                  required
                   disabled={isLoading}
                   leftSection={<IconRuler size={16} />}
-                  radius="md"
-                  description={
-                    unitConversion.height.unit === 'ft'
-                      ? 'Votre taille en pieds (ex: 5.7 pour 5 pieds 7 pouces)'
-                      : 'Votre taille en centimètres'
+                  rightSection={
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      style={{ paddingRight: '0.5rem' }}
+                    >
+                      {unitConversion.height.unit}
+                    </Text>
                   }
+                  radius="md"
+                  min={0}
+                  max={300}
+                  description={profileT.form.descriptions.height}
+                  aria-describedby={
+                    errors.height?.message
+                      ? 'height-error'
+                      : 'height-description'
+                  }
+                  aria-invalid={!!errors.height}
                 />
               )}
             />
@@ -243,33 +292,42 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
                   label={
                     <Group gap="xs">
                       <Text size="sm" fw={500}>
-                        Poids
+                        {profileT.form.fields.weight}
                       </Text>
-                      <Badge size="xs" variant="light" color="green">
-                        {unitConversion.weight.unit === 'lbs'
-                          ? 'Livres'
-                          : 'Kilogrammes'}
-                      </Badge>
+                      <Tooltip label="Informations sur le poids">
+                        <IconInfoCircle
+                          size={14}
+                          style={{ color: theme.colors.gray[5] }}
+                        />
+                      </Tooltip>
                     </Group>
                   }
-                  placeholder={
-                    unitConversion.weight.unit === 'lbs' ? '154' : '70'
-                  }
+                  placeholder={profileT.form.placeholders.weight}
                   value={field.value}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   error={errors.weight?.message as string}
-                  min={unitConversion.weight.unit === 'lbs' ? 44 : 20}
-                  max={unitConversion.weight.unit === 'lbs' ? 661 : 300}
-                  required
                   disabled={isLoading}
                   leftSection={<IconScale size={16} />}
-                  radius="md"
-                  description={
-                    unitConversion.weight.unit === 'lbs'
-                      ? 'Votre poids en livres'
-                      : 'Votre poids en kilogrammes'
+                  rightSection={
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      style={{ paddingRight: '0.5rem' }}
+                    >
+                      {unitConversion.weight.unit}
+                    </Text>
                   }
+                  radius="md"
+                  min={0}
+                  max={500}
+                  description={profileT.form.descriptions.weight}
+                  aria-describedby={
+                    errors.weight?.message
+                      ? 'weight-error'
+                      : 'weight-description'
+                  }
+                  aria-invalid={!!errors.weight}
                 />
               )}
             />
@@ -277,34 +335,95 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         </Stack>
       </Box>
 
-      {/* Test data for debugging */}
-      <div style={{ display: 'none' }}>
-        <div data-testid="is-loading">{isLoading.toString()}</div>
-        <div data-testid="errors-count">{Object.keys(errors).length}</div>
-      </div>
+      {/* Error Messages with proper ARIA */}
+      {Object.keys(errors).length > 0 && (
+        <Box role="alert" aria-live="polite">
+          <Stack gap="xs">
+            {errors.name && (
+              <Text id="name-error" size="sm" c="red" fw={500}>
+                {errors.name.message as string}
+              </Text>
+            )}
+            {errors.email && (
+              <Text id="email-error" size="sm" c="red" fw={500}>
+                {errors.email.message as string}
+              </Text>
+            )}
+            {errors.age && (
+              <Text id="age-error" size="sm" c="red" fw={500}>
+                {errors.age.message as string}
+              </Text>
+            )}
+            {errors.gender && (
+              <Text id="gender-error" size="sm" c="red" fw={500}>
+                {errors.gender.message as string}
+              </Text>
+            )}
+            {errors.height && (
+              <Text id="height-error" size="sm" c="red" fw={500}>
+                {errors.height.message as string}
+              </Text>
+            )}
+            {errors.weight && (
+              <Text id="weight-error" size="sm" c="red" fw={500}>
+                {errors.weight.message as string}
+              </Text>
+            )}
+          </Stack>
+        </Box>
+      )}
 
-      {/* Information Box */}
-      <Paper
-        p="md"
-        radius="md"
-        withBorder
-        style={{
-          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-        }}
-      >
-        <Group gap="xs" mb="xs">
-          <IconInfoCircle size={16} color="var(--mantine-color-blue-6)" />
-          <Text size="sm" fw={600} c="blue.6">
-            Informations importantes
-          </Text>
-        </Group>
-        <Text size="sm" c="dimmed">
-          Vos mesures sont utilisées pour calculer votre Indice de Masse
-          Corporelle (IMC), votre poids idéal et vos besoins caloriques
-          quotidiens. Ces informations restent confidentielles et ne sont
-          partagées qu&apos;avec votre consentement.
+      {/* Descriptions with proper ARIA */}
+      <Box aria-hidden="true">
+        <Text
+          id="name-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          {profileT.form.descriptions.name}
         </Text>
-      </Paper>
+        <Text
+          id="email-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          {profileT.form.descriptions.email}
+        </Text>
+        <Text
+          id="age-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          {profileT.form.descriptions.age}
+        </Text>
+        <Text
+          id="gender-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          Utilisé pour les calculs de santé personnalisés
+        </Text>
+        <Text
+          id="height-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          {profileT.form.descriptions.height}
+        </Text>
+        <Text
+          id="weight-description"
+          size="xs"
+          c="dimmed"
+          style={{ display: 'none' }}
+        >
+          {profileT.form.descriptions.weight}
+        </Text>
+      </Box>
     </Stack>
   );
 };

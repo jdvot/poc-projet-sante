@@ -3,7 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import '@testing-library/jest-dom';
 import AIChat from './AIChat';
+
+// Mock scrollTo pour les tests
+Object.defineProperty(window.HTMLElement.prototype, 'scrollTo', {
+  value: vi.fn(),
+  writable: true,
+});
 
 // Mock des hooks
 vi.mock('../../../shared/stores/chatStore', () => ({

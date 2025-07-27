@@ -11,12 +11,14 @@ import {
 import { useTranslation } from 'react-i18next';
 import { IconLanguage, IconChevronDown } from '@tabler/icons-react';
 import { useLanguageStore } from '../stores/languageStore';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { useEffect, useState, useMemo } from 'react';
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const { language, setLanguage } = useLanguageStore();
   const { colorScheme } = useMantineColorScheme();
+  const { isDark, colors, transitions } = useAppTheme();
   const [mounted, setMounted] = useState(false);
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
 
@@ -64,43 +66,60 @@ export function LanguageSwitcher() {
   const currentLanguage =
     languages.find((lang) => lang.code === language) || languages[0];
 
-  const buttonStyles = {
-    background:
-      actualTheme === 'dark'
-        ? 'var(--mantine-color-dark-4)'
+  const buttonStyles = useMemo(
+    () => ({
+      background: isDark
+        ? 'var(--mantine-color-dark-5)'
         : 'var(--mantine-color-gray-0)',
-    border: `1px solid ${
-      actualTheme === 'dark'
-        ? 'var(--mantine-color-dark-3)'
-        : 'var(--mantine-color-gray-3)'
-    }`,
-    color:
-      actualTheme === 'dark'
-        ? 'var(--mantine-color-gray-3)'
-        : 'var(--mantine-color-gray-7)',
-    fontWeight: 500,
-    transition: 'all 0.2s ease',
-  };
+      border: `1.5px solid ${
+        isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'
+      }`,
+      color: isDark
+        ? 'var(--mantine-color-gray-2)'
+        : 'var(--mantine-color-gray-8)',
+      fontWeight: 600,
+      fontSize: '0.875rem',
+      padding: '0.5rem 0.875rem',
+      borderRadius: '1.25rem',
+      transition: transitions.normal,
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+      '&:hover': {
+        background: isDark
+          ? 'var(--mantine-color-dark-4)'
+          : 'var(--mantine-color-gray-1)',
+        borderColor: isDark
+          ? 'var(--mantine-color-dark-2)'
+          : 'var(--mantine-color-gray-4)',
+        transform: 'translateY(-1px)',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+      },
+    }),
+    [isDark, transitions]
+  );
 
-  const dropdownStyles = {
-    border: `1px solid ${
-      actualTheme === 'dark'
-        ? 'var(--mantine-color-dark-4)'
-        : 'var(--mantine-color-gray-3)'
-    }`,
-    borderRadius: '0.75rem',
-    boxShadow:
-      actualTheme === 'dark'
-        ? '0 4px 12px rgba(0, 0, 0, 0.3)'
-        : '0 4px 12px rgba(0, 0, 0, 0.15)',
-    background:
-      actualTheme === 'dark'
+  const dropdownStyles = useMemo(
+    () => ({
+      border: `1.5px solid ${
+        isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'
+      }`,
+      borderRadius: '1rem',
+      boxShadow: isDark
+        ? '0 8px 25px rgba(0, 0, 0, 0.3)'
+        : '0 8px 25px rgba(0, 0, 0, 0.15)',
+      background: isDark
         ? 'var(--mantine-color-dark-6)'
         : 'var(--mantine-color-body)',
-  };
+      padding: '0.5rem',
+    }),
+    [isDark]
+  );
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <Menu shadow="md" width={200} position="bottom-end">
+    <Menu shadow="md" width={200} position="bottom-end" zIndex={1001}>
       <Menu.Target>
         <Button
           variant="light"
@@ -108,32 +127,11 @@ export function LanguageSwitcher() {
           leftSection={<IconLanguage size={16} />}
           rightSection={<IconChevronDown size={14} />}
           style={buttonStyles}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background =
-              actualTheme === 'dark'
-                ? 'var(--mantine-color-dark-3)'
-                : 'var(--mantine-color-gray-1)';
-            e.currentTarget.style.borderColor =
-              actualTheme === 'dark'
-                ? 'var(--mantine-color-dark-2)'
-                : 'var(--mantine-color-gray-4)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background =
-              actualTheme === 'dark'
-                ? 'var(--mantine-color-dark-4)'
-                : 'var(--mantine-color-gray-0)';
-            e.currentTarget.style.borderColor =
-              actualTheme === 'dark'
-                ? 'var(--mantine-color-dark-3)'
-                : 'var(--mantine-color-gray-3)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
+          className="hover:no-underline"
         >
           <Group gap="xs" align="center">
             <Text size="lg">{currentLanguage.flag}</Text>
-            <Text size="sm" fw={500}>
+            <Text size="sm" fw={600}>
               {currentLanguage.name}
             </Text>
           </Group>
@@ -147,56 +145,53 @@ export function LanguageSwitcher() {
             onClick={() => handleLanguageChange(lang.code as 'en' | 'fr')}
             style={{
               padding: '0.75rem 1rem',
-              fontWeight: 500,
-              transition: 'all 0.2s ease',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              transition: transitions.normal,
+              borderRadius: '0.75rem',
+              margin: '0.125rem',
               color:
                 language === lang.code
-                  ? 'var(--mantine-color-blue-6)'
-                  : actualTheme === 'dark'
+                  ? 'white'
+                  : isDark
                     ? 'var(--mantine-color-gray-3)'
                     : 'var(--mantine-color-gray-7)',
               background:
                 language === lang.code
-                  ? actualTheme === 'dark'
-                    ? 'var(--mantine-color-blue-9)'
-                    : 'var(--mantine-color-blue-0)'
+                  ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
                   : 'transparent',
+              '&:hover': {
+                background:
+                  language === lang.code
+                    ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
+                    : isDark
+                      ? 'var(--mantine-color-dark-4)'
+                      : 'var(--mantine-color-gray-0)',
+                color:
+                  language === lang.code
+                    ? 'white'
+                    : isDark
+                      ? 'var(--mantine-color-gray-1)'
+                      : 'var(--mantine-color-gray-9)',
+                transform: 'translateY(-1px)',
+              },
             }}
-            onMouseEnter={(e) => {
-              if (language !== lang.code) {
-                e.currentTarget.style.background =
-                  actualTheme === 'dark'
-                    ? 'var(--mantine-color-dark-4)'
-                    : 'var(--mantine-color-gray-0)';
-                e.currentTarget.style.color =
-                  actualTheme === 'dark'
-                    ? 'var(--mantine-color-gray-1)'
-                    : 'var(--mantine-color-gray-9)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (language !== lang.code) {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color =
-                  actualTheme === 'dark'
-                    ? 'var(--mantine-color-gray-3)'
-                    : 'var(--mantine-color-gray-7)';
-              }
-            }}
+            className="hover:no-underline"
           >
             <Group gap="sm" align="center">
               <Text size="lg">{lang.flag}</Text>
-              <Text size="sm" fw={500}>
+              <Text size="sm" fw={600}>
                 {lang.name}
               </Text>
               {language === lang.code && (
                 <Box
                   style={{
-                    width: '6px',
-                    height: '6px',
+                    width: '8px',
+                    height: '8px',
                     borderRadius: '50%',
-                    background: 'var(--mantine-color-blue-6)',
+                    background: 'white',
                     marginLeft: 'auto',
+                    boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
                   }}
                 />
               )}

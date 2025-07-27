@@ -1,0 +1,109 @@
+{
+  "name": "My workflow (enhanced + llm response)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "1659dd2d-16df-4304-9871-6c4bda96558a",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [-1424, -192],
+      "webhookId": "7fcf1274-2e93-4611-88d4-ba8beef56f82"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validation et préparation des données\nconst message = $input.first().json.message;\nconst files = $input.first().json.files || [];\nconst timestamp = $input.first().json.timestamp;\nconst sessionId = $input.first().json.sessionId || 'default';\nconst systemPrompt = $input.first().json.systemPrompt || '';\n\nif (!message && files.length === 0) {\n  throw new Error('Either message or at least one file is required');\n}\n\nif (message && message.length > 1000) {\n  throw new Error('Message is too long (max 1000 characters)');\n}\n\nconst context = {\n  message,\n  files: files.map(file => ({\n    name: file.name,\n    size: file.size,\n    type: file.type,\n    hasContent: !!file.content\n  })),\n  timestamp,\n  sessionId,\n  systemPrompt,\n  processingStart: new Date().toISOString()\n};\n\nlet contentType = 'text';\nif (files.length > 0) {\n  const fileTypes = files.map(f => f.type);\n  if (fileTypes.some(t => t.startsWith('image/'))) {\n    contentType = 'multimodal';\n  } else if (fileTypes.some(t => t.includes('pdf') || t.includes('document'))) {\n    contentType = 'document';\n  }\n}\n\nreturn [{\n  json: {\n    ...context,\n    contentType,\n    hasFiles: files.length > 0,\n    fileCount: files.length\n  }\n}];"
+      },
+      "id": "9f5992e3-af6d-44ec-8250-33eee46a6387",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1200, -192]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Préparer le contexte pour le LLM\nconst input = $input.first().json;\nconst fileData = input.$node?.[\"Process Files\"]?.json || {};\n\nlet userPrompt = '';\nif (input.message) {\n  userPrompt += `Message de l'utilisateur: ${input.message}\\n\\n`;\n}\nif (fileData.fileAnalyses && fileData.fileAnalyses.length > 0) {\n  userPrompt += 'Fichiers joints:\\n';\n  fileData.fileAnalyses.forEach(analysis => {\n    userPrompt += `- ${analysis.fileName}: ${analysis.summary}\\n`;\n    if (analysis.extractedText) {\n      userPrompt += `  Contenu: ${analysis.extractedText}\\n`;\n    }\n  });\n  userPrompt += '\\n';\n}\n\nconst defaultSystemPrompt = `Vous êtes un assistant médical IA spécialisé dans l'analyse de santé. Répondez de manière professionnelle, claire et bienveillante. Si vous détectez des informations médicales importantes, suggérez toujours de consulter un professionnel de santé.`;\nconst systemPrompt = input.systemPrompt || defaultSystemPrompt;\n\nif (fileData.hasImages) {\n  userPrompt += 'Note: Des images ont été jointes. Analysez-les pour détecter d\\'éventuels problèmes visuels ou anomalies.\\n';\n}\nif (fileData.hasDocuments) {\n  userPrompt += 'Note: Des documents médicaux ont été joints. Analysez leur contenu pour fournir des insights pertinents.\\n';\n}\nuserPrompt += '\\nVeuillez fournir une réponse détaillée et utile.\\n';\n\nreturn [{\n  json: {\n    prompt: userPrompt,\n    systemPrompt,\n    sessionId: input.sessionId,\n    timestamp: input.timestamp,\n    hasFiles: input.hasFiles,\n    fileCount: input.fileCount,\n    contentType: input.contentType\n  }\n}];"
+      },
+      "id": "9c8bf2ea-6e93-408d-9d72-3fda017b1705",
+      "name": "Prepare LLM Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-640, -208]
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "={{ $json.systemPrompt }}"
+            },
+            {
+              "role": "user",
+              "message": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [-480, -176],
+      "id": "426e1455-8178-43d8-8443-231f64911cdc",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrait la réponse Gemini (Langchain Gemini LLM)\nconst llm = $input.first().json;\nlet aiResponse = llm.candidates?.[0]?.content?.parts?.[0]?.text;\nif (!aiResponse && llm.response) aiResponse = llm.response;\nif (!aiResponse && typeof llm === 'string') aiResponse = llm;\nreturn [{\n  json: {\n    response: aiResponse || 'Aucune réponse générée',\n    sessionId: llm.sessionId,\n    timestamp: new Date().toISOString(),\n    hasFiles: llm.hasFiles,\n    fileCount: llm.fileCount,\n    contentType: llm.contentType\n  }\n}];"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-320, -176]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
+            ]
+          }
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [-100, -176]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+    },
+    "Validate Input": {
+      "main": [[{ "node": "Prepare LLM Context", "type": "main", "index": 0 }]]
+    },
+    "Prepare LLM Context": {
+      "main": [[{ "node": "Basic LLM Chain", "type": "main", "index": 0 }]]
+    },
+    "Basic LLM Chain": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Webhook Response", "type": "main", "index": 0 }]]
+    }
+  }
+}

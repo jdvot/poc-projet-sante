@@ -112,6 +112,9 @@ npm install
 # Copy environment variables
 cp env.example .env.local
 
+# Configure n8n Cloud (for AI Chat functionality)
+./scripts/setup-n8n-cloud.sh
+
 # Start development server
 npm run dev
 ```

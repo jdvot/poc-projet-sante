@@ -27,9 +27,6 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
-.env.development
-.env.test
 .env.production
 
 # vercel
@@ -39,6 +36,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firebase-debug.*.json
+.firebaserc.local
+firebase-export-*
+emulator-data/
+
 # IDE
 .vscode/
 .idea/
@@ -47,6 +53,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+.DS_Store
 
 # Logs
 logs
@@ -67,6 +74,7 @@ coverage/
 
 # Dependency directories
 node_modules/
+jspm_packages/
 
 # Optional npm cache directory
 .npm
@@ -93,6 +101,17 @@ node_modules/
 .cache
 .parcel-cache
 
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
 # Storybook build outputs
 .out
 .storybook-out
@@ -101,26 +120,47 @@ node_modules/
 tmp/
 temp/
 
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local Netlify folder
+.netlify
+
+# Sentry
+.sentryclirc
+
 # Cypress
 cypress/videos/
 cypress/screenshots/
 
-# Sentry
-.sentryclirc
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Test coverage
+coverage/
+*.lcov
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Firebase
 .firebase/
 firebase-debug.log
 firebase-debug.*.log
-
-# Docker
-.dockerignore
-
-# SSL certificates
-ssl/
-*.pem
-*.key
-*.crt
-
-# Nginx
-nginx.conf
+firebase-debug.*.json
+.firebaserc.local
+firebase-export-*
+emulator-data/

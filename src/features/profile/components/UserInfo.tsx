@@ -10,6 +10,7 @@ import {
   Box,
   Title,
   useMantineColorScheme,
+  useMantineTheme,
 } from '@mantine/core';
 import {
   IconUser,
@@ -27,24 +28,43 @@ interface UserInfoProps {
 export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
   const { profileT } = useProfileTranslations();
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
 
   if (!user) return null;
 
+  // Couleurs du thème pour l'accessibilité WCAG
+  const avatarGradient = `linear-gradient(135deg, ${theme.colors.blue[6]} 0%, ${theme.colors.blue[8]} 100%)`;
+  const cardGradient =
+    colorScheme === 'dark'
+      ? `linear-gradient(135deg, ${theme.colors.gray[8]} 0%, ${theme.colors.gray[9]} 100%)`
+      : `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.colors.gray[1]} 100%)`;
+
   return (
-    <Stack gap="xl" data-testid="user-info">
+    <Stack
+      gap="xl"
+      data-testid="user-info"
+      role="region"
+      aria-labelledby="user-info-title"
+    >
       {/* Header */}
       <Group gap="sm">
         <Box
           p="xs"
           style={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: avatarGradient,
             borderRadius: '50%',
           }}
+          aria-hidden="true"
         >
           <IconUser size={20} style={{ color: 'white' }} />
         </Box>
         <Stack gap={4}>
-          <Title order={3} size="h4">
+          <Title
+            id="user-info-title"
+            order={3}
+            size="h4"
+            style={{ color: theme.colors.blue[colorScheme === 'dark' ? 4 : 7] }}
+          >
             {profileT.userInfo.title}
           </Title>
           <Text size="sm" c="dimmed">
@@ -57,14 +77,12 @@ export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
       <Box
         p="lg"
         style={{
-          background:
-            colorScheme === 'dark'
-              ? 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
-              : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-          border:
-            colorScheme === 'dark' ? '1px solid #475569' : '1px solid #cbd5e1',
+          background: cardGradient,
+          border: `1px solid ${colorScheme === 'dark' ? theme.colors.gray[7] : theme.colors.gray[3]}`,
           borderRadius: '1rem',
         }}
+        role="article"
+        aria-labelledby="user-profile-name"
       >
         <Group gap="lg" align="flex-start">
           {/* Avatar Section */}
@@ -74,11 +92,11 @@ export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
               radius="xl"
               color="blue"
               style={{
-                background:
-                  'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6))',
-                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                border: '3px solid white',
+                background: avatarGradient,
+                boxShadow: `0 4px 12px ${theme.colors.blue[6]}40`,
+                border: `3px solid ${colorScheme === 'dark' ? theme.colors.gray[8] : 'white'}`,
               }}
+              aria-label={`Avatar de ${user.name}`}
             >
               {user.name.charAt(0).toUpperCase()}
             </Avatar>
@@ -90,67 +108,79 @@ export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
               <Group gap="xs" align="center" mb="xs">
                 <IconUser
                   size={18}
-                  style={{ color: 'var(--mantine-color-blue-6)' }}
+                  style={{ color: theme.colors.blue[6] }}
+                  aria-hidden="true"
                 />
-                <Text fw={700} size="lg" c="blue.6">
+                <Text
+                  id="user-profile-name"
+                  fw={700}
+                  size="lg"
+                  style={{
+                    color: theme.colors.blue[colorScheme === 'dark' ? 4 : 7],
+                  }}
+                >
                   {user.name}
                 </Text>
                 <Badge
                   variant="light"
                   color="green"
                   leftSection={<IconShieldCheck size={12} />}
-                  size="sm"
+                  aria-label="Compte vérifié"
                 >
-                  Connecté
+                  Vérifié
                 </Badge>
               </Group>
-
               <Group gap="xs" align="center">
                 <IconMail
                   size={16}
-                  style={{ color: 'var(--mantine-color-dimmed)' }}
+                  style={{
+                    color: theme.colors.gray[colorScheme === 'dark' ? 4 : 6],
+                  }}
+                  aria-hidden="true"
                 />
-                <Text size="sm" c="dimmed">
+                <Text
+                  size="sm"
+                  style={{
+                    color: theme.colors.gray[colorScheme === 'dark' ? 3 : 7],
+                  }}
+                >
                   {user.email}
                 </Text>
               </Group>
             </Box>
 
-            {/* Status Information */}
-            <Group gap="md">
-              <Badge
-                variant="light"
-                color="blue"
-                leftSection={<IconCrown size={12} />}
-                size="sm"
-              >
-                Membre actif
-              </Badge>
-
-              <Badge variant="light" color="grape" size="sm">
-                Profil en cours
-              </Badge>
-            </Group>
-
-            {/* Quick Stats */}
-            <Group gap="lg" mt="xs">
-              <Box>
-                <Text size="xs" c="dimmed" mb={2}>
-                  Dernière connexion
+            {/* User Status Indicators */}
+            <Group gap="md" wrap="wrap">
+              <Group gap="xs">
+                <IconClock
+                  size={16}
+                  style={{ color: theme.colors.blue[6] }}
+                  aria-hidden="true"
+                />
+                <Text
+                  size="sm"
+                  style={{
+                    color: theme.colors.gray[colorScheme === 'dark' ? 3 : 7],
+                  }}
+                >
+                  Membre depuis 2024
                 </Text>
-                <Text size="sm" fw={500}>
-                  Aujourd&apos;hui
+              </Group>
+              <Group gap="xs">
+                <IconCrown
+                  size={16}
+                  style={{ color: theme.colors.yellow[6] }}
+                  aria-hidden="true"
+                />
+                <Text
+                  size="sm"
+                  style={{
+                    color: theme.colors.gray[colorScheme === 'dark' ? 3 : 7],
+                  }}
+                >
+                  Plan Premium
                 </Text>
-              </Box>
-
-              <Box>
-                <Text size="xs" c="dimmed" mb={2}>
-                  Statut du profil
-                </Text>
-                <Text size="sm" fw={500} c="blue.6">
-                  En cours de complétion
-                </Text>
-              </Box>
+              </Group>
             </Group>
           </Stack>
         </Group>

@@ -1,10 +1,23 @@
 export interface ChatResponse {
   response: string;
+  processingTime?: number;
+  fileAnalysis?: {
+    fileName: string;
+    summary: string;
+  }[];
+  model?: string;
+  hasFiles?: boolean;
+  fileCount?: number;
+  contentType?: string;
+  static?: boolean;
+  error?: string;
+  isNetworkError?: boolean;
 }
 
 export async function postChatMessage(
   message: string,
-  files: File[]
+  files: File[],
+  sessionId?: string
 ): Promise<ChatResponse> {
   const formData = new FormData();
   formData.append('message', message);
@@ -12,8 +25,14 @@ export async function postChatMessage(
     formData.append('files', file);
   });
 
+  const headers: Record<string, string> = {};
+  if (sessionId) {
+    headers['X-Session-Id'] = sessionId;
+  }
+
   const response = await fetch('/api/n8n/chat', {
     method: 'POST',
+    headers,
     body: formData,
   });
 

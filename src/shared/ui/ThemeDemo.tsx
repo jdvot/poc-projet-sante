@@ -2,276 +2,382 @@
 
 import React from 'react';
 import {
-  Container,
+  Box,
+  Card,
   Title,
   Text,
-  Stack,
+  Button,
   Group,
-  Grid,
+  Stack,
   Badge,
+  ThemeIcon,
+  Paper,
+  Container,
+  Grid,
+  Switch,
+  Select,
+  Divider,
 } from '@mantine/core';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { ThemedCard } from './ThemedCard';
-import { ThemedButton } from './ThemedButton';
-import { ThemedPaper } from './ThemedPaper';
+import {
+  IconSparkles,
+  IconAccessible,
+  IconPalette,
+  IconEye,
+  IconTypography,
+  IconSettings,
+} from '@tabler/icons-react';
+import { useAccessibilitySettings } from '../hooks/useAccessibilitySettings';
 
 export const ThemeDemo: React.FC = () => {
   const {
-    colorScheme,
-    toggleColorScheme,
-    gradients,
-    colors,
-    spacing,
-    radius,
-    transitions,
-    isDark,
-    isLight,
-  } = useAppTheme();
+    settings,
+    updateFontSize,
+    updateLineHeight,
+    getAccessibilityClasses,
+    getAccessibilityStyles,
+  } = useAccessibilitySettings();
 
   return (
     <Container size="xl" py="xl">
       <Stack gap="xl">
-        {/* Header */}
-        <ThemedPaper variant="gradient" gradientType="primary">
-          <Stack gap="md" align="center">
-            <Title order={1} ta="center" c="white">
-              🎨 Démonstration du Thème Partagé
+        {/* En-tête de démonstration */}
+        <Paper
+          p="xl"
+          radius="xl"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            textAlign: 'center',
+          }}
+        >
+          <Group justify="center" gap="xs" mb="md">
+            <IconSparkles
+              size={32}
+              style={{ color: 'var(--mantine-color-blue-6)' }}
+            />
+            <Title order={1} size="h2">
+              Démonstration du Thème Élégant
             </Title>
-            <Text ta="center" c="white" size="lg">
-              Thème actuel : {colorScheme} {isDark ? '🌙' : '☀️'}
-            </Text>
-            <ThemedButton
-              variant="outline"
-              onClick={toggleColorScheme}
-              style={{ color: 'white', borderColor: 'white' }}
+            <IconSparkles
+              size={32}
+              style={{ color: 'var(--mantine-color-blue-6)' }}
+            />
+          </Group>
+          <Text size="lg" c="dimmed">
+            Testez les améliorations d'accessibilité et d'élégance du thème
+          </Text>
+        </Paper>
+
+        {/* Contrôles d'accessibilité */}
+        <Card p="xl" radius="lg" withBorder>
+          <Group gap="xs" mb="lg">
+            <IconAccessible size={24} />
+            <Title order={3}>Paramètres d'Accessibilité</Title>
+          </Group>
+
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Stack gap="md">
+                <Group justify="space-between">
+                  <Text>Taille de police</Text>
+                  <Select
+                    value={settings.fontSize}
+                    onChange={(value) => updateFontSize(value as any)}
+                    data={[
+                      { value: 'small', label: 'Petite' },
+                      { value: 'medium', label: 'Moyenne' },
+                      { value: 'large', label: 'Grande' },
+                    ]}
+                    size="sm"
+                  />
+                </Group>
+
+                <Group justify="space-between">
+                  <Text>Hauteur de ligne</Text>
+                  <Select
+                    value={settings.lineHeight}
+                    onChange={(value) => updateLineHeight(value as any)}
+                    data={[
+                      { value: 'tight', label: 'Serrée' },
+                      { value: 'normal', label: 'Normale' },
+                      { value: 'relaxed', label: 'Relâchée' },
+                    ]}
+                    size="sm"
+                  />
+                </Group>
+              </Stack>
+            </Grid.Col>
+
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Stack gap="md">
+                <Group justify="space-between">
+                  <Text>Mouvement réduit</Text>
+                  <Badge
+                    color={settings.prefersReducedMotion ? 'green' : 'gray'}
+                    variant="light"
+                  >
+                    {settings.prefersReducedMotion ? 'Activé' : 'Désactivé'}
+                  </Badge>
+                </Group>
+
+                <Group justify="space-between">
+                  <Text>Contraste élevé</Text>
+                  <Badge
+                    color={settings.prefersHighContrast ? 'green' : 'gray'}
+                    variant="light"
+                  >
+                    {settings.prefersHighContrast ? 'Activé' : 'Désactivé'}
+                  </Badge>
+                </Group>
+
+                <Group justify="space-between">
+                  <Text>Mode sombre</Text>
+                  <Badge
+                    color={settings.prefersDarkMode ? 'blue' : 'gray'}
+                    variant="light"
+                  >
+                    {settings.prefersDarkMode ? 'Activé' : 'Désactivé'}
+                  </Badge>
+                </Group>
+              </Stack>
+            </Grid.Col>
+          </Grid>
+        </Card>
+
+        {/* Démonstration des composants */}
+        <Grid>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card p="xl" radius="xl" withBorder className="elegant-card">
+              <Stack gap="md">
+                <Group gap="xs">
+                  <ThemeIcon size={40} radius="xl" color="blue">
+                    <IconPalette size={20} />
+                  </ThemeIcon>
+                  <Title order={4}>Carte Élégante</Title>
+                </Group>
+                <Text size="sm" c="dimmed">
+                  Cette carte utilise les nouvelles classes CSS élégantes avec
+                  des transitions fluides et des effets de survol.
+                </Text>
+                <Button
+                  variant="light"
+                  color="blue"
+                  size="sm"
+                  className="elegant-button"
+                >
+                  Action Élégante
+                </Button>
+              </Stack>
+            </Card>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Card
+              p="xl"
+              radius="xl"
+              withBorder
+              style={getAccessibilityStyles()}
             >
-              Basculer le thème
-            </ThemedButton>
-          </Stack>
-        </ThemedPaper>
-
-        {/* Composants thématisés */}
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ThemedCard variant="default">
               <Stack gap="md">
-                <Title order={3}>Carte par défaut</Title>
-                <Text>
-                  Cette carte utilise le style par défaut du thème avec des
-                  couleurs adaptatives selon le mode clair/sombre.
-                </Text>
-                <Group>
-                  <ThemedButton variant="primary">Primaire</ThemedButton>
-                  <ThemedButton variant="secondary">Secondaire</ThemedButton>
+                <Group gap="xs">
+                  <ThemeIcon size={40} radius="xl" color="green">
+                    <IconAccessible size={20} />
+                  </ThemeIcon>
+                  <Title order={4}>Carte Accessible</Title>
                 </Group>
-              </Stack>
-            </ThemedCard>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ThemedCard variant="elevated">
-              <Stack gap="md">
-                <Title order={3}>Carte élevée</Title>
-                <Text>
-                  Cette carte a un effet d&apos;élévation avec ombre et
-                  transformation.
+                <Text size="sm" c="dimmed">
+                  Cette carte applique automatiquement les paramètres
+                  d'accessibilité utilisateur.
                 </Text>
-                <Group>
-                  <ThemedButton variant="health">Santé</ThemedButton>
-                  <ThemedButton variant="medical">Médical</ThemedButton>
-                </Group>
+                <Button
+                  variant="light"
+                  color="green"
+                  size="sm"
+                  className={getAccessibilityClasses()}
+                >
+                  Action Accessible
+                </Button>
               </Stack>
-            </ThemedCard>
+            </Card>
           </Grid.Col>
         </Grid>
 
-        {/* Gradients */}
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <ThemedPaper variant="gradient" gradientType="primary">
-              <Stack gap="md" align="center">
-                <Title order={3} c="white">
-                  Gradient Primaire
-                </Title>
-                <Text c="white" ta="center">
-                  Bleu vers Cyan
-                </Text>
-              </Stack>
-            </ThemedPaper>
-          </Grid.Col>
+        {/* Démonstration des animations */}
+        <Card p="xl" radius="lg" withBorder>
+          <Group gap="xs" mb="lg">
+            <IconEye size={24} />
+            <Title order={3}>Animations et Transitions</Title>
+          </Group>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <ThemedPaper variant="gradient" gradientType="health">
-              <Stack gap="md" align="center">
-                <Title order={3} c="white">
-                  Gradient Santé
-                </Title>
-                <Text c="white" ta="center">
-                  Santé vers Bien-être
-                </Text>
-              </Stack>
-            </ThemedPaper>
-          </Grid.Col>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+              <Box className="animate-fade-in-up">
+                <Card p="md" radius="md" withBorder>
+                  <Stack gap="xs" align="center">
+                    <ThemeIcon
+                      size={50}
+                      radius="xl"
+                      color="blue"
+                      className="animate-pulse"
+                    >
+                      <IconSparkles size={25} />
+                    </ThemeIcon>
+                    <Text size="sm" ta="center">
+                      Animation Pulse
+                    </Text>
+                  </Stack>
+                </Card>
+              </Box>
+            </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <ThemedPaper variant="gradient" gradientType="medical">
-              <Stack gap="md" align="center">
-                <Title order={3} c="white">
-                  Gradient Médical
-                </Title>
-                <Text c="white" ta="center">
-                  Médical vers Rouge
-                </Text>
-              </Stack>
-            </ThemedPaper>
-          </Grid.Col>
-        </Grid>
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+              <Box className="animate-fade-in-scale">
+                <Card p="md" radius="md" withBorder>
+                  <Stack gap="xs" align="center">
+                    <ThemeIcon
+                      size={50}
+                      radius="xl"
+                      color="green"
+                      className="animate-float"
+                    >
+                      <IconSparkles size={25} />
+                    </ThemeIcon>
+                    <Text size="sm" ta="center">
+                      Animation Float
+                    </Text>
+                  </Stack>
+                </Card>
+              </Box>
+            </Grid.Col>
 
-        {/* Couleurs sémantiques */}
-        <ThemedCard>
-          <Stack gap="lg">
-            <Title order={2}>Couleurs Sémantiques</Title>
-            <Grid>
-              <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                <Stack gap="sm" align="center">
-                  <Badge color="green" size="lg">
-                    Succès
-                  </Badge>
-                  <Text size="sm" ta="center">
-                    {colors.success}
-                  </Text>
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                <Stack gap="sm" align="center">
-                  <Badge color="yellow" size="lg">
-                    Avertissement
-                  </Badge>
-                  <Text size="sm" ta="center">
-                    {colors.warning}
-                  </Text>
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                <Stack gap="sm" align="center">
-                  <Badge color="red" size="lg">
-                    Erreur
-                  </Badge>
-                  <Text size="sm" ta="center">
-                    {colors.error}
-                  </Text>
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                <Stack gap="sm" align="center">
-                  <Badge color="blue" size="lg">
-                    Info
-                  </Badge>
-                  <Text size="sm" ta="center">
-                    {colors.info}
-                  </Text>
-                </Stack>
-              </Grid.Col>
-            </Grid>
-          </Stack>
-        </ThemedCard>
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+              <Box className="hover-lift">
+                <Card p="md" radius="md" withBorder>
+                  <Stack gap="xs" align="center">
+                    <ThemeIcon
+                      size={50}
+                      radius="xl"
+                      color="orange"
+                      className="animated-icon"
+                    >
+                      <IconSparkles size={25} />
+                    </ThemeIcon>
+                    <Text size="sm" ta="center">
+                      Hover Lift
+                    </Text>
+                  </Stack>
+                </Card>
+              </Box>
+            </Grid.Col>
 
-        {/* Espacements et rayons */}
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ThemedCard>
-              <Stack gap="md">
-                <Title order={3}>Espacements</Title>
-                <Stack gap="xs">
-                  <Text>Section: {spacing.section}</Text>
-                  <Text>Page: {spacing.page}</Text>
-                  <Text>Carte: {spacing.card}</Text>
-                </Stack>
-              </Stack>
-            </ThemedCard>
-          </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+              <Box className="shine-effect">
+                <Card p="md" radius="md" withBorder>
+                  <Stack gap="xs" align="center">
+                    <ThemeIcon size={50} radius="xl" color="purple">
+                      <IconSparkles size={25} />
+                    </ThemeIcon>
+                    <Text size="sm" ta="center">
+                      Shine Effect
+                    </Text>
+                  </Stack>
+                </Card>
+              </Box>
+            </Grid.Col>
+          </Grid>
+        </Card>
 
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ThemedCard>
-              <Stack gap="md">
-                <Title order={3}>Rayons</Title>
-                <Stack gap="xs">
-                  <Text>Carte: {radius.card}</Text>
-                  <Text>Bouton: {radius.button}</Text>
-                  <Text>Input: {radius.input}</Text>
-                </Stack>
-              </Stack>
-            </ThemedCard>
-          </Grid.Col>
-        </Grid>
+        {/* Démonstration des boutons */}
+        <Card p="xl" radius="lg" withBorder>
+          <Group gap="xs" mb="lg">
+            <IconSettings size={24} />
+            <Title order={3}>Boutons et Interactions</Title>
+          </Group>
 
-        {/* Transitions */}
-        <ThemedCard>
-          <Stack gap="lg">
-            <Title order={2}>Transitions</Title>
-            <Grid>
-              <Grid.Col span={{ base: 12, sm: 4 }}>
-                <ThemedButton
-                  variant="primary"
-                  fullWidth
-                  style={{ transition: transitions.fast }}
-                >
-                  Rapide ({transitions.fast})
-                </ThemedButton>
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}>
-                <ThemedButton
-                  variant="secondary"
-                  fullWidth
-                  style={{ transition: transitions.normal }}
-                >
-                  Normal ({transitions.normal})
-                </ThemedButton>
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 4 }}>
-                <ThemedButton
-                  variant="accent"
-                  fullWidth
-                  style={{ transition: transitions.slow }}
-                >
-                  Lent ({transitions.slow})
-                </ThemedButton>
-              </Grid.Col>
-            </Grid>
-          </Stack>
-        </ThemedCard>
-
-        {/* Informations sur le thème */}
-        <ThemedCard>
           <Stack gap="md">
-            <Title order={2}>Informations sur le Thème</Title>
+            <Group gap="md" wrap="wrap">
+              <Button className="elegant-button">Bouton Élégant</Button>
+              <Button variant="light" color="blue" className="hover-scale">
+                Hover Scale
+              </Button>
+              <Button variant="outline" color="green" className="active-scale">
+                Active Scale
+              </Button>
+              <Button
+                variant="gradient"
+                gradient={{ from: 'blue', to: 'cyan' }}
+              >
+                Gradient
+              </Button>
+            </Group>
+
+            <Group gap="md" wrap="wrap">
+              <Badge size="lg" variant="light" color="blue">
+                Badge Élégant
+              </Badge>
+              <Badge size="lg" variant="filled" color="green">
+                Badge Filled
+              </Badge>
+              <Badge size="lg" variant="outline" color="orange">
+                Badge Outline
+              </Badge>
+            </Group>
+          </Stack>
+        </Card>
+
+        {/* Informations sur l'accessibilité */}
+        <Paper
+          p="xl"
+          radius="lg"
+          withBorder
+          style={{ background: 'var(--mantine-color-blue-0)' }}
+        >
+          <Stack gap="md">
+            <Group gap="xs">
+              <IconAccessible size={24} color="var(--mantine-color-blue-6)" />
+              <Title order={3} c="blue">
+                Fonctionnalités d'Accessibilité
+              </Title>
+            </Group>
+
             <Grid>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Stack gap="sm">
-                  <Text>
-                    <strong>Mode actuel:</strong> {colorScheme}
+                <Stack gap="xs">
+                  <Text size="sm" fw={500}>
+                    ✓ Navigation clavier améliorée
                   </Text>
-                  <Text>
-                    <strong>Est sombre:</strong> {isDark ? 'Oui' : 'Non'}
+                  <Text size="sm" fw={500}>
+                    ✓ Focus visible avec anneaux colorés
                   </Text>
-                  <Text>
-                    <strong>Est clair:</strong> {isLight ? 'Oui' : 'Non'}
+                  <Text size="sm" fw={500}>
+                    ✓ Contraste WCAG AA/AAA
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    ✓ Support des préférences système
                   </Text>
                 </Stack>
               </Grid.Col>
+
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Stack gap="sm">
-                  <Text>
-                    <strong>Gradients disponibles:</strong>
+                <Stack gap="xs">
+                  <Text size="sm" fw={500}>
+                    ✓ Réduction des animations
                   </Text>
-                  <Text size="sm">• Primaire: {gradients.primary}</Text>
-                  <Text size="sm">• Santé: {gradients.health}</Text>
-                  <Text size="sm">• Médical: {gradients.medical}</Text>
+                  <Text size="sm" fw={500}>
+                    ✓ Taille de police ajustable
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    ✓ Hauteur de ligne personnalisable
+                  </Text>
+                  <Text size="sm" fw={500}>
+                    ✓ Mode contraste élevé
+                  </Text>
                 </Stack>
               </Grid.Col>
             </Grid>
           </Stack>
-        </ThemedCard>
+        </Paper>
       </Stack>
     </Container>
   );

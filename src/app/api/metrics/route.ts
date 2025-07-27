@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-// Métriques simples pour Prometheus
+// Configuration pour l'export statique
+export const dynamic = 'force-static';
+export const revalidate = false;
+
+// Métriques simples pour Prometheus - version statique
 let requestCount = 0;
 let errorCount = 0;
 const startTime = Date.now();
@@ -23,9 +27,9 @@ export async function GET() {
       '# TYPE limitless_health_uptime_seconds gauge',
       `limitless_health_uptime_seconds ${uptime / 1000}`,
       '',
-      '# HELP limitless_health_memory_usage_bytes Memory usage in bytes',
-      '# TYPE limitless_health_memory_usage_bytes gauge',
-      `limitless_health_memory_usage_bytes ${process.memoryUsage().heapUsed}`,
+      '# HELP limitless_health_static_mode Static export mode indicator',
+      '# TYPE limitless_health_static_mode gauge',
+      'limitless_health_static_mode 1',
     ].join('\n');
 
     return new NextResponse(metrics, {
@@ -41,14 +45,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
-
-// Fonction pour incrémenter le compteur de requêtes
-export function incrementRequestCount() {
-  requestCount++;
-}
-
-// Fonction pour incrémenter le compteur d'erreurs
-export function incrementErrorCount() {
-  errorCount++;
 }

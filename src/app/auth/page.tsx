@@ -1,5 +1,5 @@
-import Auth from '../../features/auth/Auth';
+import { AuthPage } from '../../features/auth/AuthPage';
 
-export default function AuthPage() {
-  return <Auth />;
+export default function AuthPageRoute() {
+  return <AuthPage />;
 }

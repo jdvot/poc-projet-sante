@@ -1,0 +1,243 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-1504, -120]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "Bonjour, peux-tu analyser mon rapport sanguin joint ?"
+            },
+            {
+              "name": "systemPrompt",
+              "value": "Tu es un expert en IA médicale, reste factuel et bienveillant."
+            }
+          ],
+          "number": [{ "name": "timestamp", "value": 1722100000000 }],
+          "boolean": [{ "name": "hasFiles", "value": false }]
+        }
+      },
+      "id": "manual-set-fake-input",
+      "name": "Set Fake Input (Manual)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [-1330, -120]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "66005c76-36b0-448b-941b-21831e09b6d9",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [-1504, 32],
+      "webhookId": "7fcf1274-2e93-4611-88d4-ba8beef56f82"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validation et préparation des données\nconst message = $input.first().json.message;\nconst files = $input.first().json.files || [];\nconst timestamp = $input.first().json.timestamp;\nconst sessionId = $input.first().json.sessionId || 'default';\nconst systemPrompt = $input.first().json.systemPrompt || '';\n\nif (!message && files.length === 0) {\n  throw new Error('Either message or at least one file is required');\n}\n\nif (message && message.length > 1000) {\n  throw new Error('Message is too long (max 1000 characters)');\n}\n\nconst context = {\n  message,\n  files: files.map(file => ({\n    name: file.name,\n    size: file.size,\n    type: file.type,\n    hasContent: !!file.content\n  })),\n  timestamp,\n  sessionId,\n  systemPrompt,\n  processingStart: new Date().toISOString()\n};\n\nlet contentType = 'text';\nif (files.length > 0) {\n  const fileTypes = files.map(f => f.type);\n  if (fileTypes.some(t => t.startsWith('image/'))) {\n    contentType = 'multimodal';\n  } else if (fileTypes.some(t => t.includes('pdf') || t.includes('document'))) {\n    contentType = 'document';\n  }\n}\n\nreturn [{\n  json: {\n    ...context,\n    contentType,\n    hasFiles: files.length > 0,\n    fileCount: files.length\n  }\n}];"
+      },
+      "id": "398f05da-bfe6-4a8e-a401-9bf538e69979",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1280, 32]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Préparer le contexte pour le LLM\nconst input = $input.first().json;\nconst fileData = input.$node?.[\"Process Files\"]?.json || {};\n\nlet userPrompt = '';\nif (input.message) {\n  userPrompt += `Message de l'utilisateur: ${input.message}\\n\\n`;\n}\nif (fileData.fileAnalyses && fileData.fileAnalyses.length > 0) {\n  userPrompt += 'Fichiers joints:\\n';\n  fileData.fileAnalyses.forEach(analysis => {\n    userPrompt += `- ${analysis.fileName}: ${analysis.summary}\\n`;\n    if (analysis.extractedText) {\n      userPrompt += `  Contenu: ${analysis.extractedText}\\n`;\n    }\n  });\n  userPrompt += '\\n';\n}\n\nconst defaultSystemPrompt = `Vous êtes un assistant médical IA spécialisé dans l'analyse de santé. Répondez de manière professionnelle, claire et bienveillante. Si vous détectez des informations médicales importantes, suggérez toujours de consulter un professionnel de santé.`;\nconst systemPrompt = input.systemPrompt || defaultSystemPrompt;\n\nif (fileData.hasImages) {\n  userPrompt += 'Note: Des images ont été jointes. Analysez-les pour détecter d\\'éventuels problèmes visuels ou anomalies.\\n';\n}\nif (fileData.hasDocuments) {\n  userPrompt += 'Note: Des documents médicaux ont été joints. Analysez leur contenu pour fournir des insights pertinents.\\n';\n}\nuserPrompt += '\\nVeuillez fournir une réponse détaillée et utile.\\n';\n\nreturn [{\n  json: {\n    prompt: userPrompt,\n    systemPrompt,\n    sessionId: input.sessionId,\n    timestamp: input.timestamp,\n    hasFiles: input.hasFiles,\n    fileCount: input.fileCount,\n    contentType: input.contentType\n  }\n}];"
+      },
+      "id": "90906e10-93b2-4688-ba19-836783c328c0",
+      "name": "Prepare LLM Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1040, 32]
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.systemPrompt }}"
+            },
+            {
+              "message": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [-592, -240],
+      "id": "10327da7-21eb-44c2-9049-3d91e2199099",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [-672, -32],
+      "id": "dbf7ccbe-1205-4ba1-b299-8262241fab45",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GYc9s13hGPaRb4AB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrait la réponse Gemini (Langchain Gemini LLM)\nconst llm = $input.first().json;\nlet aiResponse = llm.candidates?.[0]?.content?.parts?.[0]?.text;\nif (!aiResponse && llm.response) aiResponse = llm.response;\nif (!aiResponse && typeof llm === 'string') aiResponse = llm;\nreturn [{\n  json: {\n    response: aiResponse || 'Aucune réponse générée',\n    sessionId: llm.sessionId,\n    timestamp: new Date().toISOString(),\n    hasFiles: llm.hasFiles,\n    fileCount: llm.fileCount,\n    contentType: llm.contentType\n  }\n}];"
+      },
+      "id": "7e3bdf65-988b-44f8-87ef-2105371e1570",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-144, -16]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "568e1f5d-a516-4e4e-87be-e66aeb298d7a",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [-48, 192]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Prepare LLM Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare LLM Context": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1
+  },
+  "versionId": "3d6a3949-3631-4c90-8442-a941d76a28b3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5576798165d9622f651a2335d5e3ff7c592daeac72eb4be2d96d89bffdef4434"
+  },
+  "id": "ksAtEV1aCG8yb2AP",
+  "tags": [
+    {
+      "name": "AI Chat",
+      "id": "UZDeYZ0MSqFDKkPL",
+      "createdAt": "2025-07-27T18:42:01.441Z",
+      "updatedAt": "2025-07-27T18:42:01.441Z"
+    }
+  ]
+}

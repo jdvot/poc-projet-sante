@@ -10,24 +10,24 @@ import {
 } from '@mantine/core';
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 // Types pour une meilleure type safety
 type ThemeMode = 'light' | 'dark' | 'auto';
 
 interface ThemeOption {
   mode: ThemeMode;
-  icon: React.ReactNode;
+  icon: React.ComponentType<{ size?: number }>;
   label: string;
 }
 
-// Icônes des thèmes
+// Icônes pour chaque thème
 const themeIcons = {
-  light: <IconSun size={18} />,
-  dark: <IconMoon size={18} />,
-  auto: <IconDeviceDesktop size={18} />,
+  light: IconSun,
+  dark: IconMoon,
+  auto: IconDeviceDesktop,
 };
 
-// Composant pour un bouton de thème individuel
 interface ThemeButtonProps {
   theme: ThemeOption;
   isActive: boolean;
@@ -42,84 +42,72 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   actualTheme,
 }) => {
   const { t } = useTranslation();
+  const { isDark, colors, transitions } = useAppTheme();
 
   const getButtonStyles = useMemo(() => {
     const baseStyles = {
-      transition: 'all 0.2s ease',
-      borderRadius: '0.5rem',
-      border: '2px solid transparent',
+      transition: transitions.normal,
+      borderRadius: '1rem',
+      border: '1.5px solid transparent',
+      padding: '0.5rem',
+      width: '2.5rem',
+      height: '2.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     };
 
     if (isActive) {
       return {
         ...baseStyles,
-        border: '2px solid var(--mantine-color-blue-6)',
-        background: 'var(--mantine-color-blue-6)',
+        border: `1.5px solid ${colors.primary}`,
+        background: `linear-gradient(135deg, ${colors.primary}, ${colors.info})`,
         color: 'white',
+        boxShadow: `0 4px 15px rgba(59, 130, 246, 0.3)`,
+        transform: 'translateY(-1px)',
       };
     }
 
     return {
       ...baseStyles,
-      border: '2px solid transparent',
-      background:
-        actualTheme === 'dark'
+      border: `1.5px solid ${
+        isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'
+      }`,
+      background: isDark
+        ? 'var(--mantine-color-dark-5)'
+        : 'var(--mantine-color-gray-0)',
+      color: isDark
+        ? 'var(--mantine-color-gray-2)'
+        : 'var(--mantine-color-gray-8)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+      '&:hover': {
+        background: isDark
           ? 'var(--mantine-color-dark-4)'
-          : 'var(--mantine-color-gray-0)',
-      color:
-        actualTheme === 'dark'
-          ? 'var(--mantine-color-gray-3)'
-          : 'var(--mantine-color-gray-7)',
+          : 'var(--mantine-color-gray-1)',
+        borderColor: isDark
+          ? 'var(--mantine-color-dark-2)'
+          : 'var(--mantine-color-gray-4)',
+        transform: 'translateY(-1px)',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+      },
     };
-  }, [isActive, actualTheme]);
+  }, [isActive, isDark, colors, transitions]);
 
   const handleClick = useCallback(() => {
     onThemeChange(theme.mode);
   }, [theme.mode, onThemeChange]);
 
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (!isActive) {
-        e.currentTarget.style.background =
-          actualTheme === 'dark'
-            ? 'var(--mantine-color-dark-3)'
-            : 'var(--mantine-color-gray-1)';
-        e.currentTarget.style.transform = 'scale(1.1)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-      }
-    },
-    [isActive, actualTheme]
-  );
-
-  const handleMouseLeave = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (!isActive) {
-        e.currentTarget.style.background =
-          actualTheme === 'dark'
-            ? 'var(--mantine-color-dark-4)'
-            : 'var(--mantine-color-gray-0)';
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.boxShadow = 'none';
-      }
-    },
-    [isActive, actualTheme]
-  );
+  const Icon = theme.icon;
 
   return (
-    <Tooltip label={theme.label} position="bottom" withArrow offset={8}>
+    <Tooltip label={theme.label} position="top">
       <ActionIcon
-        variant="unstyled"
-        size="md"
+        variant="subtle"
         onClick={handleClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         style={getButtonStyles}
-        aria-label={`${t('theme.switchTo', 'Passer au thème')} ${theme.label}`}
-        aria-pressed={isActive}
-        role="button"
-        tabIndex={0}
+        aria-label={t(`theme.${theme.mode}`, theme.label)}
       >
-        {theme.icon}
+        <Icon size={16} />
       </ActionIcon>
     </Tooltip>
   );
@@ -195,21 +183,23 @@ export function ThemeSwitcher() {
     [setColorScheme]
   );
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <Group
-      gap="xs"
-      role="group"
-      aria-label={t('theme.switcher', 'Sélecteur de thème')}
-    >
-      {themeOptions.map((theme) => (
-        <ThemeButton
-          key={theme.mode}
-          theme={theme}
-          isActive={colorScheme === theme.mode}
-          onThemeChange={handleThemeChange}
-          actualTheme={actualTheme}
-        />
-      ))}
-    </Group>
+    <Box>
+      <Group gap="xs" justify="center">
+        {themeOptions.map((theme) => (
+          <ThemeButton
+            key={theme.mode}
+            theme={theme}
+            isActive={colorScheme === theme.mode}
+            onThemeChange={handleThemeChange}
+            actualTheme={actualTheme}
+          />
+        ))}
+      </Group>
+    </Box>
   );
 }

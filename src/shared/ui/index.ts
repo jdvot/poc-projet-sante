@@ -26,6 +26,7 @@ export { ThemedCard } from './ThemedCard';
 export { ThemedButton } from './ThemedButton';
 export { ThemedPaper } from './ThemedPaper';
 export { ThemeDemo } from './ThemeDemo';
+export { ThemeOptimizedDemo } from './ThemeOptimizedDemo';
 
 // Composants atomiques
 export { AtomicCard } from './AtomicCard';
@@ -39,3 +40,21 @@ export { AtomicMessage } from './AtomicMessage';
 export { AtomicChatInput } from './AtomicChatInput';
 export { AtomicRecommendationCard } from './AtomicRecommendationCard';
 export { AtomicConfidenceBar } from './AtomicConfidenceBar';
+
+// Composants Navbar Mantine
+export { LinksGroup } from './NavbarLinksGroup';
+export { UserButton } from './UserButton';
+export { Logo } from './NavbarLogo';
+
+// Dashboard Accessibility
+export {
+  DashboardAccessibility,
+  useDashboardAccessibility,
+  FocusIndicator,
+  ScreenReaderAnnouncement,
+  useScreenReaderAnnouncement,
+  getAccessibleTextColor,
+  getAccessibleStatusColor,
+  getAccessibleBackground,
+  getAccessibleBorderColor,
+} from './DashboardAccessibility';

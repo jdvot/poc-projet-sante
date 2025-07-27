@@ -1,5 +1,10 @@
 import Settings from '../../features/settings/Settings';
+import { AuthGuard } from '../../shared/components/AuthGuard';
 
 export default function SettingsPage() {
-  return <Settings />;
+  return (
+    <AuthGuard>
+      <Settings />
+    </AuthGuard>
+  );
 }

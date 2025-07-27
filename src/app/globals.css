@@ -1,21 +1,280 @@
-@import 'tailwindcss';
+@import "tailwindcss/preflight";
+@tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+/* Variables CSS globales pour l'accessibilité */
+:root {
+  --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  --focus-ring-offset: 2px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Animation for floating save button */
-@keyframes pulse {
-  0% {
+/* Styles d'accessibilité globaux */
+* {
+  box-sizing: border-box;
+}
+
+/* Focus visible pour la navigation clavier */
+.keyboard-navigation *:focus {
+  outline: 2px solid var(--mantine-color-blue-6);
+  outline-offset: 2px;
+}
+
+/* Réduction des animations pour les utilisateurs qui le préfèrent */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Amélioration du contraste pour les utilisateurs qui le préfèrent */
+@media (prefers-contrast: high) {
+  :root {
+    --mantine-color-gray-1: #f8f9fa;
+    --mantine-color-gray-2: #e9ecef;
+    --mantine-color-gray-3: #dee2e6;
+  }
+}
+
+/* Styles pour les éléments interactifs */
+button,
+a,
+[role="button"],
+[tabindex] {
+  transition: all var(--transition-normal);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Amélioration des transitions */
+.mantine-transition {
+  transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Effets de survol élégants */
+.hover-lift {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
     transform: scale(1);
-    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
   50% {
+    opacity: 0.7;
     transform: scale(1.05);
-    box-shadow: 0 12px 35px rgba(34, 197, 94, 0.6);
   }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
   }
+  50% {
+    transform: translateY(-10px) rotate(180deg);
+  }
+}
+
+/* Classes utilitaires pour les animations */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Styles pour les cartes élégantes */
+.elegant-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all var(--transition-normal);
+}
+
+.elegant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Styles pour les boutons élégants */
+.elegant-button {
+  background: linear-gradient(135deg, var(--mantine-color-blue-6) 0%, var(--mantine-color-cyan-6) 100%);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  color: white;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.elegant-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* Styles pour les icônes animées */
+.animated-icon {
+  transition: all var(--transition-normal);
+}
+
+.animated-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Styles pour les gradients de fond */
+.gradient-bg-light {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.gradient-bg-dark {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Styles pour les effets de brillance */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.shine-effect:hover::before {
+  left: 100%;
+}
+
+/* Styles pour les textes responsifs */
+.responsive-text {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.responsive-title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* Styles pour les espacements cohérents */
+.section-spacing {
+  margin: var(--section-spacing, 3rem) 0;
+}
+
+/* Styles pour les bordures élégantes */
+.elegant-border {
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+}
+
+/* Styles pour les ombres élégantes */
+.elegant-shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.elegant-shadow-hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Styles pour les transitions fluides */
+.smooth-transition {
+  transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Styles pour l'accessibilité améliorée */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Styles pour les états de focus améliorés */
+.focus-ring {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Styles pour les états de survol améliorés */
+.hover-scale {
+  transition: transform var(--transition-normal);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Styles pour les états actifs améliorés */
+.active-scale {
+  transition: transform var(--transition-fast);
+}
+
+.active-scale:active {
+  transform: scale(0.98);
 }

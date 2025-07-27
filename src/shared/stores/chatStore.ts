@@ -7,6 +7,24 @@ export interface ChatMessage {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  file?: {
+    name: string;
+    size: number;
+    type: string;
+  };
+  metadata?: {
+    processingTime?: number;
+    fileAnalysis?: {
+      fileName: string;
+      summary: string;
+    }[];
+    model?: string;
+    hasFiles?: boolean;
+    fileCount?: number;
+    contentType?: string;
+    error?: string;
+    isNetworkError?: boolean;
+  };
 }
 
 export interface ChatState {
@@ -29,7 +47,9 @@ export interface ChatActions {
     mutateAsync: (data: {
       message: string;
       files: File[];
-    }) => Promise<ChatResponse>
+      sessionId?: string;
+    }) => Promise<ChatResponse>,
+    sessionId?: string
   ) => Promise<void>;
 }
 
@@ -82,7 +102,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
         }));
       },
 
-      sendMessageToN8n: async (message, files, mutateAsync) => {
+      sendMessageToN8n: async (message, files, mutateAsync, sessionId) => {
         const { setLoading, setError, addMessage } = get();
 
         try {
@@ -93,15 +113,33 @@ export const useChatStore = create<ChatState & ChatActions>()(
           addMessage({
             content: message,
             role: 'user',
+            file:
+              files.length > 0
+                ? {
+                    name: files[0].name,
+                    size: files[0].size,
+                    type: files[0].type,
+                  }
+                : undefined,
           });
 
-          const data = await mutateAsync({ message, files });
+          const data = await mutateAsync({ message, files, sessionId });
 
-          // Add assistant response
+          // Add assistant response with metadata
           addMessage({
             content:
               data.response || 'Sorry, I could not process your request.',
             role: 'assistant',
+            metadata: {
+              processingTime: data.processingTime,
+              fileAnalysis: data.fileAnalysis,
+              model: data.model,
+              hasFiles: data.hasFiles,
+              fileCount: data.fileCount,
+              contentType: data.contentType,
+              error: data.error,
+              isNetworkError: data.isNetworkError,
+            },
           });
         } catch (error) {
           setError(

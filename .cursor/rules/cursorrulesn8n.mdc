@@ -1,0 +1,91 @@
+---
+description: 'cursor rule'
+globs: ['**/*.{ts,tsx,js,jsx}']
+alwaysApply: true
+---
+
+# Guide d’utilisation – AI Chat Workflow n8n Gemini
+
+Ce workflow n8n permet d’interroger un LLM Gemini (Google, via LangChain) via un simple endpoint HTTP POST `/chat` et de recevoir une réponse directement exploitable côté app ou front.
+
+---
+
+## Fonctionnement global
+
+1. **Webhook Trigger**
+   - Point d’entrée HTTP sur `/chat` (POST)
+   - Reçoit les paramètres :
+     - `message` (texte utilisateur, requis)
+     - `systemPrompt` (contexte système, optionnel)
+     - `files` (tableau de fichiers optionnel)
+     - `timestamp`, `sessionId` (optionnels)
+
+2. **Validate Input**
+   - Valide le message et prépare les métadonnées (type de contenu, détection fichier, etc.)
+
+3. **Prepare LLM Context**
+   - Construit le prompt utilisateur enrichi + le prompt système
+   - Fallback automatique sur un prompt système par défaut si rien n’est fourni
+
+4. **Basic LLM Chain**
+   - Envoie à Gemini avec :
+     - `role: system` : systemPrompt
+     - `role: user` : prompt utilisateur
+
+5. **Format Response**
+   - Extrait la réponse générée par Gemini (texte) et ajoute métadonnées (session, time, etc.)
+
+6. **Webhook Response**
+   - Retourne la réponse formatée à l’appelant HTTP/app avec les bons headers CORS
+
+---
+
+## Exemple d’appel HTTP
+
+```json
+POST /chat
+Content-Type: application/json
+
+{
+  "message": "Voici mes derniers résultats sanguins...",
+  "systemPrompt": "Tu es un expert santé en nutrition préventive. Réponds comme un médecin généraliste français.",
+  "files": []
+}
+```
+
+## Exemple de retour JSON
+
+```json
+{
+  "response": "Analyse détaillée de vos résultats sanguins ...",
+  "sessionId": "default",
+  "timestamp": "2025-07-27T21:40:00.000Z",
+  "hasFiles": false,
+  "fileCount": 0,
+  "contentType": "text"
+}
+```
+
+---
+
+## Extensions possibles
+
+- Ajout d’un champ `lang` pour forcer la langue du prompt système.
+- Ajout de gestion d’erreur plus fine (catch Gemini ou files non supportés).
+- Passage en mode multimodal (images/documents) si Gemini Vision dispo.
+
+---
+
+## À savoir pour Cursor
+
+- Ce workflow est auto-documenté et facilement versionnable.
+- Modifier `systemPrompt` ou la logique du node `Prepare LLM Context` pour spécialiser les cas d’usage métier.
+- Peut être dupliqué pour d’autres endpoints ou modèles LLM.
+
+---
+
+## Maintenance
+
+- Tous les paramètres utilisateur sont passés via le POST JSON.
+- Pour tout bug, vérifier dans n8n que les IDs de nodes n’ont pas changé lors de l’import/export.
+- Peut être branché en front avec React, Next.js ou via un simple fetch/ajax classique.

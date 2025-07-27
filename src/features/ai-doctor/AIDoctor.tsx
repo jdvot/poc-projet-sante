@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo } from 'react';
 import {
   Container,
@@ -7,7 +9,9 @@ import {
   Stack,
   Progress,
   Badge,
+  Box,
 } from '@mantine/core';
+import { useAIDoctorTranslations } from './hooks/useAIDoctorTranslations';
 
 // Types pour une meilleure type safety
 interface AIRecommendation {
@@ -30,44 +34,27 @@ const getUrgencyColor = (urgency: AIRecommendation['urgency']): string => {
   return urgencyColors[urgency] || 'gray';
 };
 
-const getUrgencyLabel = (urgency: AIRecommendation['urgency']): string => {
-  const urgencyLabels: Record<AIRecommendation['urgency'], string> = {
-    low: 'Faible',
-    medium: 'Moyenne',
-    high: 'Élevée',
-    critical: 'Critique',
-  };
-  return urgencyLabels[urgency] || 'Inconnue';
-};
-
-const getCategoryLabel = (category: AIRecommendation['category']): string => {
-  const categoryLabels: Record<AIRecommendation['category'], string> = {
-    lifestyle: 'Mode de vie',
-    medical: 'Médical',
-    nutrition: 'Nutrition',
-    exercise: 'Exercice',
-  };
-  return categoryLabels[category] || 'Autre';
-};
-
 // Composant pour afficher la barre de confiance
 interface ConfidenceBarProps {
   confidence: number;
 }
 
 const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ confidence }) => {
+  const { aiDoctor } = useAIDoctorTranslations();
   const percentage = useMemo(() => Math.round(confidence * 100), [confidence]);
   const confidenceLabel = useMemo(() => {
-    if (confidence >= 0.9) return 'Très élevée';
-    if (confidence >= 0.7) return 'Élevée';
-    if (confidence >= 0.5) return 'Modérée';
-    return 'Faible';
-  }, [confidence]);
+    if (confidence >= 0.9)
+      return aiDoctor.recommendation.confidenceLevel.veryHigh;
+    if (confidence >= 0.7) return aiDoctor.recommendation.confidenceLevel.high;
+    if (confidence >= 0.5)
+      return aiDoctor.recommendation.confidenceLevel.moderate;
+    return aiDoctor.recommendation.confidenceLevel.low;
+  }, [confidence, aiDoctor.recommendation.confidenceLevel]);
 
   return (
     <Stack gap="xs">
       <Text size="sm" c="dimmed" id="confidence-label">
-        Confiance de l&apos;IA
+        {aiDoctor.recommendation.confidence}
       </Text>
       <Progress
         value={percentage}
@@ -101,6 +88,7 @@ const mockAIRecommendation: AIRecommendation = {
 };
 
 const AIDoctor: React.FC = () => {
+  const { aiDoctor } = useAIDoctorTranslations();
   // Utilisation de useMemo pour éviter les recalculs inutiles
   const aiRecommendation = useMemo(() => mockAIRecommendation, []);
 
@@ -109,22 +97,28 @@ const AIDoctor: React.FC = () => {
     [aiRecommendation.urgency]
   );
   const urgencyLabel = useMemo(
-    () => getUrgencyLabel(aiRecommendation.urgency),
-    [aiRecommendation.urgency]
+    () => aiDoctor.recommendation.urgency[aiRecommendation.urgency],
+    [aiRecommendation.urgency, aiDoctor.recommendation.urgency]
   );
   const categoryLabel = useMemo(
-    () => getCategoryLabel(aiRecommendation.category),
-    [aiRecommendation.category]
+    () => aiDoctor.recommendation.categories[aiRecommendation.category],
+    [aiRecommendation.category, aiDoctor.recommendation.categories]
   );
 
   return (
-    <Container size="lg" py="xl">
-      <Stack gap="xl">
+    <Box style={{ height: '100%', width: '100%', padding: '1rem' }}>
+      <Stack gap="xl" style={{ height: '100%' }}>
         <Title order={1} id="ai-doctor-title">
-          🤖 AI Doctor
+          {aiDoctor.title}
         </Title>
 
-        <Card withBorder p="xl" role="region" aria-labelledby="ai-doctor-title">
+        <Card
+          withBorder
+          p="xl"
+          role="region"
+          aria-labelledby="ai-doctor-title"
+          style={{ flex: 1 }}
+        >
           <Stack gap="md">
             <div
               style={{
@@ -134,7 +128,7 @@ const AIDoctor: React.FC = () => {
               }}
             >
               <Title order={2} size="h3" id="recommendation-title">
-                Recommandation IA
+                {aiDoctor.recommendation.title}
               </Title>
               <Badge
                 color={urgencyColor}
@@ -158,23 +152,23 @@ const AIDoctor: React.FC = () => {
             <Text
               size="sm"
               c="dimmed"
-              aria-label={`Catégorie de recommandation: ${categoryLabel}`}
+              aria-label={`${aiDoctor.recommendation.category}: ${categoryLabel}`}
             >
-              Catégorie: {categoryLabel}
+              {aiDoctor.recommendation.category}: {categoryLabel}
             </Text>
 
             <Text
               size="xs"
               c="dimmed"
-              aria-label={`Recommandation générée le ${new Date(aiRecommendation.timestamp).toLocaleString('fr-FR')}`}
+              aria-label={`${aiDoctor.recommendation.generatedOn} ${new Date(aiRecommendation.timestamp).toLocaleString()}`}
             >
-              Généré le:{' '}
-              {new Date(aiRecommendation.timestamp).toLocaleString('fr-FR')}
+              {aiDoctor.recommendation.generatedOn}:{' '}
+              {new Date(aiRecommendation.timestamp).toLocaleString()}
             </Text>
           </Stack>
         </Card>
       </Stack>
-    </Container>
+    </Box>
   );
 };
 

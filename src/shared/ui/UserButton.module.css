@@ -1,0 +1,12 @@
+.user {
+  display: block;
+  width: 100%;
+  padding: var(--mantine-spacing-md);
+  color: var(--mantine-color-text);
+  border-radius: var(--mantine-radius-md);
+  transition: all 0.3s ease;
+
+  @mixin hover {
+    background-color: var(--mantine-color-dark-6);
+  }
+} 

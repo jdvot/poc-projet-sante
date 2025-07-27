@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Règles pour les utilisateurs
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les profils de santé
+    match /profiles/{profileId} {
+      allow read, write: if request.auth != null && request.auth.uid == profileId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les données de santé
+    match /healthData/{dataId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les conversations AI
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les messages
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les paramètres utilisateur
+    match /userPreferences/{prefId} {
+      allow read, write: if request.auth != null && request.auth.uid == prefId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les notifications
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les métriques (lecture seule pour les utilisateurs authentifiés)
+    match /metrics/{metricId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Règles pour les configurations globales (admin seulement)
+    match /config/{configId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+  }
+}

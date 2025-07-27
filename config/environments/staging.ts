@@ -11,9 +11,7 @@ export const stagingConfig = {
   api: {
     baseUrl: 'https://staging.limitless-health.com/api',
     timeout: 12000,
-    n8nWebhookUrl:
-      process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ||
-      'https://staging-n8n.limitless-health.com/webhook/chat',
+    n8nWebhookUrl: 'https://jdvot57.app.n8n.cloud/webhook/chat',
   },
 
   // Firebase (Staging)

@@ -1,10 +1,12 @@
 'use client';
 
 import { useMantineTheme, useMantineColorScheme } from '@mantine/core';
+import { useCallback } from 'react';
 
 export const useAppTheme = () => {
   const theme = useMantineTheme();
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme, toggleColorScheme, setColorScheme } =
+    useMantineColorScheme();
 
   // Gradients personnalisés
   const gradients = {
@@ -56,28 +58,111 @@ export const useAppTheme = () => {
   const isLight = colorScheme === 'light';
 
   // Styles conditionnels basés sur le thème
-  const getCardStyle = () => ({
-    background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
-    border: isDark
-      ? '1px solid var(--mantine-color-dark-4)'
-      : '1px solid var(--mantine-color-gray-3)',
-  });
+  const getCardStyle = useCallback(
+    () => ({
+      background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+      border: isDark
+        ? '1px solid var(--mantine-color-dark-4)'
+        : '1px solid var(--mantine-color-gray-3)',
+      borderRadius: 'var(--mantine-radius-lg)',
+      boxShadow: 'var(--mantine-shadow-sm)',
+      transition: 'all 0.2s ease',
+    }),
+    [isDark]
+  );
 
-  const getPaperStyle = () => ({
-    background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
-    border: isDark
-      ? '1px solid var(--mantine-color-dark-4)'
-      : '1px solid var(--mantine-color-gray-3)',
-  });
+  const getPaperStyle = useCallback(
+    () => ({
+      background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+      border: isDark
+        ? '1px solid var(--mantine-color-dark-4)'
+        : '1px solid var(--mantine-color-gray-3)',
+      borderRadius: 'var(--mantine-radius-lg)',
+      boxShadow: 'var(--mantine-shadow-sm)',
+      transition: 'all 0.2s ease',
+    }),
+    [isDark]
+  );
 
-  const getGradientStyle = (gradientType: keyof typeof gradients) => ({
-    background: gradients[gradientType],
-  });
+  const getGradientStyle = useCallback(
+    (gradientType: keyof typeof gradients) => ({
+      background: gradients[gradientType],
+      borderRadius: 'var(--mantine-radius-lg)',
+      transition: 'all 0.2s ease',
+    }),
+    []
+  );
+
+  const getButtonStyle = useCallback(
+    (
+      variant:
+        | 'primary'
+        | 'secondary'
+        | 'accent'
+        | 'health'
+        | 'medical' = 'primary'
+    ) => {
+      const baseStyle = {
+        borderRadius: 'var(--mantine-radius-md)',
+        fontWeight: 500,
+        transition: 'all 0.2s ease',
+        border: 'none',
+      };
+
+      switch (variant) {
+        case 'health':
+          return {
+            ...baseStyle,
+            background: gradients.health,
+            color: 'white',
+          };
+        case 'medical':
+          return {
+            ...baseStyle,
+            background: gradients.medical,
+            color: 'white',
+          };
+        case 'accent':
+          return {
+            ...baseStyle,
+            background: gradients.accent,
+            color: 'white',
+          };
+        case 'secondary':
+          return {
+            ...baseStyle,
+            background: gradients.secondary,
+            color: 'white',
+          };
+        default:
+          return {
+            ...baseStyle,
+            background: gradients.primary,
+            color: 'white',
+          };
+      }
+    },
+    [gradients]
+  );
+
+  const getNavbarStyle = useCallback(
+    () => ({
+      background: isDark ? 'var(--mantine-color-dark-8)' : 'white',
+      borderRight: isDark
+        ? '1px solid var(--mantine-color-dark-4)'
+        : '1px solid var(--mantine-color-gray-3)',
+      boxShadow: isDark
+        ? '2px 0 8px rgba(0, 0, 0, 0.3)'
+        : '2px 0 8px rgba(0, 0, 0, 0.1)',
+    }),
+    [isDark]
+  );
 
   return {
     theme,
     colorScheme,
     toggleColorScheme,
+    setColorScheme,
     gradients,
     colors,
     spacing,
@@ -88,5 +173,7 @@ export const useAppTheme = () => {
     getCardStyle,
     getPaperStyle,
     getGradientStyle,
+    getButtonStyle,
+    getNavbarStyle,
   };
 };

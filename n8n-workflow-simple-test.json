@@ -1,0 +1,58 @@
+{
+  "name": "Simple Test Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [-400, 0],
+      "webhookId": "7fcf1274-2e93-4611-88d4-ba8beef56f82"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple test response\nconst input = $input.first().json;\nconst message = input.message || 'No message provided';\nconst timestamp = new Date().toISOString();\n\nreturn [{\n  json: {\n    response: `Test response: ${message}`,\n    timestamp: timestamp,\n    sessionId: input.sessionId || 'test-session',\n    hasFiles: false,\n    fileCount: 0,\n    contentType: 'text',\n    test: true\n  }\n}];"
+      },
+      "id": "test-response",
+      "name": "Test Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-200, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" },
+              { "name": "Access-Control-Allow-Origin", "value": "*" }
+            ]
+          }
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [0, 0]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Test Response", "type": "main", "index": 0 }]]
+    },
+    "Test Response": {
+      "main": [[{ "node": "Webhook Response", "type": "main", "index": 0 }]]
+    }
+  }
+}

@@ -1,408 +1,317 @@
 'use client';
 
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import {
   Group,
-  Anchor,
-  Stack,
-  Container,
-  Box,
-  Transition,
+  Code,
+  ScrollArea,
   Paper,
-  Badge,
-  ActionIcon,
-  Tooltip,
-  Divider,
-  Text,
-  Avatar,
-  Menu,
+  Box,
   Burger,
   Drawer,
-  ScrollArea,
+  Stack,
+  Divider,
+  Badge,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  IconBrain,
-  IconHeart,
-  IconUser,
-  IconSettings,
   IconHome,
   IconDashboard,
-  IconChevronDown,
-  IconSun,
-  IconMoon,
-  IconDeviceDesktop,
-  IconGlobe,
-  IconMenu2,
+  IconBrain,
+  IconMessage,
+  IconUser,
+  IconSettings,
+  IconHeart,
+  IconTestPipe,
+  IconPalette,
 } from '@tabler/icons-react';
+import { LinksGroup } from './NavbarLinksGroup';
+import { UserButton } from './UserButton';
+import { Logo } from './NavbarLogo';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useAuthStore } from '../stores/authStore';
+import { useFirebaseAuth } from '../hooks/useFirebaseAuth';
+import classes from './AppNavbar.module.css';
 
-// Types pour une meilleure type safety
-interface NavItem {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-  description?: string;
-  badge?: string;
-}
+// Données de navigation avec indicateurs d'accessibilité
+const mockdata = [
+  {
+    label: 'navigation.home',
+    icon: IconHome,
+    href: '/',
+    description: "Accéder à la page d'accueil",
+  },
+  {
+    label: 'navigation.dashboard',
+    icon: IconDashboard,
+    href: '/dashboard',
+    description: 'Voir votre tableau de bord de santé',
+  },
+  {
+    label: 'navigation.aiDoctor',
+    icon: IconBrain,
+    href: '/ai-doctor',
+    badge: 'IA',
+    description: "Consulter l'assistant IA santé",
+    badgeColor: 'blue',
+  },
+  {
+    label: 'navigation.aiChat',
+    icon: IconMessage,
+    href: '/ai-chat',
+    badge: 'Chat',
+    description: "Discuter avec l'IA santé",
+    badgeColor: 'green',
+  },
+  {
+    label: 'navigation.profile',
+    icon: IconUser,
+    href: '/profile',
+    description: 'Gérer votre profil utilisateur',
+  },
+  {
+    label: 'settings.title',
+    icon: IconSettings,
+    href: '/settings',
+    description: 'Configurer vos paramètres',
+  },
+  {
+    label: 'Test Layout',
+    icon: IconTestPipe,
+    href: '/test-layout',
+    description: 'Page de test pour la mise en page',
+  },
+  {
+    label: 'Test Theme',
+    icon: IconPalette,
+    href: '/test-theme',
+    description: 'Page de test pour les thèmes',
+  },
+];
 
-// Composant pour un élément de navigation individuel
-interface NavLinkProps {
-  item: NavItem;
-  isActive: boolean;
-  onClick?: () => void;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ item, isActive, onClick }) => {
-  const { t } = useTranslation();
-  const { isDark, colors, transitions } = useAppTheme();
-
-  const linkStyles = useMemo(
-    () => ({
-      padding: '0.75rem 1.25rem',
-      borderRadius: '1rem',
-      textDecoration: 'none',
-      fontWeight: 600,
-      transition: transitions.normal,
-      position: 'relative' as const,
-      color: isActive
-        ? 'white'
-        : isDark
-          ? 'var(--mantine-color-gray-3)'
-          : 'var(--mantine-color-gray-7)',
-      background: isActive
-        ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
-        : 'transparent',
-      border: isActive
-        ? 'none'
-        : `2px solid ${isDark ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-2)'}`,
-      boxShadow: isActive ? '0 8px 25px rgba(59, 130, 246, 0.25)' : 'none',
-      transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-    }),
-    [isActive, isDark, colors, transitions]
-  );
-
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!isActive) {
-        e.currentTarget.style.background = isDark
-          ? 'var(--mantine-color-dark-4)'
-          : 'var(--mantine-color-gray-0)';
-        e.currentTarget.style.color = isDark
-          ? 'var(--mantine-color-gray-1)'
-          : 'var(--mantine-color-gray-9)';
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-      }
-    },
-    [isActive, isDark]
-  );
-
-  const handleMouseLeave = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!isActive) {
-        e.currentTarget.style.background = 'transparent';
-        e.currentTarget.style.color = isDark
-          ? 'var(--mantine-color-gray-3)'
-          : 'var(--mantine-color-gray-7)';
-        e.currentTarget.style.transform = 'translateY(0px)';
-        e.currentTarget.style.boxShadow = 'none';
-      }
-    },
-    [isActive, isDark]
-  );
-
-  return (
-    <Anchor
-      component={Link}
-      href={item.href}
-      style={linkStyles}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      className="font-medium"
-    >
-      {item.icon}
-      <span>{t(item.label)}</span>
-      {item.badge && (
-        <Badge
-          size="xs"
-          color="red"
-          variant="filled"
-          style={{ marginLeft: 'auto' }}
-        >
-          {item.badge}
-        </Badge>
-      )}
-    </Anchor>
-  );
-};
-
-// Composant Logo amélioré avec animation
-const Logo: React.FC = () => {
-  const { isDark, gradients, transitions } = useAppTheme();
-  const [isHovered, setIsHovered] = useState(false);
-
-  const logoStyles = useMemo(
-    () => ({
-      fontSize: '1.75rem',
-      fontWeight: 800,
-      background: isHovered
-        ? gradients.health
-        : 'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6))',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      textDecoration: 'none',
-      transition: transitions.normal,
-      transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-    }),
-    [isHovered, gradients, transitions]
-  );
-
-  return (
-    <Anchor
-      component={Link}
-      href="/"
-      style={logoStyles}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="font-extrabold"
-    >
-      <IconHeart
-        size={28}
-        style={{
-          color: isHovered
-            ? 'var(--mantine-color-green-6)'
-            : 'var(--mantine-color-blue-6)',
-          transition: transitions.normal,
-        }}
-      />
-      <span>Limitless Health</span>
-    </Anchor>
-  );
-};
-
-// Composant pour le menu mobile
-const MobileMenu: React.FC<{
-  opened: boolean;
-  onClose: () => void;
-  navItems: NavItem[];
-  pathname: string;
-}> = ({ opened, onClose, navItems, pathname }) => {
-  const { t } = useTranslation();
-  const { isDark, colors } = useAppTheme();
-
-  return (
-    <Drawer
-      opened={opened}
-      onClose={onClose}
-      size="100%"
-      padding="md"
-      title={
-        <Group gap="sm">
-          <IconHeart size={24} style={{ color: colors.primary }} />
-          <Text fw={700} size="lg">
-            Limitless Health
-          </Text>
-        </Group>
-      }
-      overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-      styles={{
-        header: {
-          background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
-          borderBottom: `1px solid ${isDark ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-2)'}`,
-        },
-        content: {
-          background: isDark
-            ? 'var(--mantine-color-dark-8)'
-            : 'var(--mantine-color-gray-0)',
-        },
-      }}
-    >
-      <ScrollArea h="calc(100vh - 80px)">
-        <Stack gap="md" mt="xl">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              isActive={pathname === item.href}
-              onClick={onClose}
-            />
-          ))}
-
-          <Divider my="md" />
-
-          <Group justify="center" gap="md">
-            <Paper p="xs" withBorder radius="md">
-              <LanguageSwitcher />
-            </Paper>
-            <Paper p="xs" withBorder radius="md">
-              <ThemeSwitcher />
-            </Paper>
-          </Group>
-        </Stack>
-      </ScrollArea>
-    </Drawer>
-  );
-};
-
-// Composant principal AppNavbar
-export function AppNavbar() {
+const AppNavbarComponent = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const { isDark, colors, transitions } = useAppTheme();
+  const { isDark, transitions } = useAppTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileOpened, setMobileOpened] = useState(false);
+  const { user, isAuthenticated } = useAuthStore();
+  const { signOutUser } = useFirebaseAuth();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const navItems: NavItem[] = useMemo(
-    () => [
-      {
-        href: '/',
-        label: 'welcome',
-        icon: <IconHome size={18} />,
-        description: "Accueil de l'application",
-      },
-      {
-        href: '/dashboard',
-        label: 'dashboard.title',
-        icon: <IconDashboard size={18} />,
-        description: 'Tableau de bord santé',
-      },
-      {
-        href: '/profile',
-        label: 'navigation.profile',
-        icon: <IconUser size={18} />,
-        description: 'Profil utilisateur',
-      },
-      {
-        href: '/ai-doctor',
-        label: 'aiDoctor',
-        icon: <IconBrain size={18} />,
-        description: 'Assistant IA santé',
-        badge: 'IA',
-      },
-      {
-        href: '/settings',
-        label: 'settings.title',
-        icon: <IconSettings size={18} />,
-        description: 'Paramètres',
-      },
-    ],
-    []
-  );
+  const links = mockdata.map((item) => (
+    <LinksGroup {...item} key={item.label} />
+  ));
 
-  const navbarStyles = useMemo(
-    () => ({
-      position: 'sticky' as const,
-      top: 0,
-      zIndex: 1000,
-      background: isDark
-        ? 'rgba(26, 27, 30, 0.95)'
-        : 'rgba(255, 255, 255, 0.95)',
-      borderBottom: isDark
-        ? '1px solid var(--mantine-color-dark-4)'
-        : '1px solid var(--mantine-color-gray-2)',
-      backdropFilter: 'blur(20px)',
-      boxShadow: isDark
-        ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-        : '0 8px 32px rgba(0, 0, 0, 0.08)',
-      transition: transitions.normal,
-    }),
-    [isDark, transitions]
-  );
+  const { getCardStyle } = useAppTheme();
 
   const controlPaperStyles = useMemo(
     () => ({
-      background: isDark
-        ? 'var(--mantine-color-dark-5)'
-        : 'var(--mantine-color-gray-0)',
+      ...getCardStyle(),
+      borderRadius: 'var(--mantine-radius-lg)',
+      padding: 'var(--mantine-spacing-sm)',
+      // Amélioration du contraste pour l'accessibilité
       border: isDark
-        ? '1px solid var(--mantine-color-dark-4)'
-        : '1px solid var(--mantine-color-gray-2)',
-      transition: transitions.normal,
+        ? '2px solid var(--mantine-color-dark-3)'
+        : '2px solid var(--mantine-color-gray-4)',
     }),
-    [isDark, transitions]
+    [isDark] // getCardStyle is now memoized with useCallback
   );
 
   if (!mounted) {
     return null;
   }
 
+  // Ne pas afficher la navbar si l'utilisateur n'est pas authentifié
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <>
-      <Box component="nav" style={navbarStyles}>
-        <Container size="xl" py="md">
-          <Group justify="space-between" align="center">
-            <Logo />
-
-            {/* Navigation desktop */}
-            <Group
-              style={{ flex: 1, justifyContent: 'center' }}
-              gap="md"
-              visibleFrom="md"
+      {/* Navbar Desktop */}
+      <nav
+        className={classes.navbar}
+        role="navigation"
+        aria-label="Navigation principale"
+      >
+        <div className={classes.header}>
+          <Group justify="space-between" style={{ padding: '0 0.5rem' }}>
+            <Logo style={{ width: 'auto' }} />
+            <Code
+              fw={700}
+              style={{
+                color: isDark
+                  ? 'var(--mantine-color-gray-2)'
+                  : 'var(--mantine-color-gray-8)',
+                backgroundColor: isDark
+                  ? 'var(--mantine-color-dark-6)'
+                  : 'var(--mantine-color-gray-1)',
+                padding: '0.25rem 0.5rem',
+                borderRadius: 'var(--mantine-radius-sm)',
+                border: isDark
+                  ? '1px solid var(--mantine-color-dark-3)'
+                  : '1px solid var(--mantine-color-gray-3)',
+              }}
             >
-              {navItems.map((item) => (
-                <Tooltip
-                  key={item.href}
-                  label={item.description}
-                  position="bottom"
-                  withArrow
-                  openDelay={500}
-                >
-                  <Box>
-                    <NavLink item={item} isActive={pathname === item.href} />
-                  </Box>
-                </Tooltip>
-              ))}
-            </Group>
+              v1.0.0
+            </Code>
+          </Group>
+        </div>
 
-            {/* Contrôles desktop */}
-            <Group style={{ flexShrink: 0 }} gap="sm" visibleFrom="md">
-              <Paper p="xs" style={controlPaperStyles} withBorder radius="md">
+        <ScrollArea className={classes.links}>
+          <div className={classes.linksInner} role="menu">
+            {links}
+          </div>
+        </ScrollArea>
+
+        <div className={classes.footer}>
+          <UserButton />
+
+          {/* Contrôles avec accessibilité améliorée */}
+          <Stack gap="sm" mt="md">
+            <Paper
+              style={controlPaperStyles}
+              withBorder
+              role="group"
+              aria-label="Contrôles de langue et thème"
+            >
+              <LanguageSwitcher />
+            </Paper>
+            <Paper
+              style={controlPaperStyles}
+              withBorder
+              role="group"
+              aria-label="Sélecteur de thème"
+            >
+              <ThemeSwitcher />
+            </Paper>
+          </Stack>
+        </div>
+      </nav>
+
+      {/* Bouton mobile avec accessibilité améliorée */}
+      <Box visibleFrom="md" hiddenFrom="lg" className={classes.burgerButton}>
+        <Burger
+          opened={mobileOpened}
+          onClick={() => setMobileOpened(!mobileOpened)}
+          size="sm"
+          color={
+            isDark
+              ? 'var(--mantine-color-gray-2)'
+              : 'var(--mantine-color-gray-8)'
+          }
+          aria-label={mobileOpened ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={mobileOpened}
+          aria-controls="mobile-menu"
+        />
+      </Box>
+
+      {/* Menu mobile avec accessibilité améliorée */}
+      <Drawer
+        id="mobile-menu"
+        opened={mobileOpened}
+        onClose={() => setMobileOpened(false)}
+        size="100%"
+        padding="md"
+        zIndex={300}
+        title={
+          <Group gap="sm">
+            <IconHeart
+              size={24}
+              style={{
+                color: 'var(--mantine-color-blue-6)',
+                filter: isDark ? 'brightness(1.2)' : 'brightness(0.9)',
+              }}
+              aria-hidden="true"
+            />
+            <Logo />
+          </Group>
+        }
+        overlayProps={{
+          backgroundOpacity: 0.5,
+          blur: 4,
+          onClick: () => setMobileOpened(false),
+        }}
+        styles={{
+          header: {
+            background: isDark
+              ? 'var(--mantine-color-dark-7)'
+              : 'var(--mantine-color-white)',
+            borderBottom: `2px solid ${isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-4)'}`,
+          },
+          content: {
+            background: isDark
+              ? 'var(--mantine-color-dark-8)'
+              : 'var(--mantine-color-gray-0)',
+          },
+          title: {
+            color: isDark
+              ? 'var(--mantine-color-gray-1)'
+              : 'var(--mantine-color-gray-9)',
+            fontWeight: 600,
+          },
+        }}
+        closeButtonProps={{
+          'aria-label': 'Fermer le menu',
+          style: {
+            color: isDark
+              ? 'var(--mantine-color-gray-2)'
+              : 'var(--mantine-color-gray-8)',
+            backgroundColor: isDark
+              ? 'var(--mantine-color-dark-6)'
+              : 'var(--mantine-color-gray-1)',
+            border: isDark
+              ? '1px solid var(--mantine-color-dark-3)'
+              : '1px solid var(--mantine-color-gray-3)',
+          },
+        }}
+      >
+        <ScrollArea h="calc(100vh - 80px)">
+          <Stack gap="md" mt="xl" role="menu">
+            {links}
+
+            <Divider
+              my="md"
+              style={{
+                borderColor: isDark
+                  ? 'var(--mantine-color-dark-3)'
+                  : 'var(--mantine-color-gray-4)',
+                borderWidth: '2px',
+              }}
+            />
+
+            <Group justify="center" gap="md">
+              <Paper
+                style={controlPaperStyles}
+                withBorder
+                role="group"
+                aria-label="Contrôles de langue et thème"
+              >
                 <LanguageSwitcher />
               </Paper>
-              <Paper p="xs" style={controlPaperStyles} withBorder radius="md">
+              <Paper
+                style={controlPaperStyles}
+                withBorder
+                role="group"
+                aria-label="Sélecteur de thème"
+              >
                 <ThemeSwitcher />
               </Paper>
             </Group>
-
-            {/* Bouton mobile */}
-            <Burger
-              opened={mobileOpened}
-              onClick={() => setMobileOpened(!mobileOpened)}
-              hiddenFrom="md"
-              size="sm"
-              color={
-                isDark
-                  ? 'var(--mantine-color-gray-3)'
-                  : 'var(--mantine-color-gray-7)'
-              }
-            />
-          </Group>
-        </Container>
-      </Box>
-
-      {/* Menu mobile */}
-      <MobileMenu
-        opened={mobileOpened}
-        onClose={() => setMobileOpened(false)}
-        navItems={navItems}
-        pathname={pathname}
-      />
+          </Stack>
+        </ScrollArea>
+      </Drawer>
     </>
   );
-}
+};
+
+AppNavbarComponent.displayName = 'AppNavbar';
+
+export const AppNavbar = React.memo(AppNavbarComponent);

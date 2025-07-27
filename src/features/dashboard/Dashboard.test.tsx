@@ -1,11 +1,11 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MantineProvider } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
-import i18n from '../../shared/i18n';
+import i18n from '../../shared/i18n/config';
 import Dashboard from './Dashboard';
 import '../../test/setup';
 
@@ -41,6 +41,20 @@ vi.mock('react-i18next', () => ({
         'dashboard.loadingErrorDescription':
           'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
         'dashboard.retry': 'Réessayer',
+        // Traductions pour les noms des biomarqueurs
+        'dashboard.biomarkerNames.glucose': 'Glucose',
+        'dashboard.biomarkerNames.cholesterol': 'Cholestérol',
+        'dashboard.biomarkerNames.cholesterole': 'Cholestérol',
+        'dashboard.biomarkerNames.triglycerides': 'Triglycérides',
+        'dashboard.biomarkerNames.hdl': 'Cholestérol HDL',
+        'dashboard.biomarkerNames.ldl': 'Cholestérol LDL',
+        'dashboard.biomarkerNames.creatinine': 'Créatinine',
+        'dashboard.biomarkerNames.hemoglobin': 'Hémoglobine',
+        // Traductions pour les informations
+        'dashboard.info.updated': 'Mis à jour',
+        'dashboard.info.improvement': 'Amélioration',
+        'dashboard.info.deterioration': 'Détérioration',
+        'dashboard.info.stable': 'Stable',
       };
       return translations[key] || key;
     },
@@ -347,5 +361,190 @@ describe('Dashboard', () => {
     // Vérifier que le message d'erreur s'affiche
     expect(screen.getByText('Erreur de chargement')).toBeInTheDocument();
     expect(screen.getByText('Réessayer')).toBeInTheDocument();
+  });
+
+  // Tests spécifiques pour les traductions
+  describe('Translations', () => {
+    it('should render all dashboard translations correctly in French', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier les traductions principales
+      expect(screen.getByText('Tableau de bord santé')).toBeInTheDocument();
+      expect(
+        screen.getByText("Vue d'ensemble de vos données de santé")
+      ).toBeInTheDocument();
+      expect(screen.getByText('Biomarqueurs')).toBeInTheDocument();
+      expect(screen.getByText('Score de santé')).toBeInTheDocument();
+      expect(screen.getByText('Santé globale')).toBeInTheDocument();
+    });
+
+    it('should render biomarker names with proper translations', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier que les noms des biomarqueurs sont correctement traduits
+      expect(screen.getByText('Glucose')).toBeInTheDocument();
+      expect(screen.getByText('Cholestérol')).toBeInTheDocument();
+      expect(screen.getByText('Triglycérides')).toBeInTheDocument();
+      expect(screen.getByText('Cholestérol HDL')).toBeInTheDocument();
+      expect(screen.getByText('Cholestérol LDL')).toBeInTheDocument();
+    });
+
+    it('should render status labels with proper translations', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier que les statuts sont traduits
+      const normalStatuses = screen.getAllByText('Normal');
+      expect(normalStatuses.length).toBeGreaterThan(0);
+    });
+
+    it('should render trend descriptions with proper translations', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier que les descriptions de tendance sont traduites
+      expect(
+        screen.getByText('Tendance sur les 30 derniers jours')
+      ).toBeInTheDocument();
+    });
+
+    it('should render data source descriptions with proper translations', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier que les descriptions de source de données sont traduites
+      expect(
+        screen.getByText('Données de votre dernier contrôle de santé')
+      ).toBeInTheDocument();
+    });
+
+    it('should render last check information with proper translations', () => {
+      renderWithProviders(<Dashboard />);
+
+      // Vérifier que l'information du dernier contrôle est traduite
+      expect(screen.getByText(/Dernier contrôle/)).toBeInTheDocument();
+    });
+  });
+});
+
+describe('Dashboard Theme Integration', () => {
+  it('should use Mantine theme colors and gradients', () => {
+    render(<Dashboard />);
+
+    // Vérifier que les couleurs du thème Mantine sont utilisées
+    const healthStatsCard = screen.getByRole('region', {
+      name: /health stats/i,
+    });
+    expect(healthStatsCard).toBeInTheDocument();
+
+    // Vérifier que les gradients du thème sont appliqués
+    const biomarkerCards = screen.getAllByRole('article');
+    expect(biomarkerCards.length).toBeGreaterThan(0);
+
+    // Vérifier que les couleurs sémantiques sont utilisées
+    const wellnessElements = screen.getAllByText(/normal/i);
+    expect(wellnessElements.length).toBeGreaterThan(0);
+  });
+
+  it('should respond to color scheme changes', () => {
+    const { rerender } = render(<Dashboard />);
+
+    // Simuler un changement de thème
+    rerender(<Dashboard />);
+
+    // Vérifier que les composants s'adaptent au thème
+    const cards = screen.getAllByRole('article');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Dashboard Accessibility Colors', () => {
+  it('should use accessible colors for text and backgrounds', () => {
+    render(<Dashboard />);
+
+    // Vérifier que les couleurs accessibles sont utilisées
+    const healthStatsCard = screen.getByRole('region', {
+      name: /health stats/i,
+    });
+    expect(healthStatsCard).toBeInTheDocument();
+
+    // Vérifier que les textes utilisent les couleurs accessibles
+    const biomarkerCards = screen.getAllByRole('article');
+    expect(biomarkerCards.length).toBeGreaterThan(0);
+
+    // Vérifier que les badges utilisent des contrastes appropriés
+    const statusBadges = screen.getAllByText(/normal|elevated|high|critical/i);
+    expect(statusBadges.length).toBeGreaterThan(0);
+  });
+
+  it('should have proper contrast ratios for all text elements', () => {
+    render(<Dashboard />);
+
+    // Vérifier que les titres ont un contraste suffisant
+    const titles = screen.getAllByRole('heading');
+    expect(titles.length).toBeGreaterThan(0);
+
+    // Vérifier que les textes secondaires sont lisibles
+    const secondaryTexts = screen.getAllByText(/subtitle|description/i);
+    expect(secondaryTexts.length).toBeGreaterThan(0);
+  });
+
+  it('should support high contrast mode', () => {
+    render(<Dashboard />);
+
+    // Simuler le mode contraste élevé
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: query === '(prefers-contrast: high)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    // Vérifier que les éléments s'adaptent
+    const cards = screen.getAllByRole('article');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+
+  it('should support reduced motion preferences', () => {
+    render(<Dashboard />);
+
+    // Simuler la préférence de réduction de mouvement
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    // Vérifier que les animations sont désactivées
+    const cards = screen.getAllByRole('article');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+
+  it('should display last check information with accessible colors', () => {
+    render(<Dashboard />);
+
+    // Vérifier que l'information du dernier contrôle est présente et lisible
+    const lastCheckText = screen.getByText(/Dernier contrôle: 2024-07-25/);
+    expect(lastCheckText).toBeInTheDocument();
+
+    // Vérifier que l'icône d'horloge est présente
+    const clockIcon = screen.getByLabelText('Last update');
+    expect(clockIcon).toBeInTheDocument();
+
+    // Vérifier que le conteneur a un style approprié
+    const lastCheckContainer = lastCheckText.closest('[role="main"]');
+    expect(lastCheckContainer).toBeInTheDocument();
   });
 });

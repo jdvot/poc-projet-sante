@@ -1,7 +1,7 @@
 export const localConfig = {
   // Application
   app: {
-    name: 'Limitless Health',
+    name: 'Limitless Health (Local)',
     version: '1.0.0',
     url: 'http://localhost:3000',
     debug: true,
@@ -11,37 +11,37 @@ export const localConfig = {
   api: {
     baseUrl: 'http://localhost:3000/api',
     timeout: 10000,
-    n8nWebhookUrl: 'http://localhost:5678/webhook/chat',
+    n8nWebhookUrl: 'https://jdvot57.app.n8n.cloud/webhook/chat',
   },
 
-  // Firebase (Mock pour le développement local)
+  // Firebase (Local - Mock)
   firebase: {
-    apiKey: 'mock-api-key',
-    authDomain: 'mock-project.firebaseapp.com',
-    projectId: 'mock-project-id',
-    storageBucket: 'mock-project.appspot.com',
-    messagingSenderId: '123456789',
-    appId: 'mock-app-id',
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
   },
 
-  // Sentry (Mock pour le développement local)
+  // Sentry (Local - Désactivé)
   sentry: {
-    dsn: 'https://mock-dsn@sentry.io/123456',
-    org: 'limitless-health',
-    project: 'limitless-health',
+    dsn: '',
+    org: '',
+    project: '',
   },
 
-  // Analytics (Mock pour le développement local)
+  // Analytics (Local - Désactivé)
   analytics: {
-    gaMeasurementId: 'G-MOCKID',
-    vercelAnalyticsId: 'mock-vercel-id',
+    gaMeasurementId: '',
+    vercelAnalyticsId: '',
   },
 
   // Feature Flags
   features: {
     aiDoctor: true,
     notifications: true,
-    analytics: false, // Désactivé en local
+    analytics: false,
     debug: true,
   },
 
@@ -50,12 +50,22 @@ export const localConfig = {
     enableTelemetry: false,
     enableDebug: true,
     enableQueryDevTools: true,
-    enableStorybook: true,
+    enableStorybook: false,
   },
 
-  // Testing
-  testing: {
-    cypressBaseUrl: 'http://localhost:3000',
-    vitestEnv: 'jsdom',
+  // Performance
+  performance: {
+    enableCompression: false,
+    enableCaching: false,
+    enableMinification: false,
+    enableSourceMaps: true,
+  },
+
+  // Security
+  security: {
+    enableCSP: false,
+    enableHSTS: false,
+    enableRateLimiting: false,
+    enableCORS: true,
   },
 } as const;

@@ -103,6 +103,7 @@ export const profileTranslations = {
 
       // Actions and Buttons
       actions: {
+        title: 'Actions',
         cancel: 'Cancel',
         save: 'Save Profile',
         saving: 'Saving...',
@@ -114,6 +115,7 @@ export const profileTranslations = {
         update: 'Update',
         delete: 'Delete',
         confirm: 'Confirm',
+        preview: 'Preview',
       },
 
       // Form Fields
@@ -342,6 +344,7 @@ export const profileTranslations = {
 
       // Actions and Buttons
       actions: {
+        title: 'Actions',
         cancel: 'Annuler',
         save: 'Sauvegarder le Profil',
         saving: 'Sauvegarde...',
@@ -353,6 +356,7 @@ export const profileTranslations = {
         update: 'Mettre à Jour',
         delete: 'Supprimer',
         confirm: 'Confirmer',
+        preview: 'Aperçu',
       },
 
       // Form Fields
