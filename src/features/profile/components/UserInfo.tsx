@@ -31,7 +31,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
   if (!user) return null;
 
   return (
-    <Stack gap="xl">
+    <Stack gap="xl" data-testid="user-info">
       {/* Header */}
       <Group gap="sm">
         <Box

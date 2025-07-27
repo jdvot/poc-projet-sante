@@ -45,7 +45,7 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   const { colorScheme } = useMantineColorScheme();
 
   return (
-    <Stack gap="xl">
+    <Stack gap="xl" data-testid="profile-form-fields">
       {/* Personal Information Section */}
       <Box>
         <Group gap="xs" mb="md">
@@ -276,6 +276,12 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           </Group>
         </Stack>
       </Box>
+
+      {/* Test data for debugging */}
+      <div style={{ display: 'none' }}>
+        <div data-testid="is-loading">{isLoading.toString()}</div>
+        <div data-testid="errors-count">{Object.keys(errors).length}</div>
+      </div>
 
       {/* Information Box */}
       <Paper

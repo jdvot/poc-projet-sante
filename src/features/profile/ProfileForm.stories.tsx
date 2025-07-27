@@ -22,7 +22,7 @@ const meta: Meta<typeof ProfileForm> = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: any) => (
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         <Story />
       </div>

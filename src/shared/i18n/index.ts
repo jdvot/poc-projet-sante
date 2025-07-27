@@ -1,1 +1,2 @@
-// Point d'entrée pour la config i18n
+import i18n from './config';
+export default i18n;

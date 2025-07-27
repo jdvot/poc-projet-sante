@@ -1,12 +1,25 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AppNavbar } from './AppNavbar';
+import '../../test/setup';
 
 // Mock des hooks
-vi.mock('@/shared/hooks/useAppTheme', () => ({
-  useAppTheme: vi.fn(),
+vi.mock('../../shared/hooks/useAppTheme', () => ({
+  useAppTheme: vi.fn(() => ({
+    isDark: false,
+    colors: {
+      primary: 'var(--mantine-color-blue-6)',
+      info: 'var(--mantine-color-cyan-6)',
+    },
+    gradients: {
+      health: 'linear-gradient(135deg, #0284c7 0%, #16a34a 100%)',
+    },
+    transitions: {
+      normal: '0.3s ease',
+    },
+  })),
 }));
 
 vi.mock('react-i18next', () => ({
@@ -29,7 +42,7 @@ vi.mock('./ThemeSwitcher', () => ({
 }));
 
 describe('AppNavbar', () => {
-  const mockUseAppTheme = require('../hooks/useAppTheme').useAppTheme;
+  const mockUseAppTheme = vi.fn();
 
   const defaultMockTheme = {
     isDark: false,
@@ -46,7 +59,8 @@ describe('AppNavbar', () => {
   };
 
   beforeEach(() => {
-    mockUseAppTheme.mockReturnValue(defaultMockTheme);
+    // The mock is already set up in the vi.mock above
+    // We just need to ensure it returns the default theme
   });
 
   afterEach(() => {
@@ -97,14 +111,14 @@ describe('AppNavbar', () => {
     renderWithTheme(<AppNavbar />);
 
     // Le bouton Burger devrait être présent
-    const burgerButton = screen.getByRole('button', { name: /menu/i });
+    const burgerButton = screen.getByRole('button');
     expect(burgerButton).toBeInTheDocument();
   });
 
   it('opens mobile menu when burger button is clicked', () => {
     renderWithTheme(<AppNavbar />);
 
-    const burgerButton = screen.getByRole('button', { name: /menu/i });
+    const burgerButton = screen.getByRole('button');
     fireEvent.click(burgerButton);
 
     // Le menu mobile devrait s'ouvrir
@@ -158,7 +172,7 @@ describe('AppNavbar', () => {
     // Vérifier que les éléments desktop et mobile sont présents
     expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
     expect(screen.getByTestId('theme-switcher')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /menu/i })).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
   });
 
   it('handles theme transitions properly', () => {

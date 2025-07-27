@@ -117,15 +117,16 @@ export const AtomicBadge: React.FC<AtomicBadgeProps> = ({
   return (
     <Badge
       className={className}
-      style={{
-        ...variantConfig.style,
-        width: fullWidth ? '100%' : 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 'var(--mantine-spacing-xs)',
-        transition: 'all 0.2s ease',
-        ...style,
+      styles={{
+        root: {
+          width: fullWidth ? '100%' : 'auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'var(--mantine-spacing-xs)',
+          transition: 'all 0.2s ease',
+          ...style,
+        },
       }}
       variant={variantConfig.variant}
       color={variantConfig.color}

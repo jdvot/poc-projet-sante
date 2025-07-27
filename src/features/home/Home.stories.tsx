@@ -17,7 +17,7 @@ const meta: Meta<typeof Home> = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: any) => (
       <I18nextProvider i18n={i18n}>
         <MantineProvider>
           <Story />
@@ -57,7 +57,7 @@ export const WithDarkTheme: Story = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: any) => (
       <I18nextProvider i18n={i18n}>
         <MantineProvider defaultColorScheme="dark">
           <Story />
@@ -78,7 +78,7 @@ export const WithLightTheme: Story = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: any) => (
       <I18nextProvider i18n={i18n}>
         <MantineProvider defaultColorScheme="light">
           <Story />

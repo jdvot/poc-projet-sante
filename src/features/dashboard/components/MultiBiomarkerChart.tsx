@@ -337,6 +337,7 @@ export const MultiBiomarkerChart: React.FC<MultiBiomarkerChartProps> = ({
       radius="lg"
       withBorder
       shadow="sm"
+      data-testid="multi-biomarker-chart"
       style={{
         background: colorScheme === 'dark' ? '#1a1b1e' : 'white',
         border:
@@ -506,7 +507,7 @@ export const MultiBiomarkerChart: React.FC<MultiBiomarkerChartProps> = ({
               <Text size="xs" c="dimmed" mb={2}>
                 {t('bloodTest.chart.bloodTests')}
               </Text>
-              <Text size="sm" fw={500}>
+              <Text size="sm" fw={500} data-testid="chart-data-count">
                 {chartData.length}
               </Text>
             </Box>
@@ -514,8 +515,8 @@ export const MultiBiomarkerChart: React.FC<MultiBiomarkerChartProps> = ({
               <Text size="xs" c="dimmed" mb={2}>
                 {t('bloodTest.chart.biomarkersShown')}
               </Text>
-              <Text size="sm" fw={500}>
-                {visibleBiomarkers.length}
+              <Text size="sm" fw={500} data-testid="selected-biomarkers">
+                {visibleBiomarkers.join(', ')}
               </Text>
             </Box>
             {showBrushTool &&

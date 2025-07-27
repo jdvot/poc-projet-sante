@@ -25,6 +25,8 @@ import {
   IconTrendingUp,
   IconTarget,
   IconChartBar,
+  IconCalendar,
+  IconGenderMale,
 } from '@tabler/icons-react';
 import { useHealthCalculations } from '../hooks/useHealthCalculations';
 import { useProfileTranslations } from '../hooks/useProfileTranslations';
@@ -103,7 +105,7 @@ export const HealthStats: React.FC<HealthStatsProps> = ({
   };
 
   return (
-    <Stack gap="xl">
+    <Stack gap="xl" data-testid="health-stats">
       {/* Header */}
       <Group gap="sm">
         <Box
@@ -227,7 +229,7 @@ export const HealthStats: React.FC<HealthStatsProps> = ({
                   >
                     <IconRuler size={20} style={{ color: 'white' }} />
                   </Box>
-                  <Text fw={700} size="xl">
+                  <Text fw={700} size="xl" data-testid="height">
                     {unitConversion.height.unit === 'ft'
                       ? Math.floor(heightNum)
                       : heightNum}
@@ -265,7 +267,7 @@ export const HealthStats: React.FC<HealthStatsProps> = ({
                   >
                     <IconScale size={20} style={{ color: 'white' }} />
                   </Box>
-                  <Text fw={700} size="xl">
+                  <Text fw={700} size="xl" data-testid="weight">
                     {unitConversion.weight.unit === 'lbs'
                       ? Math.round(weightNum)
                       : weightNum}
@@ -319,6 +321,78 @@ export const HealthStats: React.FC<HealthStatsProps> = ({
                 </Paper>
               </Grid.Col>
             )}
+
+            {/* Age */}
+            <Grid.Col span={{ base: 6, sm: 3 }}>
+              <Paper
+                p="md"
+                radius="md"
+                withBorder
+                style={{
+                  background:
+                    'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)',
+                  border: '1px solid #f9a8d4',
+                }}
+              >
+                <Stack gap="xs" align="center">
+                  <Box
+                    p="xs"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+                      borderRadius: '50%',
+                    }}
+                  >
+                    <IconCalendar size={20} style={{ color: 'white' }} />
+                  </Box>
+                  <Text fw={700} size="xl" data-testid="age">
+                    {ageNum}
+                  </Text>
+                  <Badge size="xs" variant="light" color="pink">
+                    ans
+                  </Badge>
+                  <Text size="xs" c="dimmed" ta="center">
+                    Âge
+                  </Text>
+                </Stack>
+              </Paper>
+            </Grid.Col>
+
+            {/* Gender */}
+            <Grid.Col span={{ base: 6, sm: 3 }}>
+              <Paper
+                p="md"
+                radius="md"
+                withBorder
+                style={{
+                  background:
+                    'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                  border: '1px solid #7dd3fc',
+                }}
+              >
+                <Stack gap="xs" align="center">
+                  <Box
+                    p="xs"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                      borderRadius: '50%',
+                    }}
+                  >
+                    <IconGenderMale size={20} style={{ color: 'white' }} />
+                  </Box>
+                  <Text fw={700} size="xl" data-testid="gender">
+                    {gender}
+                  </Text>
+                  <Badge size="xs" variant="light" color="sky">
+                    Genre
+                  </Badge>
+                  <Text size="xs" c="dimmed" ta="center">
+                    Sexe
+                  </Text>
+                </Stack>
+              </Paper>
+            </Grid.Col>
 
             {/* BMR */}
             {stats.bmr && (

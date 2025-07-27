@@ -13,6 +13,7 @@ export interface ChatState {
   messages: ChatMessage[];
   isLoading: boolean;
   error: string | null;
+  files: File[];
 }
 
 export interface ChatActions {
@@ -20,6 +21,8 @@ export interface ChatActions {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearChat: () => void;
+  addFile: (file: File) => void;
+  removeFile: (file: File) => void;
   sendMessageToN8n: (
     message: string,
     files: File[],
@@ -37,6 +40,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
       messages: [],
       isLoading: false,
       error: null,
+      files: [],
 
       // Actions
       addMessage: (message) => {
@@ -62,7 +66,20 @@ export const useChatStore = create<ChatState & ChatActions>()(
         set({
           messages: [],
           error: null,
+          files: [],
         });
+      },
+
+      addFile: (file) => {
+        set((state) => ({
+          files: [...state.files, file],
+        }));
+      },
+
+      removeFile: (file) => {
+        set((state) => ({
+          files: state.files.filter((f) => f !== file),
+        }));
       },
 
       sendMessageToN8n: async (message, files, mutateAsync) => {

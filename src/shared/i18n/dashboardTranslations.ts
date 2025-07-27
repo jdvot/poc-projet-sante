@@ -6,7 +6,6 @@ export const dashboardTranslations = {
       subtitle: 'Overview of your health data',
       healthOverview: 'Health Overview',
       statistics: 'Health Statistics',
-      biomarkers: 'Biomarkers',
       globalHealth: 'Global Health',
 
       // Actions et boutons
@@ -53,13 +52,12 @@ export const dashboardTranslations = {
       // Sections et composants
       recentActivity: 'Recent Activity',
       trends: 'Trends',
-      alerts: 'Alerts',
-      recommendations: 'Recommendations',
       insights: 'Insights',
       summary: 'Summary',
 
       // Biomarqueurs spécifiques
       biomarkers: {
+        title: 'Biomarkers',
         glucose: 'Glucose',
         cholesterol: 'Cholesterol',
         hdl: 'HDL Cholesterol',
@@ -159,7 +157,6 @@ export const dashboardTranslations = {
       subtitle: "Vue d'ensemble de vos données de santé",
       healthOverview: 'Aperçu de la santé',
       statistics: 'Statistiques de santé',
-      biomarkers: 'Biomarqueurs',
       globalHealth: 'Santé globale',
 
       // Actions et boutons
@@ -178,7 +175,7 @@ export const dashboardTranslations = {
         excellent: 'Excellent',
         good: 'Bon',
         fair: 'Moyen',
-        poor: 'Faible',
+        poor: 'Mauvais',
       },
 
       // Scores et métriques
@@ -191,7 +188,7 @@ export const dashboardTranslations = {
       loadingErrorDescription:
         'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
       noDataAvailable: 'Aucune donnée disponible',
-      noDataDescription: "Aucune donnée de santé n'a encore été enregistrée.",
+      noDataDescription: 'Aucune donnée de santé enregistrée pour le moment.',
       connectionError: 'Erreur de connexion',
       connectionErrorDescription:
         'Impossible de se connecter au service de données de santé.',
@@ -206,13 +203,12 @@ export const dashboardTranslations = {
       // Sections et composants
       recentActivity: 'Activité récente',
       trends: 'Tendances',
-      alerts: 'Alertes',
-      recommendations: 'Recommandations',
       insights: 'Analyses',
       summary: 'Résumé',
 
       // Biomarqueurs spécifiques
       biomarkers: {
+        title: 'Biomarqueurs',
         glucose: 'Glucose',
         cholesterol: 'Cholestérol',
         hdl: 'Cholestérol HDL',
@@ -263,7 +259,7 @@ export const dashboardTranslations = {
         sleep: 'Dormez suffisamment',
         stress: 'Gérez votre niveau de stress',
         checkup: 'Planifiez des contrôles réguliers',
-        medication: 'Prenez vos médicaments comme prescrit',
+        medication: 'Prenez vos médicaments selon les prescriptions',
         lifestyle: 'Adoptez des habitudes de vie saines',
       },
 

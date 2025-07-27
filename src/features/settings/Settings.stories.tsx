@@ -18,7 +18,7 @@ const meta: Meta<typeof Settings> = {
     },
   },
   decorators: [
-    (Story) => (
+    (Story: any) => (
       <I18nextProvider i18n={i18n}>
         <MantineProvider>
           <Story />
@@ -56,7 +56,7 @@ export const WithModifiedSettings: Story = {
       },
     },
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: any }) => {
     const canvas = within(canvasElement);
 
     // Simulate user interactions to modify settings
@@ -80,7 +80,7 @@ export const AccessibilityFocused: Story = {
       },
     },
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: any }) => {
     const canvas = within(canvasElement);
 
     // Enable accessibility features
@@ -101,7 +101,7 @@ export const PrivacyFocused: Story = {
       },
     },
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: any }) => {
     const canvas = within(canvasElement);
 
     // Modify privacy settings
@@ -122,7 +122,7 @@ export const UnitsConfiguration: Story = {
       },
     },
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: any }) => {
     const canvas = within(canvasElement);
 
     // Change units to imperial

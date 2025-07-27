@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de démarrage pour l'environnement de production
+# Production environment startup script
 set -e
 
 # Couleurs pour les messages
@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Fonction pour afficher les messages
+# Function to display messages
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
 }

@@ -142,50 +142,50 @@ check_status() {
     echo ""
 }
 
-# Fonction pour afficher l'aide
+# Function to display help
 show_help() {
     echo "Usage: $0 [ENVIRONMENT] [SERVICES]"
     echo ""
-    echo "Environnements:"
-    echo "  local       - Environnement local (défaut)"
+    echo "Environments:"
+    echo "  local       - Local environment (default)"
     echo ""
     echo "Services:"
-    echo "  app         - Application uniquement (défaut)"
-    echo "  full        - Tous les services de base"
-    echo "  database    - Avec base de données PostgreSQL"
-    echo "  n8n         - Avec n8n pour les webhooks"
-    echo "  all         - Tous les services (app, db, redis, n8n)"
+    echo "  app         - Application only (default)"
+    echo "  full        - All basic services"
+    echo "  database    - With PostgreSQL database"
+    echo "  n8n         - With n8n for webhooks"
+    echo "  all         - All services (app, db, redis, n8n)"
     echo ""
-    echo "Exemples:"
-    echo "  $0                    # Application uniquement"
-    echo "  $0 local app          # Application uniquement"
-    echo "  $0 local database     # Avec base de données"
-    echo "  $0 local n8n          # Avec n8n"
-    echo "  $0 local all          # Tous les services"
+    echo "Examples:"
+    echo "  $0                    # Application only"
+    echo "  $0 local app          # Application only"
+    echo "  $0 local database     # With database"
+    echo "  $0 local n8n          # With n8n"
+    echo "  $0 local all          # All services"
 }
 
-# Fonction principale
+# Main function
 main() {
-    # Afficher l'aide si demandé
+    # Display help if requested
     if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
         show_help
         exit 0
     fi
     
-    log "Démarrage de l'environnement local: $ENVIRONMENT, services: $SERVICES"
+    log "Starting local environment: $ENVIRONMENT, services: $SERVICES"
     
     check_prerequisites
     setup_environment
     start_services
     check_status
     
-    log "Environnement local prêt!"
-    info "Utilisez 'docker-compose -f docker-compose.local.yml logs -f' pour voir les logs"
-    info "Utilisez 'docker-compose -f docker-compose.local.yml down' pour arrêter"
+    log "Local environment ready!"
+    info "Use 'docker-compose -f docker-compose.local.yml logs -f' to view logs"
+    info "Use 'docker-compose -f docker-compose.local.yml down' to stop"
 }
 
-# Gestion des erreurs
-trap 'error "Démarrage interrompu"' INT TERM
+# Error handling
+trap 'error "Startup interrupted"' INT TERM
 
-# Exécution
+# Execution
 main "$@" 

@@ -33,7 +33,9 @@ import {
   IconMicrophoneOff,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
 import { useChatStore } from '../../shared/stores/chatStore';
+import { postChatMessage } from '../../shared/api/chatApi';
 import { useAppTheme } from '../../shared/hooks/useAppTheme';
 import { ThemedCard } from '../../shared/ui/ThemedCard';
 import { ThemedButton } from '../../shared/ui/ThemedButton';
@@ -217,15 +219,14 @@ const AIChat: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const {
-    messages,
-    isLoading,
-    error,
-    addFile,
-    removeFile,
-    clearChat,
-    sendMessageToN8n,
-  } = useChatStore();
+  const { messages, isLoading, error, addFile, removeFile, clearChat } =
+    useChatStore();
+
+  // TanStack Query mutation
+  const chatMutation = useMutation({
+    mutationFn: ({ message, files }: { message: string; files: File[] }) =>
+      postChatMessage(message, files),
+  });
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   useEffect(() => {
@@ -236,11 +237,11 @@ const AIChat: React.FC = () => {
     if (!message.trim() && files.length === 0) return;
 
     try {
-      await sendMessageToN8n(message, files);
+      await chatMutation.mutateAsync({ message, files });
       setMessage('');
       setFiles([]);
     } catch (error) {
-      console.error("Erreur lors de l'envoi:", error);
+      console.error('Error sending message:', error);
     }
   };
 
