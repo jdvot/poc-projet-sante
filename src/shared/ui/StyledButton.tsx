@@ -35,15 +35,19 @@ export function StyledButton({
       boxShadow: '0 4px 14px rgba(59, 130, 246, 0.25)',
     },
     secondary: {
-      background: colorScheme === 'dark' 
-        ? 'var(--mantine-color-dark-4)' 
-        : 'var(--mantine-color-gray-0)',
-      color: colorScheme === 'dark' 
-        ? 'var(--mantine-color-gray-1)' 
-        : 'var(--mantine-color-gray-8)',
-      border: `2px solid ${colorScheme === 'dark' 
-        ? 'var(--mantine-color-dark-3)' 
-        : 'var(--mantine-color-gray-3)'}`,
+      background:
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-dark-4)'
+          : 'var(--mantine-color-gray-0)',
+      color:
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-gray-1)'
+          : 'var(--mantine-color-gray-8)',
+      border: `2px solid ${
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-dark-3)'
+          : 'var(--mantine-color-gray-3)'
+      }`,
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     },
     outline: {
@@ -54,9 +58,10 @@ export function StyledButton({
     },
     ghost: {
       background: 'transparent',
-      color: colorScheme === 'dark' 
-        ? 'var(--mantine-color-gray-3)' 
-        : 'var(--mantine-color-gray-7)',
+      color:
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-gray-3)'
+          : 'var(--mantine-color-gray-7)',
       border: '2px solid transparent',
     },
     gradient: {
@@ -75,14 +80,17 @@ export function StyledButton({
         'linear-gradient(135deg, var(--mantine-color-blue-7), var(--mantine-color-blue-8))',
     },
     secondary: {
-      background: colorScheme === 'dark' 
-        ? 'var(--mantine-color-dark-3)' 
-        : 'var(--mantine-color-gray-1)',
+      background:
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-dark-3)'
+          : 'var(--mantine-color-gray-1)',
       transform: 'translateY(-1px)',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-      border: `2px solid ${colorScheme === 'dark' 
-        ? 'var(--mantine-color-dark-2)' 
-        : 'var(--mantine-color-gray-4)'}`,
+      border: `2px solid ${
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-dark-2)'
+          : 'var(--mantine-color-gray-4)'
+      }`,
     },
     outline: {
       background: 'var(--mantine-color-blue-6)',
@@ -91,9 +99,10 @@ export function StyledButton({
       boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)',
     },
     ghost: {
-      background: colorScheme === 'dark' 
-        ? 'var(--mantine-color-dark-4)' 
-        : 'var(--mantine-color-gray-0)',
+      background:
+        colorScheme === 'dark'
+          ? 'var(--mantine-color-dark-4)'
+          : 'var(--mantine-color-gray-0)',
       transform: 'translateY(-1px)',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     },

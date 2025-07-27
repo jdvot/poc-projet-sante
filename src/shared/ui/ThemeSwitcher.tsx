@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
-import { ActionIcon, Group, Tooltip, Box, useMantineColorScheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Group,
+  Tooltip,
+  Box,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
@@ -56,12 +62,14 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
     return {
       ...baseStyles,
       border: '2px solid transparent',
-      background: actualTheme === 'dark' 
-        ? 'var(--mantine-color-dark-4)' 
-        : 'var(--mantine-color-gray-0)',
-      color: actualTheme === 'dark' 
-        ? 'var(--mantine-color-gray-3)' 
-        : 'var(--mantine-color-gray-7)',
+      background:
+        actualTheme === 'dark'
+          ? 'var(--mantine-color-dark-4)'
+          : 'var(--mantine-color-gray-0)',
+      color:
+        actualTheme === 'dark'
+          ? 'var(--mantine-color-gray-3)'
+          : 'var(--mantine-color-gray-7)',
     };
   }, [isActive, actualTheme]);
 
@@ -72,9 +80,10 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isActive) {
-        e.currentTarget.style.background = actualTheme === 'dark' 
-          ? 'var(--mantine-color-dark-3)' 
-          : 'var(--mantine-color-gray-1)';
+        e.currentTarget.style.background =
+          actualTheme === 'dark'
+            ? 'var(--mantine-color-dark-3)'
+            : 'var(--mantine-color-gray-1)';
         e.currentTarget.style.transform = 'scale(1.1)';
         e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
       }
@@ -85,9 +94,10 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   const handleMouseLeave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isActive) {
-        e.currentTarget.style.background = actualTheme === 'dark' 
-          ? 'var(--mantine-color-dark-4)' 
-          : 'var(--mantine-color-gray-0)';
+        e.currentTarget.style.background =
+          actualTheme === 'dark'
+            ? 'var(--mantine-color-dark-4)'
+            : 'var(--mantine-color-gray-0)';
         e.currentTarget.style.transform = 'scale(1)';
         e.currentTarget.style.boxShadow = 'none';
       }
@@ -124,10 +134,12 @@ export function ThemeSwitcher() {
   // Détection du thème système
   useEffect(() => {
     setMounted(true);
-    
+
     const getSystemTheme = () => {
       if (typeof window !== 'undefined') {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
       }
       return 'light';
     };
@@ -137,7 +149,7 @@ export function ThemeSwitcher() {
     // Écouteur pour les changements de thème système
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => setSystemTheme(getSystemTheme());
-    
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);

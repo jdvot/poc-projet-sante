@@ -23,30 +23,29 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
 }
 
 // Wrapper personnalisé avec tous les providers nécessaires
-function AllTheProviders({ children, queryClient }: { children: React.ReactNode; queryClient?: QueryClient }) {
+function AllTheProviders({
+  children,
+  queryClient,
+}: {
+  children: React.ReactNode;
+  queryClient?: QueryClient;
+}) {
   const testQueryClient = queryClient || createTestQueryClient();
 
   return (
     <QueryClientProvider client={testQueryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 }
 
 // Fonction de rendu personnalisée
-function customRender(
-  ui: ReactElement,
-  options: CustomRenderOptions = {}
-) {
+function customRender(ui: ReactElement, options: CustomRenderOptions = {}) {
   const { queryClient, ...renderOptions } = options;
 
   return render(ui, {
     wrapper: ({ children }) => (
-      <AllTheProviders queryClient={queryClient}>
-        {children}
-      </AllTheProviders>
+      <AllTheProviders queryClient={queryClient}>{children}</AllTheProviders>
     ),
     ...renderOptions,
   });
@@ -56,4 +55,4 @@ function customRender(
 export * from '@testing-library/react';
 
 // Exporter notre fonction de rendu personnalisée
-export { customRender as render }; 
+export { customRender as render };

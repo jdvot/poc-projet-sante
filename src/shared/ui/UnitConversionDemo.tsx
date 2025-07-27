@@ -18,20 +18,28 @@ export function UnitConversionDemo() {
       <Title order={3} mb="md" style={{ color: 'var(--mantine-color-blue-6)' }}>
         Démonstration des Unités de Conversion
       </Title>
-      
+
       <Text size="sm" c="dimmed" mb="lg">
-        Ces valeurs sont automatiquement converties selon vos préférences dans les paramètres.
+        Ces valeurs sont automatiquement converties selon vos préférences dans
+        les paramètres.
       </Text>
 
       <Stack gap="md">
         {/* Weight Conversion */}
         <Group justify="space-between" align="center">
           <Group gap="sm">
-            <IconScale size={20} style={{ color: 'var(--mantine-color-green-6)' }} />
+            <IconScale
+              size={20}
+              style={{ color: 'var(--mantine-color-green-6)' }}
+            />
             <div>
-              <Text size="sm" fw={500}>Poids</Text>
+              <Text size="sm" fw={500}>
+                Poids
+              </Text>
               <Text size="xs" c="dimmed">
-                {exampleWeight} kg → {unitConversion.weight.toDisplay(exampleWeight)} {unitConversion.weight.unit}
+                {exampleWeight} kg →{' '}
+                {unitConversion.weight.toDisplay(exampleWeight)}{' '}
+                {unitConversion.weight.unit}
               </Text>
             </div>
           </Group>
@@ -43,11 +51,18 @@ export function UnitConversionDemo() {
         {/* Height Conversion */}
         <Group justify="space-between" align="center">
           <Group gap="sm">
-            <IconRuler size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <IconRuler
+              size={20}
+              style={{ color: 'var(--mantine-color-blue-6)' }}
+            />
             <div>
-              <Text size="sm" fw={500}>Taille</Text>
+              <Text size="sm" fw={500}>
+                Taille
+              </Text>
               <Text size="xs" c="dimmed">
-                {exampleHeight} cm → {unitConversion.height.toDisplay(exampleHeight).toFixed(1)} {unitConversion.height.unit}
+                {exampleHeight} cm →{' '}
+                {unitConversion.height.toDisplay(exampleHeight).toFixed(1)}{' '}
+                {unitConversion.height.unit}
               </Text>
             </div>
           </Group>
@@ -59,11 +74,18 @@ export function UnitConversionDemo() {
         {/* Temperature Conversion */}
         <Group justify="space-between" align="center">
           <Group gap="sm">
-            <IconThermometer size={20} style={{ color: 'var(--mantine-color-red-6)' }} />
+            <IconThermometer
+              size={20}
+              style={{ color: 'var(--mantine-color-red-6)' }}
+            />
             <div>
-              <Text size="sm" fw={500}>Température</Text>
+              <Text size="sm" fw={500}>
+                Température
+              </Text>
               <Text size="xs" c="dimmed">
-                {exampleTemperature}°C → {unitConversion.temperature.toDisplay(exampleTemperature)}{unitConversion.temperature.unit}
+                {exampleTemperature}°C →{' '}
+                {unitConversion.temperature.toDisplay(exampleTemperature)}
+                {unitConversion.temperature.unit}
               </Text>
             </div>
           </Group>
@@ -74,8 +96,9 @@ export function UnitConversionDemo() {
       </Stack>
 
       <Text size="xs" c="dimmed" mt="md" ta="center">
-        Modifiez vos unités dans les paramètres pour voir les changements en temps réel !
+        Modifiez vos unités dans les paramètres pour voir les changements en
+        temps réel !
       </Text>
     </Card>
   );
-} 
+}

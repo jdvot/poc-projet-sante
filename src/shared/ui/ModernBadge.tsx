@@ -22,7 +22,7 @@ export function ModernBadge({
     switch (variant) {
       case 'gradient':
         return {
-          background: gradient 
+          background: gradient
             ? `linear-gradient(135deg, var(--mantine-color-${gradient.from}-6), var(--mantine-color-${gradient.to}-6))`
             : 'linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6))',
           color: 'white',
@@ -45,28 +45,36 @@ export function ModernBadge({
         };
       case 'light':
         return {
-          background: colorScheme === 'dark' 
-            ? 'var(--mantine-color-blue-9)' 
-            : 'var(--mantine-color-blue-0)',
-          color: colorScheme === 'dark' 
-            ? 'var(--mantine-color-blue-1)' 
-            : 'var(--mantine-color-blue-7)',
-          border: `1px solid ${colorScheme === 'dark' 
-            ? 'var(--mantine-color-blue-7)' 
-            : 'var(--mantine-color-blue-2)'}`,
+          background:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-blue-9)'
+              : 'var(--mantine-color-blue-0)',
+          color:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-blue-1)'
+              : 'var(--mantine-color-blue-7)',
+          border: `1px solid ${
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-blue-7)'
+              : 'var(--mantine-color-blue-2)'
+          }`,
           boxShadow: '0 1px 4px rgba(59, 130, 246, 0.1)',
         };
       default:
         return {
-          background: colorScheme === 'dark' 
-            ? 'var(--mantine-color-dark-4)' 
-            : 'var(--mantine-color-gray-0)',
-          color: colorScheme === 'dark' 
-            ? 'var(--mantine-color-gray-3)' 
-            : 'var(--mantine-color-gray-7)',
-          border: `1px solid ${colorScheme === 'dark' 
-            ? 'var(--mantine-color-dark-3)' 
-            : 'var(--mantine-color-gray-3)'}`,
+          background:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-dark-4)'
+              : 'var(--mantine-color-gray-0)',
+          color:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-gray-3)'
+              : 'var(--mantine-color-gray-7)',
+          border: `1px solid ${
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-dark-3)'
+              : 'var(--mantine-color-gray-3)'
+          }`,
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
         };
     }
@@ -89,4 +97,4 @@ export function ModernBadge({
       {children}
     </Badge>
   );
-} 
+}

@@ -11,7 +11,8 @@ const meta: Meta<typeof Home> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Page d\'accueil moderne avec présentation des fonctionnalités et de la stack technologique.',
+        component:
+          "Page d'accueil moderne avec présentation des fonctionnalités et de la stack technologique.",
       },
     },
   },
@@ -38,7 +39,8 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'La page d\'accueil par défaut avec toutes les sections et fonctionnalités.',
+        story:
+          "La page d'accueil par défaut avec toutes les sections et fonctionnalités.",
       },
     },
   },
@@ -49,7 +51,8 @@ export const WithDarkTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Page d\'accueil en mode sombre pour tester le contraste et la lisibilité.',
+        story:
+          "Page d'accueil en mode sombre pour tester le contraste et la lisibilité.",
       },
     },
   },
@@ -69,7 +72,8 @@ export const WithLightTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Page d\'accueil en mode clair pour tester le contraste et la lisibilité.',
+        story:
+          "Page d'accueil en mode clair pour tester le contraste et la lisibilité.",
       },
     },
   },
@@ -82,4 +86,4 @@ export const WithLightTheme: Story = {
       </I18nextProvider>
     ),
   ],
-}; 
+};

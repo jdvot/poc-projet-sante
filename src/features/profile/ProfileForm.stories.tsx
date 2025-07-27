@@ -8,7 +8,8 @@ const meta: Meta<typeof ProfileForm> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Formulaire de profil santé avec validation en temps réel et calculs de métriques de santé.',
+        component:
+          'Formulaire de profil santé avec validation en temps réel et calculs de métriques de santé.',
       },
     },
   },
@@ -99,7 +100,8 @@ export const Loading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Le formulaire affiche des états de chargement pendant la sauvegarde.',
+        story:
+          'Le formulaire affiche des états de chargement pendant la sauvegarde.',
       },
     },
   },
@@ -120,8 +122,9 @@ export const WithUnsavedChanges: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Le formulaire affiche un indicateur quand il y a des modifications non sauvegardées.',
+        story:
+          'Le formulaire affiche un indicateur quand il y a des modifications non sauvegardées.',
       },
     },
   },
-}; 
+};

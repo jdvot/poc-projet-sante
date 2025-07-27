@@ -1,6 +1,13 @@
 'use client';
 
-import { Menu, Button, Group, Text, Box, useMantineColorScheme } from '@mantine/core';
+import {
+  Menu,
+  Button,
+  Group,
+  Text,
+  Box,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconLanguage, IconChevronDown } from '@tabler/icons-react';
 import { useLanguageStore } from '../stores/languageStore';
@@ -16,10 +23,12 @@ export function LanguageSwitcher() {
   // Détection du thème système
   useEffect(() => {
     setMounted(true);
-    
+
     const getSystemTheme = () => {
       if (typeof window !== 'undefined') {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
       }
       return 'light';
     };
@@ -29,7 +38,7 @@ export function LanguageSwitcher() {
     // Écouteur pour les changements de thème système
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => setSystemTheme(getSystemTheme());
-    
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
@@ -56,30 +65,38 @@ export function LanguageSwitcher() {
     languages.find((lang) => lang.code === language) || languages[0];
 
   const buttonStyles = {
-    background: actualTheme === 'dark' 
-      ? 'var(--mantine-color-dark-4)' 
-      : 'var(--mantine-color-gray-0)',
-    border: `1px solid ${actualTheme === 'dark' 
-      ? 'var(--mantine-color-dark-3)' 
-      : 'var(--mantine-color-gray-3)'}`,
-    color: actualTheme === 'dark' 
-      ? 'var(--mantine-color-gray-3)' 
-      : 'var(--mantine-color-gray-7)',
+    background:
+      actualTheme === 'dark'
+        ? 'var(--mantine-color-dark-4)'
+        : 'var(--mantine-color-gray-0)',
+    border: `1px solid ${
+      actualTheme === 'dark'
+        ? 'var(--mantine-color-dark-3)'
+        : 'var(--mantine-color-gray-3)'
+    }`,
+    color:
+      actualTheme === 'dark'
+        ? 'var(--mantine-color-gray-3)'
+        : 'var(--mantine-color-gray-7)',
     fontWeight: 500,
     transition: 'all 0.2s ease',
   };
 
   const dropdownStyles = {
-    border: `1px solid ${actualTheme === 'dark' 
-      ? 'var(--mantine-color-dark-4)' 
-      : 'var(--mantine-color-gray-3)'}`,
+    border: `1px solid ${
+      actualTheme === 'dark'
+        ? 'var(--mantine-color-dark-4)'
+        : 'var(--mantine-color-gray-3)'
+    }`,
     borderRadius: '0.75rem',
-    boxShadow: actualTheme === 'dark' 
-      ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
-      : '0 4px 12px rgba(0, 0, 0, 0.15)',
-    background: actualTheme === 'dark' 
-      ? 'var(--mantine-color-dark-6)' 
-      : 'var(--mantine-color-body)',
+    boxShadow:
+      actualTheme === 'dark'
+        ? '0 4px 12px rgba(0, 0, 0, 0.3)'
+        : '0 4px 12px rgba(0, 0, 0, 0.15)',
+    background:
+      actualTheme === 'dark'
+        ? 'var(--mantine-color-dark-6)'
+        : 'var(--mantine-color-body)',
   };
 
   return (
@@ -92,21 +109,25 @@ export function LanguageSwitcher() {
           rightSection={<IconChevronDown size={14} />}
           style={buttonStyles}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = actualTheme === 'dark' 
-              ? 'var(--mantine-color-dark-3)' 
-              : 'var(--mantine-color-gray-1)';
-            e.currentTarget.style.borderColor = actualTheme === 'dark' 
-              ? 'var(--mantine-color-dark-2)' 
-              : 'var(--mantine-color-gray-4)';
+            e.currentTarget.style.background =
+              actualTheme === 'dark'
+                ? 'var(--mantine-color-dark-3)'
+                : 'var(--mantine-color-gray-1)';
+            e.currentTarget.style.borderColor =
+              actualTheme === 'dark'
+                ? 'var(--mantine-color-dark-2)'
+                : 'var(--mantine-color-gray-4)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = actualTheme === 'dark' 
-              ? 'var(--mantine-color-dark-4)' 
-              : 'var(--mantine-color-gray-0)';
-            e.currentTarget.style.borderColor = actualTheme === 'dark' 
-              ? 'var(--mantine-color-dark-3)' 
-              : 'var(--mantine-color-gray-3)';
+            e.currentTarget.style.background =
+              actualTheme === 'dark'
+                ? 'var(--mantine-color-dark-4)'
+                : 'var(--mantine-color-gray-0)';
+            e.currentTarget.style.borderColor =
+              actualTheme === 'dark'
+                ? 'var(--mantine-color-dark-3)'
+                : 'var(--mantine-color-gray-3)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
@@ -131,32 +152,35 @@ export function LanguageSwitcher() {
               color:
                 language === lang.code
                   ? 'var(--mantine-color-blue-6)'
-                  : actualTheme === 'dark' 
-                    ? 'var(--mantine-color-gray-3)' 
+                  : actualTheme === 'dark'
+                    ? 'var(--mantine-color-gray-3)'
                     : 'var(--mantine-color-gray-7)',
               background:
                 language === lang.code
-                  ? actualTheme === 'dark' 
-                    ? 'var(--mantine-color-blue-9)' 
+                  ? actualTheme === 'dark'
+                    ? 'var(--mantine-color-blue-9)'
                     : 'var(--mantine-color-blue-0)'
                   : 'transparent',
             }}
             onMouseEnter={(e) => {
               if (language !== lang.code) {
-                e.currentTarget.style.background = actualTheme === 'dark' 
-                  ? 'var(--mantine-color-dark-4)' 
-                  : 'var(--mantine-color-gray-0)';
-                e.currentTarget.style.color = actualTheme === 'dark' 
-                  ? 'var(--mantine-color-gray-1)' 
-                  : 'var(--mantine-color-gray-9)';
+                e.currentTarget.style.background =
+                  actualTheme === 'dark'
+                    ? 'var(--mantine-color-dark-4)'
+                    : 'var(--mantine-color-gray-0)';
+                e.currentTarget.style.color =
+                  actualTheme === 'dark'
+                    ? 'var(--mantine-color-gray-1)'
+                    : 'var(--mantine-color-gray-9)';
               }
             }}
             onMouseLeave={(e) => {
               if (language !== lang.code) {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = actualTheme === 'dark' 
-                  ? 'var(--mantine-color-gray-3)' 
-                  : 'var(--mantine-color-gray-7)';
+                e.currentTarget.style.color =
+                  actualTheme === 'dark'
+                    ? 'var(--mantine-color-gray-3)'
+                    : 'var(--mantine-color-gray-7)';
               }
             }}
           >

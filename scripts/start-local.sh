@@ -100,29 +100,29 @@ start_services() {
     log "Services started"
 }
 
-# Fonction pour vérifier le statut
+# Function to check status
 check_status() {
-    log "Vérification du statut des services..."
+    log "Checking service status..."
     
-    # Attendre que l'application soit prête
-    info "Attente du démarrage de l'application..."
+    # Wait for application to be ready
+    info "Waiting for application to start..."
     for i in {1..30}; do
         if curl -f http://localhost:3000/api/health > /dev/null 2>&1; then
-            log "Application prête!"
+            log "Application ready!"
             break
         fi
         
         if [ $i -eq 30 ]; then
-            warn "L'application n'est pas encore prête après 30 secondes"
+            warn "Application is not ready after 30 seconds"
         else
-            info "Attente... ($i/30)"
+            info "Waiting... ($i/30)"
             sleep 1
         fi
     done
     
-    # Afficher les URLs
+    # Display URLs
     echo ""
-    log "Services disponibles:"
+    log "Available services:"
     echo "  🌐 Application: http://localhost:3000"
     echo "  📊 Health Check: http://localhost:3000/api/health"
     echo "  📈 Metrics: http://localhost:3000/api/metrics"

@@ -26,8 +26,8 @@ export const ModernSectionDefault: Story = {
 
 export const ModernSectionHighlighted: Story = {
   render: () => (
-    <ModernSection 
-      title="Highlighted Section" 
+    <ModernSection
+      title="Highlighted Section"
       subtitle="This section has a highlighted variant"
       icon={<IconHeart size={20} />}
       variant="highlighted"
@@ -39,8 +39,8 @@ export const ModernSectionHighlighted: Story = {
 
 export const ModernSectionSubtle: Story = {
   render: () => (
-    <ModernSection 
-      title="Subtle Section" 
+    <ModernSection
+      title="Subtle Section"
       subtitle="This section has a subtle variant"
       variant="subtle"
     >
@@ -63,11 +63,11 @@ export const ModernProgressDefault: Story = {
 
 export const ModernProgressLarge: Story = {
   render: () => (
-    <ModernProgress 
-      value={85} 
-      label="BMI Score" 
-      unit="" 
-      color="blue" 
+    <ModernProgress
+      value={85}
+      label="BMI Score"
+      unit=""
+      color="blue"
       size={120}
       thickness={12}
       description="Normal weight range"
@@ -95,7 +95,8 @@ export const ModernAlertSuccess: Story = {
       icon={<IconUser size={16} />}
       title="Success Alert"
     >
-      This is a success alert indicating that an operation completed successfully.
+      This is a success alert indicating that an operation completed
+      successfully.
     </ModernAlert>
   ),
 };
@@ -127,7 +128,10 @@ export const ModernAlertError: Story = {
 // ModernCard Stories
 export const ModernCardDefault: Story = {
   render: () => (
-    <ModernCard title="Default Card" subtitle="A simple card with title and subtitle">
+    <ModernCard
+      title="Default Card"
+      subtitle="A simple card with title and subtitle"
+    >
       <p>This is the content of a default modern card.</p>
     </ModernCard>
   ),
@@ -135,8 +139,8 @@ export const ModernCardDefault: Story = {
 
 export const ModernCardElevated: Story = {
   render: () => (
-    <ModernCard 
-      title="Elevated Card" 
+    <ModernCard
+      title="Elevated Card"
       subtitle="A card with elevated styling"
       icon={<IconHeart size={20} />}
       variant="elevated"
@@ -148,8 +152,8 @@ export const ModernCardElevated: Story = {
 
 export const ModernCardGradient: Story = {
   render: () => (
-    <ModernCard 
-      title="Gradient Card" 
+    <ModernCard
+      title="Gradient Card"
       subtitle="A card with gradient background"
       variant="gradient"
       gradient={{ from: 'blue', to: 'cyan' }}
@@ -157,4 +161,4 @@ export const ModernCardGradient: Story = {
       <p>This is the content of a gradient modern card.</p>
     </ModernCard>
   ),
-}; 
+};

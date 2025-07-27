@@ -26,23 +26,29 @@ export function ModernSection({
     switch (variant) {
       case 'highlighted':
         return {
-          background: colorScheme === 'dark' 
-            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 197, 94, 0.1))'
-            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(34, 197, 94, 0.05))',
-          border: `1px solid ${colorScheme === 'dark' 
-            ? 'rgba(59, 130, 246, 0.2)' 
-            : 'rgba(59, 130, 246, 0.15)'}`,
+          background:
+            colorScheme === 'dark'
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 197, 94, 0.1))'
+              : 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(34, 197, 94, 0.05))',
+          border: `1px solid ${
+            colorScheme === 'dark'
+              ? 'rgba(59, 130, 246, 0.2)'
+              : 'rgba(59, 130, 246, 0.15)'
+          }`,
           borderRadius: '1rem',
           padding: '1.5rem',
         };
       case 'subtle':
         return {
-          background: colorScheme === 'dark' 
-            ? 'rgba(255, 255, 255, 0.02)' 
-            : 'rgba(0, 0, 0, 0.02)',
-          border: `1px solid ${colorScheme === 'dark' 
-            ? 'rgba(255, 255, 255, 0.05)' 
-            : 'rgba(0, 0, 0, 0.05)'}`,
+          background:
+            colorScheme === 'dark'
+              ? 'rgba(255, 255, 255, 0.02)'
+              : 'rgba(0, 0, 0, 0.02)',
+          border: `1px solid ${
+            colorScheme === 'dark'
+              ? 'rgba(255, 255, 255, 0.05)'
+              : 'rgba(0, 0, 0, 0.05)'
+          }`,
           borderRadius: '0.75rem',
           padding: '1rem',
         };
@@ -66,12 +72,12 @@ export function ModernSection({
         <Group justify="space-between" align="center" mb="lg">
           <Box>
             {title && (
-              <Text 
-                fw={600} 
-                size="lg" 
-                style={{ 
+              <Text
+                fw={600}
+                size="lg"
+                style={{
                   color: 'var(--mantine-color-text)',
-                  marginBottom: subtitle ? '0.25rem' : '0'
+                  marginBottom: subtitle ? '0.25rem' : '0',
                 }}
               >
                 {title}
@@ -84,12 +90,13 @@ export function ModernSection({
             )}
           </Box>
           {icon && (
-            <Box 
+            <Box
               style={{
                 padding: '0.75rem',
-                background: colorScheme === 'dark' 
-                  ? 'var(--mantine-color-blue-9)' 
-                  : 'var(--mantine-color-blue-100)',
+                background:
+                  colorScheme === 'dark'
+                    ? 'var(--mantine-color-blue-9)'
+                    : 'var(--mantine-color-blue-100)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -104,4 +111,4 @@ export function ModernSection({
       {children}
     </Box>
   );
-} 
+}

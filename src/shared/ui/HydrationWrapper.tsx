@@ -29,12 +29,14 @@ export function HydrationWrapper({ children }: HydrationWrapperProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: colorScheme === 'dark' 
-            ? 'var(--mantine-color-dark-6)' 
-            : 'var(--mantine-color-body)',
-          color: colorScheme === 'dark' 
-            ? 'var(--mantine-color-gray-3)' 
-            : 'var(--mantine-color-text)',
+          background:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-dark-6)'
+              : 'var(--mantine-color-body)',
+          color:
+            colorScheme === 'dark'
+              ? 'var(--mantine-color-gray-3)'
+              : 'var(--mantine-color-text)',
         }}
       >
         <div>Loading...</div>
