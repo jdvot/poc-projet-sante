@@ -17,14 +17,6 @@
     ],
     "rewrites": [
       {
-        "source": "/api/n8n/chat",
-        "function": "n8nChat"
-      },
-      {
-        "source": "/api/health",
-        "function": "health"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }
