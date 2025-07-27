@@ -2,6 +2,8 @@
 export { useFormValidation } from './useFormValidation';
 export { useApiCall, useApiMutation, useProfileSave } from './useApiCall';
 export { useDashboard } from './useDashboard';
+export { useAccessibilitySettings } from './useAccessibilitySettings';
+export { useUnitConversion } from './useUnitConversion';
 
 // Types exportés
 export type {

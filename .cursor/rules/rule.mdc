@@ -1,0 +1,327 @@
+---
+description: 'react rules'
+globs: ['**/*.{ts,tsx,js,jsx}']
+alwaysApply: true
+---
+
+# 🧠 CURSOR CODEBASE RULES – Limitless Health (React 19 / Next.js 15)
+
+## 🟦 Analysis Process
+
+**Always follow this process before coding or refactoring:**
+
+1. **Request Analysis**
+   - Identify the task type (feature, bugfix, architecture, etc.)
+   - Stack used: TypeScript, React 19, Next.js 15 (App Router)
+   - Clarify business & technical requirements
+   - Define the core problem and expected outcome
+   - Consider project context (RSC, i18n, CI/CD, Storybook, etc.)
+
+2. **Solution Planning**
+   - Break down the solution into logical steps, favor factorization
+   - Identify necessary files/folders (`/app`, `/features`, `/shared`, etc.)
+   - Consider stack alternatives/tools (Zustand, TanStack Query, Mantine, etc.)
+   - Plan unit tests and end-to-end tests
+
+3. **Implementation Strategy**
+   - Select appropriate patterns (composition, hooks, providers)
+   - Optimize for performance and accessibility (Web Vitals, a11y)
+   - Plan error handling and edge cases
+   - Validate alignment with project best practices
+
+---
+
+## 🏗️ Project Architecture
+
+### Directory Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages & layouts
+│   ├── api/               # API routes (n8n integration)
+│   ├── auth/              # Authentication pages
+│   ├── dashboard/         # Dashboard pages
+│   ├── profile/           # Profile management pages
+│   ├── settings/          # Settings pages
+│   ├── ai-doctor/         # AI Doctor feature pages
+│   └── layout.tsx         # Root layout
+├── features/              # Feature-based modules
+│   ├── auth/              # Authentication feature
+│   ├── dashboard/         # Dashboard feature
+│   ├── profile/           # Profile management feature
+│   │   ├── components/    # Feature-specific components
+│   │   ├── hooks/         # Feature-specific hooks
+│   │   └── *.tsx          # Main feature components
+│   ├── settings/          # Settings feature
+│   ├── ai-doctor/         # AI Doctor feature
+│   └── home/              # Home page feature
+├── shared/                # Shared utilities & components
+│   ├── api/               # API utilities & mock data
+│   ├── config/            # Configuration files
+│   ├── hooks/             # Shared custom hooks
+│   ├── i18n/              # Internationalization
+│   ├── mocks/             # Test mocks
+│   ├── providers/         # Context providers
+│   ├── stores/            # Zustand stores
+│   ├── types/             # TypeScript type definitions
+│   └── ui/                # Shared UI components
+└── test/                  # Test configuration
+```
+
+### Architecture Principles
+
+- **Feature-Based Organization**: Each feature is self-contained with its own components, hooks, and tests
+- **Shared Layer**: Common utilities, stores, and UI components in `/shared`
+- **App Router**: Next.js 15 App Router for routing and layouts
+- **Separation of Concerns**: Clear boundaries between features and shared code
+
+---
+
+## 💻 Code Style & Structure
+
+### General Principles
+
+- **TypeScript mandatory** everywhere (code, tests, configs)
+- Prefer declarative and functional programming
+- Apply DRY, KISS, early returns for readability
+- Logical structure: main export(s), sub-components, helpers, types at bottom
+- Avoid cross-dependencies and hidden side-effects
+
+### Naming Conventions
+
+- Use descriptive names: `isLoading`, `hasError`, `userProfile`
+- Event Handlers: prefix with `handle` (e.g., `handleSubmit`)
+- Folders: kebab-case (e.g., `components/user-card`)
+- Favor named exports for all components and hooks
+- Feature folders: kebab-case (e.g., `ai-doctor`, `user-profile`)
+
+### TypeScript
+
+- Always explicitly type props, hooks, API, stores
+- Prefer `interface` over `type`
+- Avoid enums, prefer constant objects with `as const`
+- Use the `satisfies` operator for type validation
+- Propagate typing to hooks (e.g., `useQuery`, `useStore`)
+
+---
+
+## ⚛️ React 19 / Next.js 15 Best Practices
+
+### Architecture & Components
+
+- **Favor React Server Components (RSC)**; `use client` only if necessary (interactive UI, local state)
+- Use nested layouts (`/app`)
+- Plan ErrorBoundaries and `Suspense` early
+- Handle cookie/header access asynchronously:
+
+  ```typescript
+  const cookieStore = await cookies();
+  const headersList = await headers();
+  const { isEnabled } = await draftMode();
+  ```
+
+- Take `params` and `searchParams` asynchronously in pages/layouts
+
+### State & Data Fetching
+
+- Use **Zustand** for simple global state needs, decoupled by feature/domain
+- Store structure: `/shared/stores/` with feature-specific stores
+- Prefer **TanStack Query** for client-side data fetching, with invalidation and suspense
+- Minimize client-side state; everything that can be server-side should be
+- Manage URL state with **nuqs** for searchParams <-> UI sync
+
+### Form & Async
+
+- **React 19**: Prefer `useActionState` for async forms
+- Use `useFormStatus` to manage transitions (pending, data, method, action)
+- Prefer **React Hook Form** for complex forms with Zod validation
+
+---
+
+## 🧩 UI / UX
+
+- Use **Mantine UI** + **Tabler Icons** for all accessible, customizable components
+- Styling: Tailwind CSS exclusively, via utility classes
+- Clear component structure (`/features/*/components`, `/shared/ui`)
+- Plan Storybook stories for all reusable UI components
+- Follow Mantine design system patterns and components
+
+---
+
+## 🏪 State Management (Zustand)
+
+### Store Organization
+
+```typescript
+// /shared/stores/authStore.ts
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      // State
+      user: null,
+      isAuthenticated: false,
+
+      // Actions
+      login: (user) => set({ user, isAuthenticated: true }),
+      logout: () => set({ user: null, isAuthenticated: false }),
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({
+        /* selective persistence */
+      }),
+    }
+  )
+);
+```
+
+### Store Patterns
+
+- **Feature-based stores**: One store per major feature domain
+- **Persistent stores**: Use `persist` middleware for critical data
+- **Selective persistence**: Only persist non-sensitive data
+- **Type safety**: Full TypeScript interfaces for all stores
+- **Store composition**: Combine stores when needed
+
+---
+
+## 🌐 Internationalization (i18n)
+
+### Structure
+
+```typescript
+// /shared/i18n/config.ts
+const resources = {
+  en: {
+    translation: {
+      // Feature-based organization
+      auth: {
+        /* auth translations */
+      },
+      profile: {
+        /* profile translations */
+      },
+      dashboard: {
+        /* dashboard translations */
+      },
+    },
+  },
+  fr: {
+    translation: {
+      // Same structure as English
+    },
+  },
+};
+```
+
+### Usage Patterns
+
+- **Feature-based keys**: Organize translations by feature
+- **Typed translations**: Use TypeScript for translation keys
+- **Dynamic loading**: Load translations on demand
+- **Fallback handling**: Graceful fallback to default language
+
+---
+
+## 🧪 Tests & Quality
+
+### Test Structure
+
+```
+src/
+├── features/
+│   └── profile/
+│       ├── ProfileForm.test.tsx    # Component tests
+│       └── hooks/
+│           └── useHealthCalculations.test.ts  # Hook tests
+├── test/
+│   ├── setup.ts                   # Test configuration
+│   └── test-utils.tsx             # Test utilities
+└── cypress/
+    └── e2e/                       # E2E tests
+```
+
+### Testing Patterns
+
+- **Unit tests** with Vitest (structure: `__tests__` or `.test.tsx`)
+- **E2E tests** with Cypress (structure: `/e2e`)
+- **Test utilities**: Shared test setup and utilities in `/test`
+- **Component testing**: Test components in isolation
+- **Hook testing**: Test custom hooks separately
+- **Store testing**: Test Zustand stores with state changes
+
+### CI/CD Requirements
+
+- **Linting**: `eslint` with Next.js and TypeScript rules
+- **Formatting**: `prettier` for consistent code style
+- **Testing**: `vitest` for unit tests, `cypress` for E2E
+- **Husky**: Pre-commit hooks (lint, test, format)
+- **All tests must be written in English** for consistency
+
+---
+
+## 🔧 Development Tools
+
+### Scripts
+
+```json
+{
+  "dev": "next dev --turbopack",
+  "build": "next build",
+  "test": "vitest",
+  "test:ui": "vitest --ui",
+  "test:coverage": "vitest --coverage",
+  "storybook": "storybook dev -p 6006",
+  "cypress:open": "cypress open",
+  "cypress:run": "cypress run"
+}
+```
+
+### Key Dependencies
+
+- **UI**: Mantine Core, Mantine Hooks, Tabler Icons
+- **State**: Zustand with persistence
+- **Forms**: React Hook Form with Zod validation
+- **Testing**: Vitest, Testing Library, Cypress
+- **i18n**: i18next with React integration
+- **Monitoring**: Sentry for error tracking
+
+---
+
+## 🚨 Monitoring & Analytics
+
+- **Sentry** for all front and back errors (Next.js middleware ready)
+- **Vercel Analytics** for web metrics
+- **Error boundaries**: Implement at feature level
+- **Performance monitoring**: Track Core Web Vitals
+
+---
+
+## 🧠 Key Points
+
+### Feature Development
+
+- **Self-contained features**: Each feature should be independently testable
+- **Shared components**: Extract reusable components to `/shared/ui`
+- **Custom hooks**: Feature-specific hooks in `/features/*/hooks`
+- **Type definitions**: Feature types in `/shared/types`
+
+### Code Organization
+
+- **Import paths**: Use relative imports within features, absolute for shared
+- **Component structure**: Main component, sub-components, hooks, types
+- **File naming**: PascalCase for components, camelCase for utilities
+- **Export patterns**: Named exports preferred over default exports
+
+### Best Practices
+
+- **Error handling**: Implement proper error boundaries and fallbacks
+- **Loading states**: Use Suspense and loading indicators
+- **Accessibility**: Follow WCAG guidelines with Mantine components
+- **Performance**: Optimize with React.memo, useMemo, useCallback
+- **Documentation**: Document complex logic and custom hooks
+
+---
+
+_Ref: This file serves as a reference for all contributions to Limitless Health (React 19 / Next.js 15)._
+_Update as the project or stack evolves._

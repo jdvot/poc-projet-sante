@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Card, Text, Stack } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
+import { ModernAlert } from '../../../shared/ui/ModernAlert';
+import { useProfileTranslations } from '../hooks/useProfileTranslations';
 
 interface ValidationErrorsProps {
   errors: string[];
@@ -10,24 +13,23 @@ interface ValidationErrorsProps {
 export const ValidationErrors: React.FC<ValidationErrorsProps> = ({
   errors,
 }) => {
+  const { profileT } = useProfileTranslations();
+  
   if (errors.length === 0) return null;
 
   return (
-    <Card
-      withBorder
-      p="md"
-      style={{ borderColor: 'var(--mantine-color-red-6)' }}
+    <ModernAlert
+      variant="error"
+      icon={<IconAlertTriangle size={16} />}
+      title={profileT.validation.errorsFound.replace('{{count}}', errors.length.toString())}
     >
-      <Stack gap="xs">
-        <Text size="sm" c="red" fw={500}>
-          Erreurs de validation:
-        </Text>
+      <Stack gap="xs" mt="xs">
         {errors.map((error, index) => (
-          <Text key={index} size="sm" c="red">
+          <Text key={index} size="sm" style={{ color: 'var(--mantine-color-text)' }}>
             • {error}
           </Text>
         ))}
       </Stack>
-    </Card>
+    </ModernAlert>
   );
 };

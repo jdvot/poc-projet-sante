@@ -1,21 +1,20 @@
 'use client';
 
-import { MantineProvider, createTheme } from '@mantine/core';
-import { ReactNode } from 'react';
+import React from 'react';
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
+import { appTheme } from '../config/theme';
 
 interface ThemeProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-const theme = createTheme({
-  primaryColor: 'blue',
-  fontFamily: 'Inter, sans-serif',
-});
-
-export function ThemeProvider({ children }: ThemeProviderProps) {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="auto">
-      {children}
-    </MantineProvider>
+    <>
+      <ColorSchemeScript />
+      <MantineProvider theme={appTheme} defaultColorScheme="auto">
+        {children}
+      </MantineProvider>
+    </>
   );
-}
+};

@@ -1,1 +1,2 @@
-// Point d'entrée pour les appels API (mock)
+export * from './mockApi';
+export * from './chatApi';

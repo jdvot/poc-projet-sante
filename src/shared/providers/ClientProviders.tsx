@@ -8,6 +8,8 @@ import i18n from '../i18n/config';
 import { ThemeProvider } from './ThemeProvider';
 import { I18nProvider } from '../i18n/I18nProvider';
 import { HydrationWrapper } from '../ui/HydrationWrapper';
+import { NotificationContainer } from '../ui/NotificationContainer';
+import { useAccessibilitySettings } from '../hooks/useAccessibilitySettings';
 
 interface ClientProvidersProps {
   children: ReactNode;
@@ -28,11 +30,15 @@ const queryClient = new QueryClient({
 });
 
 export function ClientProviders({ children }: ClientProvidersProps) {
+  // Apply accessibility settings globally
+  useAccessibilitySettings();
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
         <I18nProvider>
           <ThemeProvider>
+            <NotificationContainer />
             <HydrationWrapper>{children}</HydrationWrapper>
           </ThemeProvider>
         </I18nProvider>

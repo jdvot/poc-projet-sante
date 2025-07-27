@@ -1,96 +1,183 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Dashboard from './Dashboard';
 
-// Mock de l'API
-vi.mock('../../shared/api/mockApi', () => ({
-  fetchDashboardData: vi.fn(() =>
-    Promise.resolve({
-      biomarkers: [
-        { name: 'Glucose', value: 0.95, unit: 'g/L' },
-        { name: 'Cholestérol', value: 1.8, unit: 'g/L' },
-        { name: 'Triglycérides', value: 1.2, unit: 'g/L' },
-      ],
-      lastCheck: '2024-07-25',
-    })
+// Mock des hooks
+const mockUseDashboard = vi.fn(() => ({
+  dashboardData: {
+    biomarkers: [
+      { name: 'Glucose', value: 0.95, unit: 'g/L' },
+      { name: 'Cholestérol', value: 1.8, unit: 'g/L' },
+      { name: 'Triglycérides', value: 1.2, unit: 'g/L' },
+      { name: 'HDL', value: 0.6, unit: 'g/L' },
+      { name: 'LDL', value: 1.1, unit: 'g/L' },
+    ],
+    lastCheck: '2024-07-25',
+  },
+  biomarkersWithStatus: [
+    {
+      id: 'glucose-0',
+      name: 'Glucose',
+      value: 0.95,
+      unit: 'g/L',
+      status: 'normal' as const,
+    },
+    {
+      id: 'cholesterol-1',
+      name: 'Cholestérol',
+      value: 1.8,
+      unit: 'g/L',
+      status: 'normal' as const,
+    },
+  ],
+  statistics: {
+    healthScore: 100,
+    normal: 5,
+    elevated: 0,
+    high: 0,
+    critical: 0,
+    total: 5,
+  },
+  isLoading: false,
+  error: null,
+  isRefetching: false,
+  refetch: vi.fn(),
+}));
+
+vi.mock('../../../shared/hooks/useDashboard', () => ({
+  useDashboard: mockUseDashboard,
+}));
+
+// Mock du hook useTranslation
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
+// Mock du hook useMantineColorScheme
+vi.mock('@mantine/core', async () => {
+  const actual = await vi.importActual('@mantine/core');
+  return {
+    ...actual,
+    useMantineColorScheme: () => ({
+      colorScheme: 'light',
+    }),
+  };
+});
+
+// Mock du composant MultiBiomarkerChart
+vi.mock('./components/MultiBiomarkerChart', () => ({
+  MultiBiomarkerChart: ({ data, selectedBiomarkers }: any) => (
+    <div data-testid="multi-biomarker-chart">
+      <div data-testid="chart-data-count">{data.length}</div>
+      <div data-testid="selected-biomarkers">
+        {selectedBiomarkers.join(', ')}
+      </div>
+    </div>
   ),
 }));
 
-const createTestQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
     },
-  });
+  },
+});
 
 const renderWithProviders = (component: React.ReactElement) => {
-  const testQueryClient = createTestQueryClient();
   return render(
-    <QueryClientProvider client={testQueryClient}>
+    <QueryClientProvider client={queryClient}>
       <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
 
+const renderWithDarkTheme = (component: React.ReactElement) => {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MantineProvider defaultColorScheme="dark">{component}</MantineProvider>
+    </QueryClientProvider>
+  );
+};
+
 describe('Dashboard', () => {
-  it('affiche le titre du dashboard', () => {
+  it('renders dashboard with blood test chart', () => {
     renderWithProviders(<Dashboard />);
-    expect(screen.getByText('📊 Dashboard Santé')).toBeInTheDocument();
+
+    // Vérifier que le titre du dashboard s'affiche
+    expect(screen.getByText('dashboard.title')).toBeInTheDocument();
+
+    // Vérifier que le graphique multi-biomarqueurs s'affiche
+    expect(screen.getByTestId('multi-biomarker-chart')).toBeInTheDocument();
+
+    // Vérifier que les données de prises de sang sont passées au graphique
+    expect(screen.getByTestId('chart-data-count')).toHaveTextContent('4');
+
+    // Vérifier que les biomarqueurs sélectionnés sont corrects
+    expect(screen.getByTestId('selected-biomarkers')).toHaveTextContent(
+      'glucose, cholesterol, hdl, ldl, triglycerides'
+    );
   });
 
-  it('affiche le skeleton pendant le chargement', () => {
+  it('displays blood test data spanning 2 years', () => {
     renderWithProviders(<Dashboard />);
-    // Pendant le chargement, on voit le skeleton mais pas le titre "Biomarkers"
-    expect(screen.getByText('📊 Dashboard Santé')).toBeInTheDocument();
-    expect(screen.getByLabelText('Actualiser les données')).toBeInTheDocument();
+
+    // Vérifier que nous avons 4 prises de sang (2 par an sur 2 ans)
+    expect(screen.getByTestId('chart-data-count')).toHaveTextContent('4');
   });
 
-  it('affiche les biomarkers après chargement', async () => {
+  it('shows correct biomarker selection', () => {
     renderWithProviders(<Dashboard />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Glucose')).toBeInTheDocument();
-      expect(screen.getByText('Cholestérol')).toBeInTheDocument();
-      expect(screen.getByText('Triglycérides')).toBeInTheDocument();
-    });
+    // Vérifier que les biomarqueurs sélectionnés sont corrects
+    expect(screen.getByTestId('selected-biomarkers')).toHaveTextContent(
+      'glucose, cholesterol, hdl, ldl, triglycerides'
+    );
   });
 
-  it('affiche les valeurs des biomarkers', async () => {
+  it('displays health statistics correctly', () => {
     renderWithProviders(<Dashboard />);
 
-    await waitFor(() => {
-      expect(screen.getByText('0.95 g/L')).toBeInTheDocument();
-      expect(screen.getByText('1.8 g/L')).toBeInTheDocument();
-      expect(screen.getByText('1.2 g/L')).toBeInTheDocument();
-    });
+    // Vérifier que les statistiques de santé s'affichent
+    expect(screen.getByText('Score de Santé Global')).toBeInTheDocument();
+    expect(screen.getByText('100%')).toBeInTheDocument(); // Score de santé
   });
 
-  it('affiche la date du dernier check', async () => {
+  it('shows biomarker cards with status', () => {
     renderWithProviders(<Dashboard />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Dernier check: 2024-07-25')).toBeInTheDocument();
-    });
+    // Vérifier que les cartes de biomarqueurs s'affichent
+    expect(screen.getByText('Glucose')).toBeInTheDocument();
+    expect(screen.getByText('Cholestérol')).toBeInTheDocument();
   });
 
-  it('affiche les badges de statut', async () => {
-    renderWithProviders(<Dashboard />);
+  it('renders correctly in dark theme', () => {
+    renderWithDarkTheme(<Dashboard />);
 
-    await waitFor(() => {
-      // Utiliser getAllByText pour les éléments multiples
-      const normalBadges = screen.getAllByText('Normal');
-      expect(normalBadges.length).toBeGreaterThan(0);
-
-      const elevatedBadges = screen.getAllByText('Élevé');
-      expect(elevatedBadges.length).toBeGreaterThan(0);
-    });
+    // Vérifier que le dashboard s'affiche en thème sombre
+    expect(screen.getByText('dashboard.title')).toBeInTheDocument();
+    expect(screen.getByTestId('multi-biomarker-chart')).toBeInTheDocument();
   });
 
-  it("affiche le bouton d'actualisation", () => {
+  it('displays theme-aware components', () => {
     renderWithProviders(<Dashboard />);
-    expect(screen.getByLabelText('Actualiser les données')).toBeInTheDocument();
+
+    // Vérifier que les composants utilisent le thème
+    expect(screen.getByText('dashboard.title')).toBeInTheDocument();
+
+    // Vérifier que les cartes de biomarqueurs s'affichent
+    expect(screen.getByText('Glucose')).toBeInTheDocument();
+    expect(screen.getByText('Cholestérol')).toBeInTheDocument();
+  });
+
+  it('shows last check information', () => {
+    renderWithProviders(<Dashboard />);
+
+    // Vérifier que la date du dernier check s'affiche
+    expect(screen.getByText(/2024-07-25/)).toBeInTheDocument();
   });
 });

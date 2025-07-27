@@ -1,101 +1,189 @@
-🧠 README.CURSOR.txt
+# 🧠 GUIDE CURSOR - React/Next.js
 
-Tu es l’assistant de développement sur ce projet React.
-À CHAQUE SESSION, lorsque tu ouvres un fichier ou modifies du code, tu DOIS :
-
-1. Relire ce README
-2. Analyser les fichiers modifiés
-3. Appliquer les bonnes pratiques listées ci‑dessous
-4. Commenter directement dans le code si un point n’est pas respecté
+**À CHAQUE MODIFICATION, vérifier ce guide et commenter dans le code si non-respecté.**
 
 ---
 
-1. Structure du projet
-   /src
-   /components # UI atoms & molecules (Function Components, PascalCase)
-   /features # Domain modules (feature-based)
-   /hooks # Custom React hooks
-   /pages # Pages (Next.js App Router ou React Router)
-   /services # Appels API & logique métier
-   /stores # Zustand / Context API
-   /types # Déclarations TypeScript partagées
-   /utils # Fonctions pures réutilisables
+## 📁 Structure
+
+```
+/src
+├── app/           # Next.js App Router
+├── features/      # Modules métier (auth, dashboard, etc.)
+├── shared/        # Code partagé (hooks, stores, types, ui)
+└── test/          # Tests
+```
 
 ---
 
-2. Composants
+## 🧩 Composants
 
-- Function Components uniquement, nom en PascalCase.
-- Fichiers .tsx.
-- Props typées via interface Props { … } ou type Props = { … }.
-- Séparer UI et logique : data fetching dans /services ou hooks (/hooks).
-- Dans Next.js App Router, ajouter "use client" en tête de tout fichier interactif.
+### Règles
 
----
+- **Function Components** uniquement, PascalCase
+- **"use client"** en tête des fichiers interactifs
+- **Props typées** avec interface
+- **Séparer UI et logique**
 
-3. Hooks & état local
+```tsx
+'use client';
 
-- useState, useEffect, useMemo, useCallback, useRef :
-  - Jamais dans une condition ou une boucle.
-  - useEffect avec tableau de dépendances complet.
-- Créer des hooks personnalisés (useFetchX, useAuth, etc.) dans /hooks.
+interface Props {
+  title: string;
+  onAction?: () => void;
+}
 
----
-
-4. État global & data fetching
-
-- Zustand ou Context API pour l’état partagé.
-- @tanstack/react-query pour les requêtes : cache, loading, erreurs, invalidation.
-- Appels réseau dans /services/api.ts ou /features/<X>/services.
+export function MyComponent({ title, onAction }: Props) {
+  return <div onClick={onAction}>{title}</div>;
+}
+```
 
 ---
 
-5. Styling & accessibilité
+## 🪝 Hooks
 
-- CSS-in-JS (Emotion/Styled) ou CSS Modules.
-- Attributs ARIA, label + htmlFor pour chaque input.
-- role / tabIndex pour éléments non-natifs focusables.
+### Règles strictes
 
----
+- **Jamais dans conditions/boucles**
+- **Dépendances complètes** dans useEffect
+- **Hooks personnalisés** dans `/shared/hooks/`
 
-6. TypeScript
+```tsx
+// ✅ CORRECT
+const [state, setState] = useState('');
+useEffect(() => {}, [state]);
 
-- Pas de any : typer toutes les props, retours et variables.
-- Utiliser Partial<T>, Pick<T>, Record<K,V> pour affiner les types.
-
----
-
-7. Performance
-
-- React.memo pour composants lourds.
-- useMemo & useCallback pour éviter les re-renders inutiles.
-- Signaler tout goulet d’étranglement potentiel.
+// ❌ INCORRECT
+if (condition) {
+  const [state, setState] = useState('');
+}
+```
 
 ---
 
-8. Tests
+## 🌐 État global
 
-- Jest + React Testing Library :
-  - Tests unitaires pour hooks/utilitaires.
-  - Tests d’intégration légère pour composants critiques.
+### Zustand (dans `/shared/stores/`)
+
+```tsx
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  login: (user) => set({ user }),
+  logout: () => set({ user: null }),
+}));
+```
+
+### Services API (dans `/shared/api/`)
+
+```tsx
+export class ApiService {
+  static async get<T>(endpoint: string): Promise<T> {
+    const response = await fetch(endpoint);
+    return response.json();
+  }
+}
+```
 
 ---
 
-9. Revue de code & commentaires
-   À chaque review, commente si :
+## 📝 TypeScript
 
-- Un composant dépasse 150 lignes ou a trop de responsabilités.
-- Un hook est mal utilisé (dépendances manquantes).
-- Un console.log de debug est présent.
-- Il manque la gestion d’erreur (try/catch) ou loading/error.
-- Des problèmes d’accessibilité ou de typage.
+### Règles
+
+- **Pas de `any`**
+- **Tout typer** : props, retours, variables
+- **Types utilitaires** : `Partial<T>`, `Pick<T>`, `Omit<T>`
+
+```tsx
+// ✅
+interface User {
+  id: string;
+  email: string;
+}
+
+type UserUpdate = Partial<User>;
+
+// ❌
+const data: any = response.json();
+```
 
 ---
 
-10. Maintenance continue
+## ⚡ Performance
 
-- Documenter les choix architecturaux importants.
-- Proposer des refactors quand un module devient complexe.
-- Mettre à jour ce README au fil des évolutions.
+### Optimisations
 
-🙏 Merci Cursor ! Grâce à ce guide, ce projet React restera propre, performant et maintenable. 🚀
+- **React.memo** pour composants lourds
+- **useMemo/useCallback** pour éviter re-renders
+- **Lazy loading** pour composants volumineux
+
+```tsx
+const ExpensiveComponent = React.memo(({ data }: Props) => {
+  const memoizedValue = useMemo(() => compute(data), [data]);
+  return <div>{memoizedValue}</div>;
+});
+```
+
+---
+
+## 🎨 Accessibilité
+
+### Règles de base
+
+- **Labels** pour tous les inputs
+- **Attributs ARIA** : `aria-label`, `aria-describedby`
+- **Navigation clavier** fonctionnelle
+
+```tsx
+<label htmlFor="email">Email</label>
+<input
+  id="email"
+  aria-describedby="email-error"
+  aria-invalid={hasError}
+/>
+```
+
+---
+
+## 🧪 Tests
+
+### Structure
+
+```tsx
+describe('Component', () => {
+  it('should render', () => {
+    render(<Component title="Test" />);
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+});
+```
+
+---
+
+## 🔍 Checklist Revue de Code
+
+### Vérifier automatiquement :
+
+- [ ] Composant > 150 lignes → Décomposer
+- [ ] Hook dans condition/boucle → Corriger
+- [ ] `console.log` présent → Supprimer
+- [ ] Gestion d'erreur manquante → Ajouter
+- [ ] Types `any` → Typer
+- [ ] Props non typées → Typer
+- [ ] Attributs ARIA manquants → Ajouter
+- [ ] Dépendances useEffect manquantes → Corriger
+
+---
+
+## 🚀 Commandes
+
+```bash
+npm run dev      # Développement
+npm run build    # Build
+npm run test     # Tests
+npm run lint     # Linting
+```
+
+---
+
+**💡 RÈGLE D'OR : Si tu vois quelque chose qui ne respecte pas ce guide, commente-le directement dans le code !**

@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
-import { ActionIcon, Group, Tooltip, Box } from '@mantine/core';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import { ActionIcon, Group, Tooltip, Box, useMantineColorScheme } from '@mantine/core';
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react';
-import { useMantineColorScheme } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 // Types pour une meilleure type safety
@@ -14,28 +13,6 @@ interface ThemeOption {
   icon: React.ReactNode;
   label: string;
 }
-
-// Styles extraits pour éviter les recréations d'objets
-const themeStyles = {
-  active: {
-    border: '2px solid var(--mantine-color-blue-6)',
-    background: 'var(--mantine-color-blue-6)',
-    color: 'white',
-  },
-  inactive: {
-    border: '2px solid transparent',
-    background: 'var(--mantine-color-gray-0)',
-    color: 'var(--mantine-color-gray-7)',
-  },
-  hover: {
-    background: 'var(--mantine-color-gray-1)',
-    transform: 'scale(1.1)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-  },
-  base: {
-    transition: 'all 0.2s ease',
-  },
-};
 
 // Icônes des thèmes
 const themeIcons = {
@@ -49,22 +26,44 @@ interface ThemeButtonProps {
   theme: ThemeOption;
   isActive: boolean;
   onThemeChange: (mode: ThemeMode) => void;
+  actualTheme: 'light' | 'dark';
 }
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({
   theme,
   isActive,
   onThemeChange,
+  actualTheme,
 }) => {
   const { t } = useTranslation();
 
-  const buttonStyles = useMemo(
-    () => ({
-      ...themeStyles.base,
-      ...(isActive ? themeStyles.active : themeStyles.inactive),
-    }),
-    [isActive]
-  );
+  const getButtonStyles = useMemo(() => {
+    const baseStyles = {
+      transition: 'all 0.2s ease',
+      borderRadius: '0.5rem',
+      border: '2px solid transparent',
+    };
+
+    if (isActive) {
+      return {
+        ...baseStyles,
+        border: '2px solid var(--mantine-color-blue-6)',
+        background: 'var(--mantine-color-blue-6)',
+        color: 'white',
+      };
+    }
+
+    return {
+      ...baseStyles,
+      border: '2px solid transparent',
+      background: actualTheme === 'dark' 
+        ? 'var(--mantine-color-dark-4)' 
+        : 'var(--mantine-color-gray-0)',
+      color: actualTheme === 'dark' 
+        ? 'var(--mantine-color-gray-3)' 
+        : 'var(--mantine-color-gray-7)',
+    };
+  }, [isActive, actualTheme]);
 
   const handleClick = useCallback(() => {
     onThemeChange(theme.mode);
@@ -73,35 +72,38 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isActive) {
-        e.currentTarget.style.background = themeStyles.hover.background;
-        e.currentTarget.style.transform = themeStyles.hover.transform;
-        e.currentTarget.style.boxShadow = themeStyles.hover.boxShadow;
+        e.currentTarget.style.background = actualTheme === 'dark' 
+          ? 'var(--mantine-color-dark-3)' 
+          : 'var(--mantine-color-gray-1)';
+        e.currentTarget.style.transform = 'scale(1.1)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
       }
     },
-    [isActive]
+    [isActive, actualTheme]
   );
 
   const handleMouseLeave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isActive) {
-        e.currentTarget.style.background = themeStyles.inactive.background;
+        e.currentTarget.style.background = actualTheme === 'dark' 
+          ? 'var(--mantine-color-dark-4)' 
+          : 'var(--mantine-color-gray-0)';
         e.currentTarget.style.transform = 'scale(1)';
         e.currentTarget.style.boxShadow = 'none';
       }
     },
-    [isActive]
+    [isActive, actualTheme]
   );
 
   return (
     <Tooltip label={theme.label} position="bottom" withArrow offset={8}>
       <ActionIcon
-        variant={isActive ? 'filled' : 'light'}
-        color={theme.mode === 'dark' ? 'dark' : 'gray'}
+        variant="unstyled"
         size="md"
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={buttonStyles}
+        style={getButtonStyles}
         aria-label={`${t('theme.switchTo', 'Passer au thème')} ${theme.label}`}
         aria-pressed={isActive}
         role="button"
@@ -116,6 +118,37 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({
 export function ThemeSwitcher() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
+
+  // Détection du thème système
+  useEffect(() => {
+    setMounted(true);
+    
+    const getSystemTheme = () => {
+      if (typeof window !== 'undefined') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      return 'light';
+    };
+
+    setSystemTheme(getSystemTheme());
+
+    // Écouteur pour les changements de thème système
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => setSystemTheme(getSystemTheme());
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Calcul du thème réel (système ou manuel)
+  const actualTheme = useMemo(() => {
+    if (colorScheme === 'auto') {
+      return systemTheme;
+    }
+    return colorScheme;
+  }, [colorScheme, systemTheme]);
 
   // Utilisation de useMemo pour éviter les recréations d'objets
   const themeOptions = useMemo<ThemeOption[]>(
@@ -145,7 +178,6 @@ export function ThemeSwitcher() {
         setColorScheme(mode);
       } catch (error) {
         console.error('Erreur lors du changement de thème:', error);
-        // Ici on pourrait ajouter une notification d'erreur pour l'utilisateur
       }
     },
     [setColorScheme]
@@ -163,6 +195,7 @@ export function ThemeSwitcher() {
           theme={theme}
           isActive={colorScheme === theme.mode}
           onThemeChange={handleThemeChange}
+          actualTheme={actualTheme}
         />
       ))}
     </Group>

@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:firebase": "next build --config next.config.firebase.ts",
+    "build:static": "next build --config next.config.firebase.ts",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -17,10 +19,23 @@
     "build-storybook": "storybook build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docker:build": "docker build -t limitless-health .",
+    "docker:run": "docker run -p 3000:3000 limitless-health",
+    "docker:dev": "docker-compose -f docker-compose.local.yml up -d",
+    "docker:prod": "docker-compose -f docker-compose.production.yml up -d",
+    "docker:local": "./scripts/start-local.sh",
+    "docker:production": "./scripts/start-production.sh",
+    "firebase:deploy": "firebase deploy --only hosting",
+    "firebase:serve": "firebase serve --only hosting",
+    "deploy": "./scripts/deploy.sh",
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "setup:local": "./scripts/setup-env.sh local",
+    "setup:staging": "./scripts/setup-env.sh staging",
+    "setup:production": "./scripts/setup-env.sh production"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.1.1",
+    "@hookform/resolvers": "^5.2.0",
     "@mantine/core": "^8.2.1",
     "@mantine/hooks": "^8.2.1",
     "@mantine/next": "^6.0.22",
@@ -42,6 +57,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.61.1",
     "react-i18next": "^15.6.1",
+    "recharts": "^3.1.0",
     "vitest": "^3.2.4",
     "zod": "^4.0.10",
     "zustand": "^5.0.6"

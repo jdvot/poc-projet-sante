@@ -15,3 +15,11 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Add a mock for ResizeObserver, which is not available in JSDOM environment
+// This is required for Mantine components that use use-resize-observer hook
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
