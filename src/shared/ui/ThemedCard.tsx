@@ -15,20 +15,40 @@ export const ThemedCard: React.FC<ThemedCardProps> = ({
   gradientType = 'primary',
   ...props
 }) => {
-  const { getCardStyle, getGradientStyle, spacing, radius } = useAppTheme();
+  const { gradients, spacing, radius, isDark } = useAppTheme();
 
   const getVariantStyle = () => {
+    const baseStyle = {
+      borderRadius: radius.card,
+      transition: 'all 0.2s ease',
+    };
+
     switch (variant) {
       case 'gradient':
-        return getGradientStyle(gradientType);
+        return {
+          ...baseStyle,
+          background: gradients[gradientType],
+          color: 'white',
+        };
       case 'elevated':
         return {
-          ...getCardStyle(),
+          ...baseStyle,
+          background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+          border: isDark
+            ? '1px solid var(--mantine-color-dark-4)'
+            : '1px solid var(--mantine-color-gray-3)',
           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
           transform: 'translateY(-2px)',
         };
       default:
-        return getCardStyle();
+        return {
+          ...baseStyle,
+          background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+          border: isDark
+            ? '1px solid var(--mantine-color-dark-4)'
+            : '1px solid var(--mantine-color-gray-3)',
+          boxShadow: 'var(--mantine-shadow-sm)',
+        };
     }
   };
 

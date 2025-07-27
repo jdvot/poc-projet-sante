@@ -25,34 +25,3 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   // failing the test on uncaught exceptions
   return false;
 });
-
-// Configure viewport for mobile testing
-Cypress.Commands.add('mobileViewport', () => {
-  cy.viewport('iphone-x');
-});
-
-// Configure viewport for desktop testing
-Cypress.Commands.add('desktopViewport', () => {
-  cy.viewport(1280, 720);
-});
-
-// Custom command to wait for authentication
-Cypress.Commands.add('waitForAuth', () => {
-  cy.wait(2000); // Wait for authentication process
-});
-
-// Custom command to mock offline state
-Cypress.Commands.add('mockOffline', () => {
-  cy.window().then((win) => {
-    cy.stub(win.navigator, 'onLine').value(false);
-    win.dispatchEvent(new Event('offline'));
-  });
-});
-
-// Custom command to mock online state
-Cypress.Commands.add('mockOnline', () => {
-  cy.window().then((win) => {
-    cy.stub(win.navigator, 'onLine').value(true);
-    win.dispatchEvent(new Event('online'));
-  });
-});

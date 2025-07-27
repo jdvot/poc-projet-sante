@@ -69,29 +69,32 @@ export function LanguageSwitcher() {
   const buttonStyles = useMemo(
     () => ({
       background: isDark
-        ? 'var(--mantine-color-dark-5)'
-        : 'var(--mantine-color-gray-0)',
+        ? 'var(--mantine-color-dark-4)'
+        : 'var(--mantine-color-white)',
       border: `1.5px solid ${
-        isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'
+        isDark ? 'var(--mantine-color-dark-2)' : 'var(--mantine-color-gray-2)'
       }`,
       color: isDark
-        ? 'var(--mantine-color-gray-2)'
-        : 'var(--mantine-color-gray-8)',
+        ? 'var(--mantine-color-gray-1)'
+        : 'var(--mantine-color-gray-9)',
       fontWeight: 600,
       fontSize: '0.875rem',
-      padding: '0.5rem 0.875rem',
-      borderRadius: '1.25rem',
+      padding: '0.625rem 1rem',
+      borderRadius: '0.875rem',
       transition: transitions.normal,
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+      boxShadow: isDark
+        ? '0 2px 8px rgba(0, 0, 0, 0.2)'
+        : '0 2px 8px rgba(0, 0, 0, 0.06)',
+      width: '100%',
+      justifyContent: 'space-between',
       '&:hover': {
         background: isDark
-          ? 'var(--mantine-color-dark-4)'
-          : 'var(--mantine-color-gray-1)',
-        borderColor: isDark
-          ? 'var(--mantine-color-dark-2)'
-          : 'var(--mantine-color-gray-4)',
+          ? 'var(--mantine-color-dark-3)'
+          : 'var(--mantine-color-gray-0)',
         transform: 'translateY(-1px)',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+        boxShadow: isDark
+          ? '0 4px 12px rgba(0, 0, 0, 0.3)'
+          : '0 4px 12px rgba(0, 0, 0, 0.1)',
       },
     }),
     [isDark, transitions]
@@ -100,16 +103,17 @@ export function LanguageSwitcher() {
   const dropdownStyles = useMemo(
     () => ({
       border: `1.5px solid ${
-        isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'
+        isDark ? 'var(--mantine-color-dark-2)' : 'var(--mantine-color-gray-2)'
       }`,
-      borderRadius: '1rem',
+      borderRadius: '0.875rem',
       boxShadow: isDark
-        ? '0 8px 25px rgba(0, 0, 0, 0.3)'
+        ? '0 8px 25px rgba(0, 0, 0, 0.4)'
         : '0 8px 25px rgba(0, 0, 0, 0.15)',
       background: isDark
-        ? 'var(--mantine-color-dark-6)'
-        : 'var(--mantine-color-body)',
+        ? 'var(--mantine-color-dark-5)'
+        : 'var(--mantine-color-white)',
       padding: '0.5rem',
+      backdropFilter: 'blur(10px)',
     }),
     [isDark]
   );
@@ -129,11 +133,23 @@ export function LanguageSwitcher() {
           style={buttonStyles}
           className="hover:no-underline"
         >
-          <Group gap="xs" align="center">
-            <Text size="lg">{currentLanguage.flag}</Text>
-            <Text size="sm" fw={600}>
-              {currentLanguage.name}
-            </Text>
+          <Group
+            gap="xs"
+            align="center"
+            justify="space-between"
+            style={{ width: '100%' }}
+          >
+            <Group gap="xs" align="center">
+              <Text
+                size="lg"
+                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+              >
+                {currentLanguage.flag}
+              </Text>
+              <Text size="sm" fw={600}>
+                {currentLanguage.name}
+              </Text>
+            </Group>
           </Group>
         </Button>
       </Menu.Target>
@@ -154,8 +170,8 @@ export function LanguageSwitcher() {
                 language === lang.code
                   ? 'white'
                   : isDark
-                    ? 'var(--mantine-color-gray-3)'
-                    : 'var(--mantine-color-gray-7)',
+                    ? 'var(--mantine-color-gray-2)'
+                    : 'var(--mantine-color-gray-8)',
               background:
                 language === lang.code
                   ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
@@ -167,22 +183,23 @@ export function LanguageSwitcher() {
                     : isDark
                       ? 'var(--mantine-color-dark-4)'
                       : 'var(--mantine-color-gray-0)',
-                color:
-                  language === lang.code
-                    ? 'white'
-                    : isDark
-                      ? 'var(--mantine-color-gray-1)'
-                      : 'var(--mantine-color-gray-9)',
-                transform: 'translateY(-1px)',
+                transform: 'translateX(2px)',
               },
             }}
             className="hover:no-underline"
           >
-            <Group gap="sm" align="center">
-              <Text size="lg">{lang.flag}</Text>
-              <Text size="sm" fw={600}>
-                {lang.name}
-              </Text>
+            <Group gap="sm" align="center" justify="space-between">
+              <Group gap="sm" align="center">
+                <Text
+                  size="lg"
+                  style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+                >
+                  {lang.flag}
+                </Text>
+                <Text size="sm" fw={600}>
+                  {lang.name}
+                </Text>
+              </Group>
               {language === lang.code && (
                 <Box
                   style={{
@@ -190,7 +207,6 @@ export function LanguageSwitcher() {
                     height: '8px',
                     borderRadius: '50%',
                     background: 'white',
-                    marginLeft: 'auto',
                     boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.3)',
                   }}
                 />

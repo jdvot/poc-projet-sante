@@ -32,17 +32,13 @@ export default function TestThemePage() {
     transitions,
     isDark,
     isLight,
-    getCardStyle,
-    getPaperStyle,
-    getGradientStyle,
-    getButtonStyle,
   } = useAppTheme();
 
   return (
-    <Box>
-      <Stack gap="xl">
+    <Box p="md">
+      <Stack gap="lg">
         {/* Header */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md" align="center">
             <Title order={1} c="blue">
               🎨 Test de Gestion du Thème
@@ -63,7 +59,7 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Theme Switcher Test */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>
               <IconPalette size={24} style={{ marginRight: 8 }} />
@@ -82,33 +78,61 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Gradients Test */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>🌈 Test des Gradients</Title>
             <Grid>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" style={getGradientStyle('primary')}>
+                <Paper
+                  p="md"
+                  style={{
+                    background: gradients.primary,
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Text c="white" ta="center" fw={600}>
                     Gradient Primaire
                   </Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" style={getGradientStyle('health')}>
+                <Paper
+                  p="md"
+                  style={{
+                    background: gradients.health,
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Text c="white" ta="center" fw={600}>
                     Gradient Santé
                   </Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" style={getGradientStyle('medical')}>
+                <Paper
+                  p="md"
+                  style={{
+                    background: gradients.medical,
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Text c="white" ta="center" fw={600}>
                     Gradient Médical
                   </Text>
                 </Paper>
               </Grid.Col>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" style={getGradientStyle('accent')}>
+                <Paper
+                  p="md"
+                  style={{
+                    background: gradients.accent,
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Text c="white" ta="center" fw={600}>
                     Gradient Accent
                   </Text>
@@ -119,7 +143,7 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Colors Test */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>🎨 Test des Couleurs</Title>
             <Grid>
@@ -156,25 +180,83 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Buttons Test */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>🔘 Test des Boutons</Title>
             <Group>
-              <Button style={getButtonStyle('primary')}>Bouton Primaire</Button>
-              <Button style={getButtonStyle('health')}>Bouton Santé</Button>
-              <Button style={getButtonStyle('medical')}>Bouton Médical</Button>
-              <Button style={getButtonStyle('accent')}>Bouton Accent</Button>
+              <Button
+                style={{
+                  background: gradients.primary,
+                  borderRadius: 'var(--mantine-radius-md)',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                  border: 'none',
+                  color: 'white',
+                }}
+              >
+                Bouton Primaire
+              </Button>
+              <Button
+                style={{
+                  background: gradients.health,
+                  borderRadius: 'var(--mantine-radius-md)',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                  border: 'none',
+                  color: 'white',
+                }}
+              >
+                Bouton Santé
+              </Button>
+              <Button
+                style={{
+                  background: gradients.medical,
+                  borderRadius: 'var(--mantine-radius-md)',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                  border: 'none',
+                  color: 'white',
+                }}
+              >
+                Bouton Médical
+              </Button>
+              <Button
+                style={{
+                  background: gradients.accent,
+                  borderRadius: 'var(--mantine-radius-md)',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                  border: 'none',
+                  color: 'white',
+                }}
+              >
+                Bouton Accent
+              </Button>
             </Group>
           </Stack>
         </Paper>
 
         {/* Cards Test */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>🃏 Test des Cartes</Title>
             <Grid>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" withBorder style={getCardStyle()}>
+                <Paper
+                  p="md"
+                  withBorder
+                  style={{
+                    background: isDark
+                      ? 'var(--mantine-color-dark-7)'
+                      : 'white',
+                    border: isDark
+                      ? '1px solid var(--mantine-color-dark-4)'
+                      : '1px solid var(--mantine-color-gray-3)',
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    boxShadow: 'var(--mantine-shadow-sm)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Title order={3} mb="md">
                     Carte Standard
                   </Title>
@@ -184,7 +266,21 @@ export default function TestThemePage() {
                 </Paper>
               </Grid.Col>
               <Grid.Col span={{ base: 12, md: 6 }}>
-                <Paper p="md" withBorder style={getCardStyle()}>
+                <Paper
+                  p="md"
+                  withBorder
+                  style={{
+                    background: isDark
+                      ? 'var(--mantine-color-dark-7)'
+                      : 'white',
+                    border: isDark
+                      ? '1px solid var(--mantine-color-dark-4)'
+                      : '1px solid var(--mantine-color-gray-3)',
+                    borderRadius: 'var(--mantine-radius-lg)',
+                    boxShadow: 'var(--mantine-shadow-sm)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <Title order={3} mb="md">
                     Carte avec Contenu
                   </Title>
@@ -198,7 +294,7 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Theme Info */}
-        <Paper p="xl" withBorder style={getPaperStyle()}>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>📊 Informations du Thème</Title>
             <Grid>
@@ -249,7 +345,7 @@ export default function TestThemePage() {
         </Paper>
 
         {/* Success Message */}
-        <Paper p="xl" withBorder bg="green.0">
+        <Paper p="lg" withBorder bg="green.0">
           <Stack gap="md" align="center">
             <Title order={2} c="green">
               <IconCheck size={24} style={{ marginRight: 8 }} />

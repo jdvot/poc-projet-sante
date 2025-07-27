@@ -5,10 +5,10 @@ import { IconCheck, IconLayout, IconArrowRight } from '@tabler/icons-react';
 
 export default function TestLayoutPage() {
   return (
-    <Box>
-      <Stack gap="xl">
+    <Box p="md">
+      <Stack gap="lg">
         {/* Header */}
-        <Paper p="xl" withBorder>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={1} c="blue">
               🧪 Test de Layout - Navbar à Gauche
@@ -22,7 +22,7 @@ export default function TestLayoutPage() {
         </Paper>
 
         {/* Instructions */}
-        <Paper p="xl" withBorder>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>
               <IconLayout size={24} style={{ marginRight: 8 }} />
@@ -58,7 +58,7 @@ export default function TestLayoutPage() {
         </Paper>
 
         {/* Layout Info */}
-        <Paper p="xl" withBorder>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>📐 Informations de Layout</Title>
             <Stack gap="xs">
@@ -79,7 +79,7 @@ export default function TestLayoutPage() {
         </Paper>
 
         {/* Navigation Test */}
-        <Paper p="xl" withBorder>
+        <Paper p="lg" withBorder>
           <Stack gap="md">
             <Title order={2}>🧭 Test de Navigation</Title>
             <Text>
@@ -95,20 +95,20 @@ export default function TestLayoutPage() {
                 <IconArrowRight size={16} style={{ marginRight: 8 }} />
                 <strong>Dashboard :</strong> Tableau de bord avec graphiques
               </Text>
-              <Text>
-                <IconArrowRight size={16} style={{ marginRight: 8 }} />
-                <strong>AI Doctor :</strong> Assistant IA médical
-                <Badge size="sm" ml="xs">
-                  IA
-                </Badge>
-              </Text>
-              <Text>
-                <IconArrowRight size={16} style={{ marginRight: 8 }} />
-                <strong>AI Chat :</strong> Chat avec l&apos;IA
-                <Badge size="sm" ml="xs">
-                  Chat
-                </Badge>
-              </Text>
+              <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconArrowRight size={16} />
+                <Text>
+                  <strong>AI Doctor :</strong> Assistant IA médical
+                </Text>
+                <Badge size="sm">IA</Badge>
+              </Box>
+              <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconArrowRight size={16} />
+                <Text>
+                  <strong>AI Chat :</strong> Chat avec l&apos;IA
+                </Text>
+                <Badge size="sm">Chat</Badge>
+              </Box>
               <Text>
                 <IconArrowRight size={16} style={{ marginRight: 8 }} />
                 <strong>Profil :</strong> Gestion du profil utilisateur
@@ -123,7 +123,7 @@ export default function TestLayoutPage() {
         </Paper>
 
         {/* Success Message */}
-        <Paper p="xl" withBorder bg="green.0">
+        <Paper p="lg" withBorder bg="green.0">
           <Stack gap="md" align="center">
             <Title order={2} c="green">
               ✅ Layout Réussi !

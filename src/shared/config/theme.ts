@@ -194,7 +194,7 @@ export const appTheme: MantineThemeOverride = {
         root: {
           fontWeight: 500,
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:focus-visible': {
+          '&:focusVisible': {
             outline: '2px solid var(--mantine-color-blue-6)',
             outlineOffset: '2px',
           },
@@ -216,7 +216,7 @@ export const appTheme: MantineThemeOverride = {
       styles: {
         root: {
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:focus-within': {
+          '&:focusWithin': {
             outline: '2px solid var(--mantine-color-blue-6)',
             outlineOffset: '2px',
           },
@@ -318,7 +318,7 @@ export const appTheme: MantineThemeOverride = {
       styles: {
         root: {
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:focus-within': {
+          '&:focusWithin': {
             outline: '2px solid var(--mantine-color-blue-6)',
             outlineOffset: '2px',
           },

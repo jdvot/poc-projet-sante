@@ -26,12 +26,18 @@ vi.mock('../../../shared/stores/chatStore', () => ({
 }));
 
 vi.mock('../../../shared/hooks/useAppTheme', () => ({
-  useAppTheme: vi.fn(() => ({
+  useAppTheme: () => ({
     isDark: false,
+    isLight: true,
+    colorScheme: 'light',
+    toggleColorScheme: vi.fn(),
+    setColorScheme: vi.fn(),
     gradients: {
-      primary: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-      health: 'linear-gradient(135deg, #0284c7 0%, #16a34a 100%)',
-      medical: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+      primary: 'linear-gradient(135deg, #228be6 0%, #40c057 100%)',
+      secondary: 'linear-gradient(135deg, #40c057 0%, #20c997 100%)',
+      accent: 'linear-gradient(135deg, #7950f2 0%, #e64980 100%)',
+      health: 'linear-gradient(135deg, #20c997 0%, #40c057 100%)',
+      medical: 'linear-gradient(135deg, #fa5252 0%, #e64980 100%)',
     },
     colors: {
       success: 'var(--mantine-color-green-6)',
@@ -39,9 +45,21 @@ vi.mock('../../../shared/hooks/useAppTheme', () => ({
       error: 'var(--mantine-color-red-6)',
       info: 'var(--mantine-color-blue-6)',
     },
-    getCardStyle: vi.fn(),
-    getPaperStyle: vi.fn(),
-    getGradientStyle: vi.fn(),
+    spacing: {
+      section: '3rem',
+      page: '2rem',
+      card: '1.5rem',
+    },
+    radius: {
+      card: '1rem',
+      button: '0.75rem',
+      input: '0.5rem',
+    },
+    transitions: {
+      fast: '0.15s ease',
+      normal: '0.3s ease',
+      slow: '0.5s ease',
+    },
   })),
 }));
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import {
   Group,
   Code,
@@ -11,7 +11,7 @@ import {
   Drawer,
   Stack,
   Divider,
-  Badge,
+  Text,
 } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
@@ -25,6 +25,8 @@ import {
   IconHeart,
   IconTestPipe,
   IconPalette,
+  IconLanguage,
+  IconPalette as IconTheme,
 } from '@tabler/icons-react';
 import { LinksGroup } from './NavbarLinksGroup';
 import { UserButton } from './UserButton';
@@ -32,11 +34,9 @@ import { Logo } from './NavbarLogo';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useAppTheme } from '../hooks/useAppTheme';
-import { useAuthStore } from '../stores/authStore';
-import { useFirebaseAuth } from '../hooks/useFirebaseAuth';
 import classes from './AppNavbar.module.css';
 
-// Données de navigation avec indicateurs d'accessibilité
+// Move mockdata outside component to prevent recreation
 const mockdata = [
   {
     label: 'navigation.home',
@@ -90,46 +90,74 @@ const mockdata = [
     href: '/test-theme',
     description: 'Page de test pour les thèmes',
   },
-];
+] as const;
 
 const AppNavbarComponent = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const { isDark, transitions } = useAppTheme();
+  const { isDark, colors, transitions } = useAppTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileOpened, setMobileOpened] = useState(false);
-  const { user, isAuthenticated } = useAuthStore();
-  const { signOutUser } = useFirebaseAuth();
+
+  // Memoize the links with proper dependencies
+  const links = useMemo(
+    () => mockdata.map((item) => <LinksGroup {...item} key={item.label} />),
+    [t] // Only recreate when translation function changes
+  );
+
+  // Handle mobile menu toggle
+  const handleMobileToggle = useCallback(() => {
+    setMobileOpened((prev) => !prev);
+  }, []);
+
+  // Handle mobile menu close
+  const handleMobileClose = useCallback(() => {
+    setMobileOpened(false);
+  }, []);
+
+  // Close mobile menu when pathname changes
+  useEffect(() => {
+    setMobileOpened(false);
+  }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const links = mockdata.map((item) => (
-    <LinksGroup {...item} key={item.label} />
-  ));
-
-  const { getCardStyle } = useAppTheme();
-
-  const controlPaperStyles = useMemo(
+  // Styles pour les contrôles améliorés
+  const controlsContainerStyles = useMemo(
     () => ({
-      ...getCardStyle(),
-      borderRadius: 'var(--mantine-radius-lg)',
-      padding: 'var(--mantine-spacing-sm)',
-      // Amélioration du contraste pour l'accessibilité
-      border: isDark
-        ? '2px solid var(--mantine-color-dark-3)'
-        : '2px solid var(--mantine-color-gray-4)',
+      background: isDark
+        ? 'linear-gradient(135deg, var(--mantine-color-dark-6), var(--mantine-color-dark-5))'
+        : 'linear-gradient(135deg, var(--mantine-color-gray-0), var(--mantine-color-gray-1))',
+      border: `1px solid ${isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'}`,
+      borderRadius: '1rem',
+      padding: '1rem',
+      boxShadow: isDark
+        ? '0 4px 20px rgba(0, 0, 0, 0.2)'
+        : '0 4px 20px rgba(0, 0, 0, 0.08)',
+      backdropFilter: 'blur(10px)',
     }),
-    [isDark] // getCardStyle is now memoized with useCallback
+    [isDark]
   );
 
-  if (!mounted) {
-    return null;
-  }
+  const sectionTitleStyles = useMemo(
+    () => ({
+      fontSize: '0.75rem',
+      fontWeight: 700,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.05em',
+      color: isDark
+        ? 'var(--mantine-color-gray-4)'
+        : 'var(--mantine-color-gray-6)',
+      marginBottom: '0.75rem',
+      textAlign: 'center' as const,
+    }),
+    [isDark]
+  );
 
-  // Ne pas afficher la navbar si l'utilisateur n'est pas authentifié
-  if (!isAuthenticated) {
+  // Early return for hydration
+  if (!mounted) {
     return null;
   }
 
@@ -144,24 +172,7 @@ const AppNavbarComponent = () => {
         <div className={classes.header}>
           <Group justify="space-between" style={{ padding: '0 0.5rem' }}>
             <Logo style={{ width: 'auto' }} />
-            <Code
-              fw={700}
-              style={{
-                color: isDark
-                  ? 'var(--mantine-color-gray-2)'
-                  : 'var(--mantine-color-gray-8)',
-                backgroundColor: isDark
-                  ? 'var(--mantine-color-dark-6)'
-                  : 'var(--mantine-color-gray-1)',
-                padding: '0.25rem 0.5rem',
-                borderRadius: 'var(--mantine-radius-sm)',
-                border: isDark
-                  ? '1px solid var(--mantine-color-dark-3)'
-                  : '1px solid var(--mantine-color-gray-3)',
-              }}
-            >
-              v1.0.0
-            </Code>
+            <Code fw={700}>v1.0.0</Code>
           </Group>
         </div>
 
@@ -172,27 +183,54 @@ const AppNavbarComponent = () => {
         </ScrollArea>
 
         <div className={classes.footer}>
-          <UserButton />
+          {/* Section utilisateur améliorée */}
+          <Box
+            style={{
+              background: isDark
+                ? 'linear-gradient(135deg, var(--mantine-color-dark-6), var(--mantine-color-dark-5))'
+                : 'linear-gradient(135deg, var(--mantine-color-gray-0), var(--mantine-color-gray-1))',
+              border: `1px solid ${isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'}`,
+              borderRadius: '1rem',
+              padding: '0.5rem',
+              marginBottom: '1rem',
+              boxShadow: isDark
+                ? '0 2px 8px rgba(0, 0, 0, 0.15)'
+                : '0 2px 8px rgba(0, 0, 0, 0.05)',
+            }}
+          >
+            <UserButton />
+          </Box>
 
-          {/* Contrôles avec accessibilité améliorée */}
-          <Stack gap="sm" mt="md">
-            <Paper
-              style={controlPaperStyles}
-              withBorder
-              role="group"
-              aria-label="Contrôles de langue et thème"
-            >
+          {/* Contrôles améliorés avec design moderne */}
+          <Box style={controlsContainerStyles}>
+            {/* Section Langue */}
+            <Box mb="lg">
+              <Text style={sectionTitleStyles}>
+                <IconLanguage size={12} style={{ marginRight: '0.5rem' }} />
+                {t('settings.language', 'Langue')}
+              </Text>
               <LanguageSwitcher />
-            </Paper>
-            <Paper
-              style={controlPaperStyles}
-              withBorder
-              role="group"
-              aria-label="Sélecteur de thème"
-            >
+            </Box>
+
+            <Divider
+              my="md"
+              color={
+                isDark
+                  ? 'var(--mantine-color-dark-3)'
+                  : 'var(--mantine-color-gray-3)'
+              }
+              opacity={0.5}
+            />
+
+            {/* Section Thème */}
+            <Box>
+              <Text style={sectionTitleStyles}>
+                <IconTheme size={12} style={{ marginRight: '0.5rem' }} />
+                {t('settings.theme', 'Thème')}
+              </Text>
               <ThemeSwitcher />
-            </Paper>
-          </Stack>
+            </Box>
+          </Box>
         </div>
       </nav>
 
@@ -200,13 +238,8 @@ const AppNavbarComponent = () => {
       <Box visibleFrom="md" hiddenFrom="lg" className={classes.burgerButton}>
         <Burger
           opened={mobileOpened}
-          onClick={() => setMobileOpened(!mobileOpened)}
+          onClick={handleMobileToggle}
           size="sm"
-          color={
-            isDark
-              ? 'var(--mantine-color-gray-2)'
-              : 'var(--mantine-color-gray-8)'
-          }
           aria-label={mobileOpened ? 'Fermer le menu' : 'Ouvrir le menu'}
           aria-expanded={mobileOpened}
           aria-controls="mobile-menu"
@@ -217,94 +250,76 @@ const AppNavbarComponent = () => {
       <Drawer
         id="mobile-menu"
         opened={mobileOpened}
-        onClose={() => setMobileOpened(false)}
+        onClose={handleMobileClose}
         size="100%"
         padding="md"
         zIndex={300}
         title={
           <Group gap="sm">
-            <IconHeart
-              size={24}
-              style={{
-                color: 'var(--mantine-color-blue-6)',
-                filter: isDark ? 'brightness(1.2)' : 'brightness(0.9)',
-              }}
-              aria-hidden="true"
-            />
+            <IconHeart size={24} aria-hidden="true" />
             <Logo />
           </Group>
         }
         overlayProps={{
           backgroundOpacity: 0.5,
           blur: 4,
-          onClick: () => setMobileOpened(false),
-        }}
-        styles={{
-          header: {
-            background: isDark
-              ? 'var(--mantine-color-dark-7)'
-              : 'var(--mantine-color-white)',
-            borderBottom: `2px solid ${isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-4)'}`,
-          },
-          content: {
-            background: isDark
-              ? 'var(--mantine-color-dark-8)'
-              : 'var(--mantine-color-gray-0)',
-          },
-          title: {
-            color: isDark
-              ? 'var(--mantine-color-gray-1)'
-              : 'var(--mantine-color-gray-9)',
-            fontWeight: 600,
-          },
-        }}
-        closeButtonProps={{
-          'aria-label': 'Fermer le menu',
-          style: {
-            color: isDark
-              ? 'var(--mantine-color-gray-2)'
-              : 'var(--mantine-color-gray-8)',
-            backgroundColor: isDark
-              ? 'var(--mantine-color-dark-6)'
-              : 'var(--mantine-color-gray-1)',
-            border: isDark
-              ? '1px solid var(--mantine-color-dark-3)'
-              : '1px solid var(--mantine-color-gray-3)',
-          },
+          onClick: handleMobileClose,
         }}
       >
         <ScrollArea h="calc(100vh - 80px)">
           <Stack gap="md" mt="xl" role="menu">
             {links}
 
-            <Divider
-              my="md"
-              style={{
-                borderColor: isDark
-                  ? 'var(--mantine-color-dark-3)'
-                  : 'var(--mantine-color-gray-4)',
-                borderWidth: '2px',
-              }}
-            />
+            <Divider my="md" />
 
-            <Group justify="center" gap="md">
-              <Paper
-                style={controlPaperStyles}
-                withBorder
-                role="group"
-                aria-label="Contrôles de langue et thème"
-              >
+            {/* Section utilisateur mobile améliorée */}
+            <Box
+              style={{
+                background: isDark
+                  ? 'linear-gradient(135deg, var(--mantine-color-dark-6), var(--mantine-color-dark-5))'
+                  : 'linear-gradient(135deg, var(--mantine-color-gray-0), var(--mantine-color-gray-1))',
+                border: `1px solid ${isDark ? 'var(--mantine-color-dark-3)' : 'var(--mantine-color-gray-3)'}`,
+                borderRadius: '1rem',
+                padding: '0.5rem',
+                marginBottom: '1rem',
+                boxShadow: isDark
+                  ? '0 2px 8px rgba(0, 0, 0, 0.15)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.05)',
+              }}
+            >
+              <UserButton />
+            </Box>
+
+            {/* Contrôles mobiles améliorés */}
+            <Box style={controlsContainerStyles}>
+              {/* Section Langue */}
+              <Box mb="lg">
+                <Text style={sectionTitleStyles}>
+                  <IconLanguage size={12} style={{ marginRight: '0.5rem' }} />
+                  {t('settings.language', 'Langue')}
+                </Text>
                 <LanguageSwitcher />
-              </Paper>
-              <Paper
-                style={controlPaperStyles}
-                withBorder
-                role="group"
-                aria-label="Sélecteur de thème"
-              >
+              </Box>
+
+              <Divider
+                my="md"
+                color={
+                  isDark
+                    ? 'var(--mantine-color-dark-3)'
+                    : 'var(--mantine-color-gray-3)'
+                }
+                opacity={0.5}
+              />
+
+              {/* Section Thème */}
+              <Box>
+                <Text style={sectionTitleStyles}>
+                  <IconTheme size={12} style={{ marginRight: '0.5rem' }} />
+                  {t('settings.theme', 'Thème')}
+                </Text>
                 <ThemeSwitcher />
-              </Paper>
-            </Group>
+              </Box>
+            </Box>
           </Stack>
         </ScrollArea>
       </Drawer>

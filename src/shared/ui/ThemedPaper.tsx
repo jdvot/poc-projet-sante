@@ -16,20 +16,40 @@ export const ThemedPaper: React.FC<ThemedPaperProps> = ({
   gradientType = 'primary',
   ...props
 }) => {
-  const { getPaperStyle, getGradientStyle, spacing, radius } = useAppTheme();
+  const { gradients, spacing, radius, isDark } = useAppTheme();
 
   const getVariantStyle = () => {
+    const baseStyle = {
+      borderRadius: radius.card,
+      transition: 'all 0.2s ease',
+    };
+
     switch (variant) {
       case 'gradient':
-        return getGradientStyle(gradientType);
+        return {
+          ...baseStyle,
+          background: gradients[gradientType],
+          color: 'white',
+        };
       case 'elevated':
         return {
-          ...getPaperStyle(),
+          ...baseStyle,
+          background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+          border: isDark
+            ? '1px solid var(--mantine-color-dark-4)'
+            : '1px solid var(--mantine-color-gray-3)',
           boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
           transform: 'translateY(-1px)',
         };
       default:
-        return getPaperStyle();
+        return {
+          ...baseStyle,
+          background: isDark ? 'var(--mantine-color-dark-7)' : 'white',
+          border: isDark
+            ? '1px solid var(--mantine-color-dark-4)'
+            : '1px solid var(--mantine-color-gray-3)',
+          boxShadow: 'var(--mantine-shadow-sm)',
+        };
     }
   };
 

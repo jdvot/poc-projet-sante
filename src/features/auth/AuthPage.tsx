@@ -86,7 +86,7 @@ const AuthPageComponent = () => {
     if (isAuthenticated && !loading) {
       router.push('/');
     }
-  }, [isAuthenticated, loading]); // Remove router dependency as it's stable
+  }, [isAuthenticated, loading, router]);
 
   // Vérifier la connectivité réseau
   useEffect(() => {

@@ -35,20 +35,13 @@ export const useAccessibilitySettings = () => {
       }));
     };
 
-    // Écouteurs d'événements pour les changements de préférences
-    const listeners = [
-      () =>
-        mediaQueries.reducedMotion.addEventListener('change', updateSettings),
-      () =>
-        mediaQueries.highContrast.addEventListener('change', updateSettings),
-      () => mediaQueries.darkMode.addEventListener('change', updateSettings),
-    ];
-
     // Initialisation
     updateSettings();
 
     // Ajout des écouteurs
-    listeners.forEach((listener) => listener());
+    mediaQueries.reducedMotion.addEventListener('change', updateSettings);
+    mediaQueries.highContrast.addEventListener('change', updateSettings);
+    mediaQueries.darkMode.addEventListener('change', updateSettings);
 
     // Nettoyage
     return () => {
@@ -109,64 +102,9 @@ export const useAccessibilitySettings = () => {
     setSettings((prev) => ({ ...prev, lineHeight: height }));
   };
 
-  // Fonction pour obtenir les classes CSS appropriées
-  const getAccessibilityClasses = () => {
-    const classes = [];
-
-    if (settings.prefersReducedMotion) {
-      classes.push('prefers-reduced-motion');
-    }
-
-    if (settings.prefersHighContrast) {
-      classes.push('prefers-high-contrast');
-    }
-
-    if (settings.fontSize !== 'medium') {
-      classes.push(`font-size-${settings.fontSize}`);
-    }
-
-    if (settings.lineHeight !== 'normal') {
-      classes.push(`line-height-${settings.lineHeight}`);
-    }
-
-    return classes.join(' ');
-  };
-
-  // Fonction pour obtenir les styles CSS appropriés
-  const getAccessibilityStyles = () => {
-    const styles: React.CSSProperties = {};
-
-    if (settings.prefersReducedMotion) {
-      styles.transition = 'none';
-      styles.animation = 'none';
-    }
-
-    if (settings.fontSize !== 'medium') {
-      const fontSizeMap = {
-        small: '0.875rem',
-        medium: '1rem',
-        large: '1.125rem',
-      };
-      styles.fontSize = fontSizeMap[settings.fontSize];
-    }
-
-    if (settings.lineHeight !== 'normal') {
-      const lineHeightMap = {
-        tight: '1.4',
-        normal: '1.6',
-        relaxed: '1.8',
-      };
-      styles.lineHeight = lineHeightMap[settings.lineHeight];
-    }
-
-    return styles;
-  };
-
   return {
     settings,
     updateFontSize,
     updateLineHeight,
-    getAccessibilityClasses,
-    getAccessibilityStyles,
   };
 };

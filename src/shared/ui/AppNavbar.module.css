@@ -184,15 +184,15 @@
 }
 
 /* Amélioration de l'accessibilité pour les focus - Suppression de l'outline bleu */
-.navbar:focus-within {
+.navbar {
   outline: none;
 }
 
-[data-mantine-color-scheme="light"] .navbar:focus-within {
+[data-mantine-color-scheme="light"] .navbar {
   outline: none;
 }
 
-[data-mantine-color-scheme="dark"] .navbar:focus-within {
+[data-mantine-color-scheme="dark"] .navbar {
   outline: none;
 }
 
@@ -283,4 +283,43 @@
 
 [data-mantine-color-scheme="dark"] .burgerButton:focus {
   outline: none;
+}
+
+/* Styles pour l'état désactivé de la navbar */
+.navbar.disabled {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.navbar.disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+[data-mantine-color-scheme="light"] .navbar.disabled::before {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-mantine-color-scheme="dark"] .navbar.disabled::before {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Styles pour le bouton burger désactivé */
+.burgerButton button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animation de transition pour l'état désactivé */
+.navbar.disabled,
+.navbar.disabled * {
+  transition: opacity 0.3s ease;
 } 

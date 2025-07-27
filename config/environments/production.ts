@@ -1,71 +1,39 @@
 export const productionConfig = {
-  // Application
+  // Configuration Firebase
+  firebase: {
+    apiKey: 'AIzaSyAo2jMGkiZFl3y8dk72esvIL7jfYxgtYQY',
+    authDomain: 'sante-limitless-poc.firebaseapp.com',
+    projectId: 'sante-limitless-poc',
+    storageBucket: 'sante-limitless-poc.firebasestorage.app',
+    messagingSenderId: '219684993961',
+    appId: '1:219684993961:web:084d9b5e6d4555412f22b8',
+  },
+
+  // Configuration de l'application
   app: {
     name: 'Limitless Health',
     version: '1.0.0',
-    url: 'https://limitless-health.com',
-    debug: false,
+    url: 'https://sante-limitless-poc.web.app',
+    apiUrl: 'https://sante-limitless-poc.web.app/api',
   },
 
-  // API
-  api: {
-    baseUrl: 'https://limitless-health.com/api',
-    timeout: 15000,
-    n8nWebhookUrl: 'https://jdvot57.app.n8n.cloud/webhook/chat',
-  },
-
-  // Firebase (Production)
-  firebase: {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-  },
-
-  // Sentry (Production)
-  sentry: {
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN!,
-    org: process.env.SENTRY_ORG!,
-    project: process.env.SENTRY_PROJECT!,
-  },
-
-  // Analytics (Production)
-  analytics: {
-    gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!,
-    vercelAnalyticsId: process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID!,
+  // Configuration N8N
+  n8n: {
+    webhookUrl: 'https://jdvot57.app.n8n.cloud/webhook/chat',
   },
 
   // Feature Flags
   features: {
-    aiDoctor: true,
-    notifications: true,
-    analytics: true,
-    debug: false,
-  },
-
-  // Development
-  development: {
-    enableTelemetry: false,
+    enableAIDoctor: true,
+    enableNotifications: true,
+    enableAnalytics: false,
     enableDebug: false,
-    enableQueryDevTools: false,
-    enableStorybook: false,
   },
 
-  // Performance
-  performance: {
-    enableCompression: true,
-    enableCaching: true,
-    enableMinification: true,
-    enableSourceMaps: false,
+  // Configuration Sentry
+  sentry: {
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    org: process.env.SENTRY_ORG,
+    project: 'limitless-health',
   },
-
-  // Security
-  security: {
-    enableCSP: true,
-    enableHSTS: true,
-    enableRateLimiting: true,
-    enableCORS: true,
-  },
-} as const;
+};

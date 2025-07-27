@@ -10,38 +10,40 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
+export {};
+
 declare global {
   namespace Cypress {
-    interface Chainable {
+    interface Chainable<Subject> {
       /**
        * Custom command to set mobile viewport
        * @example cy.mobileViewport()
        */
-      mobileViewport(): Chainable<void>;
+      mobileViewport(): Chainable<Subject>;
 
       /**
        * Custom command to set desktop viewport
        * @example cy.desktopViewport()
        */
-      desktopViewport(): Chainable<void>;
+      desktopViewport(): Chainable<Subject>;
 
       /**
        * Custom command to wait for authentication
        * @example cy.waitForAuth()
        */
-      waitForAuth(): Chainable<void>;
+      waitForAuth(): Chainable<Subject>;
 
       /**
        * Custom command to mock offline state
        * @example cy.mockOffline()
        */
-      mockOffline(): Chainable<void>;
+      mockOffline(): Chainable<Subject>;
 
       /**
        * Custom command to mock online state
        * @example cy.mockOnline()
        */
-      mockOnline(): Chainable<void>;
+      mockOnline(): Chainable<Subject>;
     }
   }
 }

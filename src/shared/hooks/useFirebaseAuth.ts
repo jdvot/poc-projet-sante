@@ -228,7 +228,7 @@ export const useFirebaseAuth = (): AuthState & AuthActions => {
     }
 
     checkRedirectResult();
-  }, []); // Remove handleAuthError dependency to prevent infinite loop
+  }, [handleAuthError]);
 
   // Écouter les changements d'état d'authentification
   useEffect(() => {
@@ -270,7 +270,7 @@ export const useFirebaseAuth = (): AuthState & AuthActions => {
     );
 
     return () => unsubscribe();
-  }, []); // Remove dependencies to prevent infinite loop - these functions are stable
+  }, [convertFirebaseUser, login, logout, t]);
 
   // Connexion avec Google
   const signInWithGoogle = useCallback(async () => {

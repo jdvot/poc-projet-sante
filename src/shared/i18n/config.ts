@@ -28,6 +28,20 @@ const resources = {
         about: 'About',
         contact: 'Contact',
       },
+      theme: {
+        light: 'Light',
+        dark: 'Dark',
+        auto: 'Auto',
+      },
+      user: {
+        account: 'User Account',
+        profile: 'My Profile',
+        settings: 'Settings',
+        logout: 'Logout',
+        manage: 'Manage',
+        configure: 'Configure',
+        exit: 'Exit',
+      },
       // Test direct des traductions AI Doctor
       aiDoctorTest: aiDoctorTranslations.en.aiDoctor.title,
       aiChatTest: aiDoctorTranslations.en.aiChat.title,
@@ -51,6 +65,20 @@ const resources = {
         settings: 'Paramètres',
         about: 'À propos',
         contact: 'Contact',
+      },
+      theme: {
+        light: 'Clair',
+        dark: 'Sombre',
+        auto: 'Automatique',
+      },
+      user: {
+        account: 'Compte utilisateur',
+        profile: 'Mon profil',
+        settings: 'Paramètres',
+        logout: 'Se déconnecter',
+        manage: 'Gérer',
+        configure: 'Configurer',
+        exit: 'Quitter',
       },
       // Test direct des traductions AI Doctor
       aiDoctorTest: aiDoctorTranslations.fr.aiDoctor.title,

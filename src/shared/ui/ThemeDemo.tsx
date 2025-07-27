@@ -65,7 +65,8 @@ export const ThemeDemo: React.FC = () => {
             />
           </Group>
           <Text size="lg" c="dimmed">
-            Testez les améliorations d'accessibilité et d'élégance du thème
+            Testez les améliorations d&apos;accessibilité et d&apos;élégance du
+            thème
           </Text>
         </Paper>
 
@@ -73,7 +74,7 @@ export const ThemeDemo: React.FC = () => {
         <Card p="xl" radius="lg" withBorder>
           <Group gap="xs" mb="lg">
             <IconAccessible size={24} />
-            <Title order={3}>Paramètres d'Accessibilité</Title>
+            <Title order={3}>Paramètres d&apos;Accessibilité</Title>
           </Group>
 
           <Grid>
@@ -188,7 +189,7 @@ export const ThemeDemo: React.FC = () => {
                 </Group>
                 <Text size="sm" c="dimmed">
                   Cette carte applique automatiquement les paramètres
-                  d'accessibilité utilisateur.
+                  d&apos;accessibilité utilisateur.
                 </Text>
                 <Button
                   variant="light"
@@ -337,7 +338,7 @@ export const ThemeDemo: React.FC = () => {
             <Group gap="xs">
               <IconAccessible size={24} color="var(--mantine-color-blue-6)" />
               <Title order={3} c="blue">
-                Fonctionnalités d'Accessibilité
+                Fonctionnalités d&apos;Accessibilité
               </Title>
             </Group>
 

@@ -65,7 +65,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   return (
     <>
       <ColorSchemeScript />
-      <MantineProvider theme={appTheme} defaultColorScheme="auto">
+      <MantineProvider theme={appTheme} defaultColorScheme="light">
         {children}
       </MantineProvider>
     </>
