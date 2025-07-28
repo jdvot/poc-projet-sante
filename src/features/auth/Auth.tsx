@@ -1,5 +1,13 @@
 import React from 'react';
-import { Container, Title, Card, Text, Stack, Button } from '@mantine/core';
+import {
+  Container,
+  Title,
+  Card,
+  Text,
+  Stack,
+  Button,
+  Box,
+} from '@mantine/core';
 
 const Auth = () => {
   return (
@@ -28,9 +36,17 @@ const Auth = () => {
               Prêt pour intégration OAuth/SSO
             </Text>
 
-            <Button variant="outline" component="a" href="/dashboard">
-              Accéder au Dashboard
-            </Button>
+            <Box
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '1rem',
+              }}
+            >
+              <Button variant="outline" component="a" href="/dashboard">
+                Accéder au Dashboard
+              </Button>
+            </Box>
           </Stack>
         </Card>
       </Stack>

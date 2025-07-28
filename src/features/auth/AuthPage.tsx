@@ -1,82 +1,52 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Container,
   Title,
-  Card,
-  Text,
   Button,
   Alert,
-  Group,
   Stack,
   Loader,
-  Avatar,
-  Divider,
   Box,
-  Badge,
-  Paper,
-  Modal,
-  Progress,
-  RingProgress,
-  Center,
+  Text,
+  Transition,
 } from '@mantine/core';
-import classes from './AuthPage.module.css';
 import {
   IconBrandGoogle,
   IconAlertCircle,
   IconHeartbeat,
-  IconCheck,
-  IconX,
-  IconShield,
-  IconLock,
-  IconUser,
-  IconDeviceMobile,
-  IconDeviceDesktop,
-  IconArrowRight,
-  IconRefresh,
-  IconWifi,
   IconWifiOff,
-  IconExternalLink,
-  IconBug,
 } from '@tabler/icons-react';
 import { useFirebaseAuth } from '../../shared/hooks/useFirebaseAuth';
 import { useAuthStore } from '../../shared/stores/authStore';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '../../shared/ui/LanguageSwitcher';
-import { ThemeSwitcher } from '../../shared/ui/ThemeSwitcher';
 import { useAppTheme } from '../../shared/hooks/useAppTheme';
 import { useIsMobile } from '../../shared/hooks/useDeviceDetection';
-import { AuthDiagnostic } from './components/AuthDiagnostic';
 
 const AuthPageComponent = () => {
   const { t } = useTranslation();
-  const { isDark, colors, transitions } = useAppTheme();
+  const { isDark, gradients } = useAppTheme();
   const {
     signInWithGoogle,
-    signOutUser,
     loading,
     error,
     isAuthenticated,
     user,
-    redirectPending,
-    configError,
-    mobileAuthError,
     clearError,
-    clearRedirectPending,
-    retryAuthentication,
-    retryMobileAuth,
   } = useFirebaseAuth();
-  const [localError, setLocalError] = useState<string | null>(null);
   const { user: storeUser } = useAuthStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [showMobileInfo, setShowMobileInfo] = useState(false);
-  const [mobileRedirectProgress, setMobileRedirectProgress] = useState(0);
   const [isOnline, setIsOnline] = useState(true);
-  const [showDiagnostic, setShowDiagnostic] = useState(false);
   const isMobile = useIsMobile();
+
+  const handleOnline = useCallback(() => setIsOnline(true), []);
+  const handleOffline = useCallback(() => setIsOnline(false), []);
+  const handleClearError = useCallback(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     setMounted(true);
@@ -88,11 +58,7 @@ const AuthPageComponent = () => {
     }
   }, [isAuthenticated, loading, router]);
 
-  // Vérifier la connectivité réseau
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     setIsOnline(navigator.onLine);
@@ -101,25 +67,8 @@ const AuthPageComponent = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [handleOnline, handleOffline]);
 
-  // Animation de progression pour la redirection mobile
-  useEffect(() => {
-    if ((loading || redirectPending) && isMobile) {
-      const interval = setInterval(() => {
-        setMobileRedirectProgress((prev) => {
-          if (prev >= 90) return prev;
-          return prev + Math.random() * 10;
-        });
-      }, 500);
-
-      return () => clearInterval(interval);
-    } else {
-      setMobileRedirectProgress(0);
-    }
-  }, [loading, redirectPending, isMobile]);
-
-  // Effacer l'erreur après 5 secondes
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -129,101 +78,90 @@ const AuthPageComponent = () => {
     }
   }, [error, clearError]);
 
-  // Effacer l'erreur locale après 5 secondes
-  useEffect(() => {
-    if (localError) {
-      const timer = setTimeout(() => {
-        setLocalError(null);
-      }, 5000);
-      return () => clearTimeout(timer);
+  const handleGoogleSignIn = useCallback(async () => {
+    try {
+      if (!isOnline) {
+        return;
+      }
+      await signInWithGoogle();
+    } catch (err) {
+      console.error('Erreur lors de la connexion:', err);
     }
-  }, [localError]);
+  }, [isOnline, signInWithGoogle]);
 
   if (!mounted) {
     return null;
   }
 
-  const handleGoogleSignIn = async () => {
-    try {
-      // Vérifier la connectivité
-      if (!isOnline) {
-        setLocalError(t('auth.error.noInternet'));
-        return;
-      }
-
-      // Afficher l'info mobile si nécessaire
-      if (isMobile) {
-        setShowMobileInfo(true);
-        // Fermer automatiquement après 2 secondes
-        setTimeout(() => setShowMobileInfo(false), 2000);
-      }
-
-      await signInWithGoogle();
-    } catch (err) {
-      console.error('Erreur lors de la connexion:', err);
-      setLocalError(t('auth.error.generic'));
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOutUser();
-    } catch (err) {
-      console.error('Erreur lors de la déconnexion:', err);
-    }
-  };
-
-  // Fonction pour obtenir le message d'erreur approprié
-  const getErrorMessage = (error: string) => {
-    if (error.includes('popup-blocked') || error.includes('popup-closed')) {
-      return isMobile
-        ? t('auth.error.mobileRedirect')
-        : t('auth.error.popupBlocked');
-    }
-    if (error.includes('network-request-failed')) {
-      return t('auth.error.networkError');
-    }
-    if (error.includes('too-many-requests')) {
-      return t('auth.error.tooManyRequests');
-    }
-    if (error.includes('unauthorized-domain')) {
-      return t('auth.error.unauthorizedDomain');
-    }
-    return error;
-  };
-
-  // Fonction pour gérer l'annulation de la redirection
-  const handleCancelRedirect = () => {
-    clearRedirectPending();
-    setMobileRedirectProgress(0);
-  };
-
-  // Fonction pour basculer le diagnostic
-  const toggleDiagnostic = () => {
-    setShowDiagnostic(!showDiagnostic);
-  };
-
   return (
-    <Box className={classes.authContainer}>
+    <Box
+      style={{
+        minHeight: '100vh',
+        backgroundImage: isDark ? gradients.health : gradients.primary,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       {/* Animated background elements */}
-      <Box className={classes.animatedBackground} />
+      <Box
+        style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          backgroundImage: isDark
+            ? 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)'
+            : 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+          backgroundRepeat: 'repeat',
+          backgroundPosition: 'center',
+          animation: 'float 20s ease-in-out infinite',
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+        }}
+      />
 
-      {/* Switchers container - corrige le chevauchement */}
-      <Box className={classes.switchersContainer}>
-        <ThemeSwitcher />
-        <LanguageSwitcher />
-      </Box>
-
-      <Container size="sm" py="xl" style={{ position: 'relative', zIndex: 10 }}>
+      <Container
+        size="xs"
+        style={{ position: 'relative', zIndex: 10, padding: '2rem 1rem' }}
+      >
         <Stack
           gap="xl"
           align="center"
-          style={{ minHeight: '100vh', justifyContent: 'center' }}
+          justify="center"
+          style={{ minHeight: '100vh' }}
         >
-          {/* Header with enhanced styling */}
+          {/* Logo et titre */}
           <Stack gap="lg" align="center">
-            <Box className={classes.headerIcon}>
-              <IconHeartbeat size={48} />
+            <Box
+              style={{
+                background: isDark
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                padding: '2rem',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <IconHeartbeat
+                size={64}
+                style={{
+                  color: 'var(--mantine-color-white)',
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+                }}
+              />
             </Box>
 
             <Stack gap="xs" align="center">
@@ -231,414 +169,169 @@ const AuthPageComponent = () => {
                 order={1}
                 ta="center"
                 size="h1"
-                className={classes.authTitle}
+                style={{
+                  color: 'var(--mantine-color-white)',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                  fontWeight: 800,
+                  letterSpacing: '-0.025em',
+                  fontSize: isMobile ? '2rem' : '2.5rem',
+                }}
               >
                 {t('auth.title')}
               </Title>
-              <Text size="lg" ta="center" className={classes.authSubtitle}>
+              <Text
+                size="lg"
+                ta="center"
+                style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                  lineHeight: 1.5,
+                  maxWidth: '300px',
+                }}
+              >
                 {t('auth.subtitle')}
               </Text>
             </Stack>
           </Stack>
 
-          {/* Enhanced main card */}
-          <Card
-            withBorder
-            p="xl"
-            radius="xl"
-            shadow="xl"
-            w="100%"
-            className={classes.authCard}
-            data-testid="auth-card"
+          {/* Bouton Google centré */}
+          <Box
+            style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              borderRadius: '20px',
+              padding: '3rem 2rem',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+              minWidth: '320px',
+              maxWidth: '400px',
+              width: '100%',
+            }}
           >
-            <Stack gap="lg">
-              {/* État de connexion */}
-              {isAuthenticated && user && (
-                <Alert
-                  icon={<IconCheck size={16} />}
-                  title={t('auth.connected')}
-                  color="green"
-                  variant="light"
-                  style={{
-                    borderRadius: '12px',
-                    border: '1px solid rgba(34, 197, 94, 0.2)',
-                  }}
-                >
-                  <Text size="sm">
-                    {t('auth.user.welcome')}{' '}
-                    <strong>{user.displayName || storeUser?.name}</strong> !
-                  </Text>
-                  <Text size="xs" c="dimmed" mt={4}>
-                    {t('auth.user.email')} {user.email}
-                  </Text>
-                </Alert>
-              )}
-
+            <Stack gap="xl" align="center">
               {/* Indicateur de connectivité */}
               {!isOnline && (
                 <Alert
                   icon={<IconWifiOff size={16} />}
                   title={t('auth.connectivity.noConnection')}
                   color="red"
-                  variant="light"
-                  data-testid="offline-alert"
+                  variant="filled"
                   style={{
                     borderRadius: '12px',
-                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    width: '100%',
+                    marginBottom: '1rem',
                   }}
                 >
-                  <Text size="sm">{t('auth.connectivity.checkNetwork')}</Text>
+                  <Text size="sm" style={{ color: 'white' }}>
+                    {t('auth.connectivity.checkNetwork')}
+                  </Text>
                 </Alert>
               )}
 
               {/* Affichage des erreurs */}
-              {(error || localError) && (
+              {error && (
                 <Alert
-                  icon={<IconX size={16} />}
+                  icon={<IconAlertCircle size={16} />}
                   title={t('auth.error.title')}
                   color="red"
-                  variant="light"
+                  variant="filled"
                   withCloseButton
-                  onClose={() => {
-                    clearError();
-                    setLocalError(null);
-                  }}
-                  data-testid="error-message"
+                  onClose={handleClearError}
                   style={{
                     borderRadius: '12px',
-                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    width: '100%',
+                    marginBottom: '1rem',
                   }}
                 >
-                  <Stack gap="sm">
-                    <Text size="sm">
-                      {getErrorMessage(error || localError || '')}
-                    </Text>
-                    {configError && (
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        onClick={retryAuthentication}
-                        leftSection={<IconRefresh size={12} />}
-                        data-testid="retry-button"
-                      >
-                        {t('auth.error.retry')}
-                      </Button>
-                    )}
-                    {mobileAuthError && (
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        onClick={retryMobileAuth}
-                        leftSection={<IconRefresh size={12} />}
-                        data-testid="retry-mobile-button"
-                        color="blue"
-                      >
-                        {t('auth.error.retry')} Mobile
-                      </Button>
-                    )}
-                  </Stack>
+                  <Text size="sm" style={{ color: 'white' }}>
+                    {error}
+                  </Text>
                 </Alert>
               )}
 
-              {/* Contenu principal */}
-              {!isAuthenticated ? (
-                <Stack gap="lg">
-                  <Text size="md" ta="center" c="dimmed" fw={500}>
-                    {t('auth.login.title')}
-                  </Text>
+              {/* Bouton Google */}
+              <Button
+                variant="outline"
+                size="xl"
+                leftSection={
+                  loading ? (
+                    <Loader size="sm" color="blue" />
+                  ) : (
+                    <IconBrandGoogle size={24} />
+                  )
+                }
+                onClick={handleGoogleSignIn}
+                disabled={loading || !isOnline}
+                fullWidth
+                radius="lg"
+                data-testid="google-signin-button"
+                style={{
+                  border: '2px solid var(--mantine-color-blue-6)',
+                  color: 'var(--mantine-color-blue-6)',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  minHeight: '64px',
+                  padding: '0 2rem',
+                  transition: 'all 0.3s ease',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+                    },
+                    '&:active': {
+                      transform: 'translateY(0)',
+                    },
+                  },
+                }}
+              >
+                {loading
+                  ? t('auth.login.loading')
+                  : t('auth.login.googleButton')}
+              </Button>
 
-                  {/* Device indicator avec connectivité */}
-                  <Group
-                    justify="center"
-                    gap="xs"
-                    className={classes.deviceIndicator}
-                    data-testid="device-indicator"
-                  >
-                    {isMobile ? (
-                      <>
-                        <IconDeviceMobile
-                          size={16}
-                          style={{ color: colors.primary }}
-                        />
-                        <Text size="xs" c="dimmed">
-                          {t('auth.mobile.deviceMode')}
-                        </Text>
-                      </>
-                    ) : (
-                      <>
-                        <IconDeviceDesktop
-                          size={16}
-                          style={{ color: colors.primary }}
-                        />
-                        <Text size="xs" c="dimmed">
-                          {t('auth.mobile.desktopMode')}
-                        </Text>
-                      </>
-                    )}
-                    {isOnline ? (
-                      <IconWifi
-                        size={12}
-                        style={{ color: colors.success }}
-                        data-testid="connectivity-indicator"
-                      />
-                    ) : (
-                      <IconWifiOff
-                        size={12}
-                        style={{ color: colors.error }}
-                        data-testid="connectivity-indicator"
-                      />
-                    )}
-                  </Group>
-
-                  {/* Progress indicator pour mobile */}
-                  {(loading || redirectPending) && isMobile && (
-                    <Center data-testid="mobile-loading">
-                      <Stack gap="md" align="center">
-                        <RingProgress
-                          size={80}
-                          thickness={4}
-                          sections={[
-                            {
-                              value: mobileRedirectProgress,
-                              color: colors.primary,
-                            },
-                          ]}
-                          data-testid="ring-progress"
-                          label={
-                            <Center>
-                              <IconRefresh
-                                size={20}
-                                className={classes.rotatingIcon}
-                                data-testid="refresh-icon"
-                              />
-                            </Center>
-                          }
-                        />
-                        <Text size="sm" c="dimmed" ta="center">
-                          {redirectPending
-                            ? t('auth.login.mobileRedirecting')
-                            : t('auth.login.mobileLoading')}
-                        </Text>
-                        <Progress
-                          value={mobileRedirectProgress}
-                          size="sm"
-                          w="100%"
-                          color={colors.primary}
-                          animated
-                          data-testid="progress-bar"
-                        />
-
-                        {/* Bouton d'annulation pour la redirection */}
-                        {redirectPending && (
-                          <Button
-                            variant="subtle"
-                            size="xs"
-                            onClick={handleCancelRedirect}
-                            color="gray"
-                            data-testid="cancel-redirect-button"
-                          >
-                            {t('auth.login.cancelRedirect')}
-                          </Button>
-                        )}
-                      </Stack>
-                    </Center>
-                  )}
-
-                  {/* Enhanced Google button */}
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    leftSection={
-                      loading || redirectPending ? (
-                        <Loader size="sm" color="blue" />
-                      ) : (
-                        <IconBrandGoogle size={20} />
-                      )
-                    }
-                    rightSection={
-                      !(loading || redirectPending) && isMobile ? (
-                        <IconArrowRight size={16} data-testid="arrow-icon" />
-                      ) : null
-                    }
-                    onClick={handleGoogleSignIn}
-                    disabled={loading || redirectPending || !isOnline}
-                    fullWidth
-                    radius="md"
-                    className={classes.googleButton}
-                    data-testid="google-signin-button"
-                  >
-                    {loading || redirectPending
-                      ? isMobile
-                        ? redirectPending
-                          ? t('auth.login.mobileRedirecting')
-                          : t('auth.login.mobileLoading')
-                        : t('auth.login.loading')
-                      : t('auth.login.googleButton')}
-                  </Button>
-
-                  <Divider
-                    label={t('auth.login.or')}
-                    labelPosition="center"
-                    classNames={{
-                      label: classes.dividerLabel,
-                    }}
-                  />
-
-                  {/* Enhanced features list */}
-                  <Stack gap="sm">
-                    <Group gap="xs" justify="center">
-                      <IconShield size={16} style={{ color: colors.success }} />
-                      <Text size="sm" c="dimmed">
-                        {t('auth.features.secure')}
-                      </Text>
-                    </Group>
-                    <Group gap="xs" justify="center">
-                      <IconLock size={16} style={{ color: colors.success }} />
-                      <Text size="sm" c="dimmed">
-                        {t('auth.features.privacy')}
-                      </Text>
-                    </Group>
-                    <Group gap="xs" justify="center">
-                      <IconUser size={16} style={{ color: colors.success }} />
-                      <Text size="sm" c="dimmed">
-                        {t('auth.features.gdpr')}
-                      </Text>
-                    </Group>
-                  </Stack>
-
-                  {/* Diagnostic button for mobile issues */}
-                  {isMobile && (
-                    <Button
-                      variant="subtle"
-                      size="xs"
-                      onClick={toggleDiagnostic}
-                      leftSection={<IconBug size={12} />}
-                      data-testid="diagnostic-button"
-                    >
-                      Diagnostic mobile
-                    </Button>
-                  )}
-                </Stack>
-              ) : (
-                <Stack gap="lg">
-                  {/* Enhanced user profile */}
-                  <Group justify="center">
-                    <Avatar
-                      src={user?.photoURL || undefined}
-                      alt={user?.displayName || 'Utilisateur'}
-                      size="xl"
-                      radius="xl"
-                      className={classes.userAvatar}
-                    />
-                    <Stack gap={4}>
-                      <Text fw={700} size="lg">
-                        {user?.displayName || storeUser?.name}
-                      </Text>
-                      <Text size="sm" c="dimmed">
-                        {user?.email}
-                      </Text>
-                      <Badge
-                        color="green"
-                        variant="light"
-                        size="sm"
-                        className={classes.connectedBadge}
-                      >
-                        {t('auth.connected')}
-                      </Badge>
-                    </Stack>
-                  </Group>
-
-                  {/* Enhanced action buttons */}
-                  <Stack gap="md">
-                    <Button
-                      variant="filled"
-                      size="lg"
-                      onClick={() => router.push('/')}
-                      fullWidth
-                      radius="md"
-                      className={classes.dashboardButton}
-                      data-testid="home-button"
-                    >
-                      {t('auth.home.button')}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="md"
-                      onClick={handleSignOut}
-                      disabled={loading}
-                      fullWidth
-                      radius="md"
-                      className={classes.signOutButton}
-                      data-testid="signout-button"
-                    >
-                      {loading
-                        ? t('auth.logout.loading')
-                        : t('auth.logout.button')}
-                    </Button>
-                  </Stack>
-                </Stack>
-              )}
-            </Stack>
-          </Card>
-
-          {/* Enhanced footer */}
-          <Paper p="md" radius="md" className={classes.footer}>
-            <Text size="xs" ta="center" className={classes.footerText}>
-              {t('auth.footer.terms')}{' '}
-              <Text component="span" className={classes.footerLink}>
-                {t('auth.footer.termsLink')}
-              </Text>{' '}
-              {t('auth.footer.privacy')}{' '}
-              <Text component="span" className={classes.footerLink}>
-                {t('auth.footer.privacyLink')}
+              {/* Texte informatif */}
+              <Text
+                size="xs"
+                ta="center"
+                style={{
+                  color: 'var(--mantine-color-gray-6)',
+                  lineHeight: 1.4,
+                  maxWidth: '280px',
+                }}
+              >
+                {t('auth.features.secure')} • {t('auth.features.privacy')} •{' '}
+                {t('auth.features.gdpr')}
               </Text>
-            </Text>
-          </Paper>
-
-          {/* Diagnostic component */}
-          <AuthDiagnostic isVisible={showDiagnostic} />
+            </Stack>
+          </Box>
         </Stack>
       </Container>
 
-      {/* Modal d'information mobile améliorée */}
-      <Modal
-        opened={showMobileInfo}
-        onClose={() => setShowMobileInfo(false)}
-        title={
-          <Group gap="xs">
-            <IconDeviceMobile size={20} />
-            <Text>{t('auth.mobile.title')}</Text>
-          </Group>
+      <style jsx>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-20px) rotate(1deg);
+          }
+          66% {
+            transform: translateY(10px) rotate(-1deg);
+          }
         }
-        centered
-        size="sm"
-        data-testid="mobile-modal"
-        classNames={{
-          title: classes.mobileModalTitle,
-        }}
-      >
-        <Stack gap="md">
-          <Alert
-            icon={<IconExternalLink size={16} />}
-            color="blue"
-            variant="light"
-            style={{ borderRadius: '8px' }}
-          >
-            <Text size="sm">{t('auth.mobile.info')}</Text>
-          </Alert>
 
-          <Group gap="xs" justify="center">
-            <IconShield size={16} style={{ color: colors.success }} />
-            <Text size="xs" c="dimmed">
-              {t('auth.mobile.secure')}
-            </Text>
-          </Group>
-
-          <Text size="xs" c="dimmed" ta="center">
-            {t('auth.mobile.popupNote')}
-          </Text>
-        </Stack>
-      </Modal>
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation: none !important;
+          }
+        }
+      `}</style>
     </Box>
   );
 };

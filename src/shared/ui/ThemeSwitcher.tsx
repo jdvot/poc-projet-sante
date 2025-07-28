@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '../hooks/useAppTheme';
 
 // Types pour une meilleure type safety
-type ThemeMode = 'light' | 'dark' | 'auto';
+type ThemeMode = 'light' | 'dark';
 
 interface ThemeOption {
   mode: ThemeMode;
@@ -32,7 +32,7 @@ interface ThemeButtonProps {
   theme: ThemeOption;
   isActive: boolean;
   onThemeChange: (mode: ThemeMode) => void;
-  actualTheme: 'light' | 'dark';
+  actualTheme: 'light' | 'dark' | 'auto';
 }
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({
@@ -146,38 +146,18 @@ export function ThemeSwitcher() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
 
-  // Détection du thème système
+  // Hydration check
   useEffect(() => {
     setMounted(true);
-
-    const getSystemTheme = () => {
-      if (typeof window !== 'undefined') {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light';
-      }
-      return 'light';
-    };
-
-    setSystemTheme(getSystemTheme());
-
-    // Écouteur pour les changements de thème système
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => setSystemTheme(getSystemTheme());
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Calcul du thème réel (système ou manuel)
-  const actualTheme = useMemo(() => {
+  // Si le thème actuel est 'auto', forcer vers 'light'
+  useEffect(() => {
     if (colorScheme === 'auto') {
-      return systemTheme;
+      setColorScheme('light');
     }
-    return colorScheme;
-  }, [colorScheme, systemTheme]);
+  }, [colorScheme, setColorScheme]);
 
   // Utilisation de useMemo pour éviter les recréations d'objets
   const themeOptions = useMemo<ThemeOption[]>(
@@ -191,11 +171,6 @@ export function ThemeSwitcher() {
         mode: 'dark',
         icon: themeIcons.dark,
         label: t('theme.dark', 'Sombre'),
-      },
-      {
-        mode: 'auto',
-        icon: themeIcons.auto,
-        label: t('theme.auto', 'Automatique'),
       },
     ],
     [t]
@@ -225,7 +200,7 @@ export function ThemeSwitcher() {
             theme={theme}
             isActive={colorScheme === theme.mode}
             onThemeChange={handleThemeChange}
-            actualTheme={actualTheme}
+            actualTheme={colorScheme}
           />
         ))}
       </Group>

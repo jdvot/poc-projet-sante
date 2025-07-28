@@ -68,36 +68,25 @@ export function LanguageSwitcher() {
 
   const buttonStyles = useMemo(
     () => ({
-      background: isDark
-        ? 'var(--mantine-color-dark-4)'
-        : 'var(--mantine-color-white)',
+      background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
       border: `1.5px solid ${
-        isDark ? 'var(--mantine-color-dark-2)' : 'var(--mantine-color-gray-2)'
+        isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)'
       }`,
       color: isDark
-        ? 'var(--mantine-color-gray-1)'
-        : 'var(--mantine-color-gray-9)',
+        ? 'rgba(255, 255, 255, 0.9)'
+        : 'var(--mantine-color-gray-8)',
       fontWeight: 600,
       fontSize: '0.875rem',
-      padding: '0.625rem 1rem',
+      padding: '0.5rem 0.75rem',
       borderRadius: '0.875rem',
       transition: transitions.normal,
       boxShadow: isDark
-        ? '0 2px 8px rgba(0, 0, 0, 0.2)'
-        : '0 2px 8px rgba(0, 0, 0, 0.06)',
+        ? '0 2px 8px rgba(0, 0, 0, 0.1)'
+        : '0 2px 8px rgba(0, 0, 0, 0.05)',
       width: '100%',
       justifyContent: 'space-between',
-      '&:hover': {
-        background: isDark
-          ? 'var(--mantine-color-dark-3)'
-          : 'var(--mantine-color-gray-0)',
-        transform: 'translateY(-1px)',
-        boxShadow: isDark
-          ? '0 4px 12px rgba(0, 0, 0, 0.3)'
-          : '0 4px 12px rgba(0, 0, 0, 0.1)',
-      },
     }),
-    [isDark, transitions]
+    [transitions, isDark]
   );
 
   const dropdownStyles = useMemo(
@@ -142,7 +131,11 @@ export function LanguageSwitcher() {
             <Group gap="xs" align="center">
               <Text
                 size="lg"
-                style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+                style={{
+                  filter: isDark
+                    ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                }}
               >
                 {currentLanguage.flag}
               </Text>
@@ -176,15 +169,6 @@ export function LanguageSwitcher() {
                 language === lang.code
                   ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
                   : 'transparent',
-              '&:hover': {
-                background:
-                  language === lang.code
-                    ? `linear-gradient(135deg, ${colors.primary}, ${colors.info})`
-                    : isDark
-                      ? 'var(--mantine-color-dark-4)'
-                      : 'var(--mantine-color-gray-0)',
-                transform: 'translateX(2px)',
-              },
             }}
             className="hover:no-underline"
           >
@@ -192,7 +176,11 @@ export function LanguageSwitcher() {
               <Group gap="sm" align="center">
                 <Text
                   size="lg"
-                  style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
+                  style={{
+                    filter: isDark
+                      ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                      : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                  }}
                 >
                   {lang.flag}
                 </Text>

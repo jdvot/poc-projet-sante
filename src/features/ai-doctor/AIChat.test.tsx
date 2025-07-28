@@ -60,7 +60,7 @@ vi.mock('../../../shared/hooks/useAppTheme', () => ({
       normal: '0.3s ease',
       slow: '0.5s ease',
     },
-  })),
+  }),
 }));
 
 vi.mock('react-i18next', () => ({

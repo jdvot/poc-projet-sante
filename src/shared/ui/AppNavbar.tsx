@@ -23,8 +23,6 @@ import {
   IconUser,
   IconSettings,
   IconHeart,
-  IconTestPipe,
-  IconPalette,
   IconLanguage,
   IconPalette as IconTheme,
 } from '@tabler/icons-react';
@@ -77,18 +75,6 @@ const mockdata = [
     icon: IconSettings,
     href: '/settings',
     description: 'Configurer vos paramètres',
-  },
-  {
-    label: 'Test Layout',
-    icon: IconTestPipe,
-    href: '/test-layout',
-    description: 'Page de test pour la mise en page',
-  },
-  {
-    label: 'Test Theme',
-    icon: IconPalette,
-    href: '/test-theme',
-    description: 'Page de test pour les thèmes',
   },
 ] as const;
 

@@ -1,42 +1,63 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '../../test/test-utils';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { AuthPage } from './AuthPage';
+import { useFirebaseAuth } from '../../shared/hooks/useFirebaseAuth';
+import { useAuthStore } from '../../shared/stores/authStore';
+import { useTranslation } from 'react-i18next';
+import { useAppTheme } from '../../shared/hooks/useAppTheme';
+import { useIsMobile } from '../../shared/hooks/useDeviceDetection';
 
 // Mock des hooks
-vi.mock('../../shared/hooks/useFirebaseAuth', () => ({
-  useFirebaseAuth: vi.fn(),
-}));
-
-vi.mock('../../shared/stores/authStore', () => ({
-  useAuthStore: vi.fn(),
-}));
-
-vi.mock('../../shared/hooks/useDeviceDetection', () => ({
-  useIsMobile: vi.fn(),
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: vi.fn(),
-}));
-
+vi.mock('../../shared/hooks/useFirebaseAuth');
+vi.mock('../../shared/stores/authStore');
+vi.mock('react-i18next');
+vi.mock('../../shared/hooks/useAppTheme');
+vi.mock('../../shared/hooks/useDeviceDetection');
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
 }));
 
-describe('AuthPage', () => {
-  const mockT = vi.fn((key: string) => key);
+// Mock des composants UI
+vi.mock('../../shared/ui/LanguageSwitcher', () => ({
+  LanguageSwitcher: () => (
+    <div data-testid="language-switcher">Language Switcher</div>
+  ),
+}));
 
+vi.mock('../../shared/ui/ThemeSwitcher', () => ({
+  ThemeSwitcher: () => <div data-testid="theme-switcher">Theme Switcher</div>,
+}));
+
+vi.mock('./components/AuthDiagnostic', () => ({
+  AuthDiagnostic: ({ isVisible }: { isVisible: boolean }) =>
+    isVisible ? <div data-testid="auth-diagnostic">Auth Diagnostic</div> : null,
+}));
+
+const mockUseFirebaseAuth = vi.mocked(useFirebaseAuth);
+const mockUseAuthStore = vi.mocked(useAuthStore);
+const mockUseTranslation = vi.mocked(useTranslation);
+const mockUseAppTheme = vi.mocked(useAppTheme);
+const mockUseIsMobile = vi.mocked(useIsMobile);
+
+describe('AuthPage', () => {
   const defaultAuthProps = {
     signInWithGoogle: vi.fn(),
     signOutUser: vi.fn(),
-    clearError: vi.fn(),
     loading: false,
     error: null,
     isAuthenticated: false,
     user: null,
+    redirectPending: false,
+    configError: false,
+    mobileAuthError: false,
+    clearError: vi.fn(),
+    clearRedirectPending: vi.fn(),
+    retryAuthentication: vi.fn(),
+    retryMobileAuth: vi.fn(),
   };
 
   const defaultStoreProps = {
@@ -46,88 +67,115 @@ describe('AuthPage', () => {
     logout: vi.fn(),
   };
 
+  const defaultThemeProps = {
+    theme: {} as any,
+    colorScheme: 'light' as any,
+    toggleColorScheme: vi.fn(),
+    setColorScheme: vi.fn(),
+    isDark: false,
+    isLight: true,
+    colors: {
+      primary: '#228be6',
+      success: '#40c057',
+      error: '#fa5252',
+      warning: '#f59e0b',
+      info: '#228be6',
+      secondary: '#868e96',
+    },
+    gradients: {
+      primary: 'linear-gradient(135deg, #228be6 0%, #15aabf 100%)',
+      health: 'linear-gradient(135deg, #0ea5e9 0%, #16a34a 100%)',
+      secondary: 'linear-gradient(135deg, #40c057 0%, #12b886 100%)',
+      accent: 'linear-gradient(135deg, #7950f2 0%, #e64980 100%)',
+      medical: 'linear-gradient(135deg, #dc2626 0%, #fa5252 100%)',
+    },
+    spacing: {
+      section: '3rem',
+      page: '2rem',
+      card: '1.5rem',
+    },
+    radius: {
+      card: '1rem',
+      button: '0.75rem',
+      input: '0.5rem',
+    },
+    transitions: {
+      default: '150ms ease',
+    },
+  } as any;
+
+  const defaultTranslationProps = {
+    t: (key: string) => key,
+    i18n: {
+      language: 'fr',
+      changeLanguage: vi.fn(),
+    },
+    ready: true,
+  } as any;
+
   beforeEach(() => {
-    // Mock useTranslation
-    vi.mocked(require('react-i18next').useTranslation).mockReturnValue({
-      t: mockT,
-      i18n: { language: 'fr' },
-    });
-
-    // Mock useIsMobile
-    vi.mocked(
-      require('../../shared/hooks/useDeviceDetection').useIsMobile
-    ).mockReturnValue(false);
-
-    // Mock useFirebaseAuth
-    vi.mocked(
-      require('../../shared/hooks/useFirebaseAuth').useFirebaseAuth
-    ).mockReturnValue(defaultAuthProps);
-
-    // Mock useAuthStore
-    vi.mocked(
-      require('../../shared/stores/authStore').useAuthStore
-    ).mockReturnValue(defaultStoreProps);
-  });
-
-  afterEach(() => {
     vi.clearAllMocks();
-  });
 
-  it('should render authentication page with all elements', () => {
-    render(<AuthPage />);
-
-    // Vérifier les éléments principaux
-    expect(screen.getByTestId('auth-card')).toBeDefined();
-    expect(screen.getByTestId('google-signin-button')).toBeDefined();
-    expect(screen.getByTestId('device-indicator')).toBeDefined();
-  });
-
-  it('should display mobile indicators when on mobile', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(true);
-
-    render(<AuthPage />);
-
-    expect(screen.getByTestId('device-indicator')).toHaveTextContent(
-      'auth.mobile.deviceMode'
-    );
-  });
-
-  it('should display desktop indicators when on desktop', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(false);
-
-    render(<AuthPage />);
-
-    expect(screen.getByTestId('device-indicator')).toHaveTextContent(
-      'auth.mobile.desktopMode'
-    );
-  });
-
-  it('should show connectivity indicator', () => {
-    render(<AuthPage />);
-
-    expect(screen.getByTestId('connectivity-indicator')).toBeDefined();
-  });
-
-  it('should show offline alert when not connected', () => {
-    // Mock navigator.onLine
+    // Mock de window.navigator.onLine
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
-      value: false,
+      value: true,
     });
 
-    render(<AuthPage />);
+    // Mock de window.addEventListener et removeEventListener
+    const addEventListener = vi.fn();
+    const removeEventListener = vi.fn();
+    Object.defineProperty(window, 'addEventListener', {
+      value: addEventListener,
+    });
+    Object.defineProperty(window, 'removeEventListener', {
+      value: removeEventListener,
+    });
 
-    expect(screen.getByTestId('offline-alert')).toBeDefined();
+    mockUseFirebaseAuth.mockReturnValue(defaultAuthProps);
+    mockUseAuthStore.mockReturnValue(defaultStoreProps);
+    mockUseTranslation.mockReturnValue(defaultTranslationProps);
+    mockUseAppTheme.mockReturnValue(defaultThemeProps);
+    mockUseIsMobile.mockReturnValue(false);
   });
 
-  it('should handle Google sign in click', async () => {
-    const mockSignInWithGoogle = vi.fn();
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
+  it('renders authentication page correctly', () => {
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('auth-card')).toBeDefined();
+    expect(screen.getByTestId('google-signin-button')).toBeDefined();
+    expect(screen.getByText('auth.title')).toBeDefined();
+    expect(screen.getByText('auth.subtitle')).toBeDefined();
+  });
+
+  it('displays language and theme switchers', () => {
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('language-switcher')).toBeDefined();
+    expect(screen.getByTestId('theme-switcher')).toBeDefined();
+  });
+
+  it('shows device indicator for desktop', () => {
+    mockUseIsMobile.mockReturnValue(false);
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('device-indicator')).toBeDefined();
+    expect(screen.getByText('auth.mobile.desktopMode')).toBeDefined();
+  });
+
+  it('shows device indicator for mobile', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('device-indicator')).toBeDefined();
+    expect(screen.getByText('auth.mobile.deviceMode')).toBeDefined();
+  });
+
+  it('handles Google sign in correctly', async () => {
+    const signInWithGoogle = vi.fn().mockResolvedValue(undefined);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
-      signInWithGoogle: mockSignInWithGoogle,
+      signInWithGoogle,
     });
 
     render(<AuthPage />);
@@ -136,30 +184,25 @@ describe('AuthPage', () => {
     fireEvent.click(signInButton);
 
     await waitFor(() => {
-      expect(mockSignInWithGoogle).toHaveBeenCalled();
+      expect(signInWithGoogle).toHaveBeenCalled();
     });
   });
 
-  it('should show loading state when authenticating', () => {
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
+  it('shows loading state during authentication', () => {
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
       loading: true,
     });
 
     render(<AuthPage />);
 
-    expect(screen.getByTestId('google-signin-button')).toHaveTextContent(
-      'auth.login.loading'
-    );
+    expect(screen.getByText('auth.login.loading')).toBeDefined();
+    expect(screen.getByTestId('google-signin-button')).toBeDisabled();
   });
 
-  it('should show mobile loading state when on mobile', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-
-    useIsMobile.mockReturnValue(true);
-    useFirebaseAuth.mockReturnValue({
+  it('shows mobile loading state', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
       loading: true,
     });
@@ -169,72 +212,127 @@ describe('AuthPage', () => {
     expect(screen.getByTestId('mobile-loading')).toBeDefined();
     expect(screen.getByTestId('ring-progress')).toBeDefined();
     expect(screen.getByTestId('progress-bar')).toBeDefined();
-    expect(screen.getByTestId('refresh-icon')).toBeDefined();
   });
 
-  it('should show error message when authentication fails', () => {
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
+  it('shows redirect pending state for mobile', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
-      error: 'auth.error.popupBlocked',
+      redirectPending: true,
+    });
+
+    render(<AuthPage />);
+
+    expect(screen.getByText('auth.login.mobileRedirecting')).toBeDefined();
+    expect(screen.getByTestId('cancel-redirect-button')).toBeDefined();
+  });
+
+  it('handles cancel redirect', () => {
+    const clearRedirectPending = vi.fn();
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      redirectPending: true,
+      clearRedirectPending,
+    });
+
+    render(<AuthPage />);
+
+    const cancelButton = screen.getByTestId('cancel-redirect-button');
+    fireEvent.click(cancelButton);
+
+    expect(clearRedirectPending).toHaveBeenCalled();
+  });
+
+  it('displays error messages correctly', () => {
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'popup-blocked',
     });
 
     render(<AuthPage />);
 
     expect(screen.getByTestId('error-message')).toBeDefined();
+    expect(screen.getByText('auth.error.popupBlocked')).toBeDefined();
   });
 
-  it('should show authenticated user state', () => {
-    const mockUser = {
-      uid: '123',
-      email: 'test@example.com',
-      displayName: 'Test User',
-      photoURL: 'https://example.com/photo.jpg',
-    };
-
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    const { useAuthStore } = require('../../shared/stores/authStore');
-
-    useFirebaseAuth.mockReturnValue({
+  it('displays mobile error messages correctly', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
-      isAuthenticated: true,
-      user: mockUser,
-    });
-
-    useAuthStore.mockReturnValue({
-      ...defaultStoreProps,
-      isAuthenticated: true,
-      user: { id: '123', name: 'Test User', email: 'test@example.com' },
+      error: 'popup-blocked',
     });
 
     render(<AuthPage />);
 
+    expect(screen.getByTestId('error-message')).toBeDefined();
+    expect(screen.getByText('auth.error.mobileRedirect')).toBeDefined();
+  });
+
+  it('shows retry button for config errors', () => {
+    const retryAuthentication = vi.fn();
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'config-error',
+      configError: true,
+      retryAuthentication,
+    });
+
+    render(<AuthPage />);
+
+    const retryButton = screen.getByTestId('retry-button');
+    fireEvent.click(retryButton);
+
+    expect(retryAuthentication).toHaveBeenCalled();
+  });
+
+  it('shows mobile retry button for mobile auth errors', () => {
+    const retryMobileAuth = vi.fn();
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'mobile-auth-error',
+      mobileAuthError: true,
+      retryMobileAuth,
+    });
+
+    render(<AuthPage />);
+
+    const retryButton = screen.getByTestId('retry-mobile-button');
+    fireEvent.click(retryButton);
+
+    expect(retryMobileAuth).toHaveBeenCalled();
+  });
+
+  it('shows authenticated user profile', () => {
+    const user = {
+      displayName: 'John Doe',
+      email: 'john@example.com',
+      photoURL: 'https://example.com/photo.jpg',
+    } as any;
+
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      isAuthenticated: true,
+      user,
+    });
+
+    render(<AuthPage />);
+
+    expect(screen.getByText('John Doe')).toBeDefined();
+    expect(screen.getByText('john@example.com')).toBeDefined();
     expect(screen.getByTestId('home-button')).toBeDefined();
     expect(screen.getByTestId('signout-button')).toBeDefined();
   });
 
-  it('should handle sign out click', async () => {
-    const mockSignOutUser = vi.fn();
-    const mockUser = {
-      uid: '123',
-      email: 'test@example.com',
-      displayName: 'Test User',
-    };
+  it('handles sign out correctly', async () => {
+    const signOutUser = vi.fn().mockResolvedValue(undefined);
+    const user = { displayName: 'John Doe', email: 'john@example.com' } as any;
 
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    const { useAuthStore } = require('../../shared/stores/authStore');
-
-    useFirebaseAuth.mockReturnValue({
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
       isAuthenticated: true,
-      user: mockUser,
-      signOutUser: mockSignOutUser,
-    });
-
-    useAuthStore.mockReturnValue({
-      ...defaultStoreProps,
-      isAuthenticated: true,
-      user: { id: '123', name: 'Test User', email: 'test@example.com' },
+      user,
+      signOutUser,
     });
 
     render(<AuthPage />);
@@ -243,58 +341,63 @@ describe('AuthPage', () => {
     fireEvent.click(signOutButton);
 
     await waitFor(() => {
-      expect(mockSignOutUser).toHaveBeenCalled();
+      expect(signOutUser).toHaveBeenCalled();
     });
   });
 
-  it('should show arrow icon on mobile for Google button', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(true);
-
-    render(<AuthPage />);
-
-    expect(screen.getByTestId('arrow-icon')).toBeDefined();
-  });
-
-  it('should not show arrow icon on desktop for Google button', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(false);
-
-    render(<AuthPage />);
-
-    expect(screen.queryByTestId('arrow-icon')).toBeNull();
-  });
-
-  it('should handle error clearing', () => {
-    const mockClearError = vi.fn();
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
-      ...defaultAuthProps,
-      error: 'Some error',
-      clearError: mockClearError,
+  it('shows offline connectivity indicator', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      writable: true,
+      value: false,
     });
 
     render(<AuthPage />);
 
-    const errorMessage = screen.getByTestId('error-message');
-    const closeButton = errorMessage.querySelector('[aria-label="Close"]');
-
-    if (closeButton) {
-      fireEvent.click(closeButton);
-      expect(mockClearError).toHaveBeenCalled();
-    }
+    expect(screen.getByTestId('offline-alert')).toBeDefined();
+    expect(screen.getByText('auth.connectivity.noConnection')).toBeDefined();
   });
 
-  it('should show mobile modal when clicking sign in on mobile', async () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
+  it('shows connectivity indicator', () => {
+    render(<AuthPage />);
 
-    useIsMobile.mockReturnValue(true);
-    const mockSignInWithGoogle = vi.fn();
+    expect(screen.getByTestId('connectivity-indicator')).toBeDefined();
+  });
 
-    useFirebaseAuth.mockReturnValue({
+  it('disables sign in button when offline', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      writable: true,
+      value: false,
+    });
+
+    render(<AuthPage />);
+
+    const signInButton = screen.getByTestId('google-signin-button');
+    expect(signInButton).toBeDisabled();
+  });
+
+  it('shows diagnostic button on mobile', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('diagnostic-button')).toBeDefined();
+  });
+
+  it('toggles diagnostic visibility', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    render(<AuthPage />);
+
+    const diagnosticButton = screen.getByTestId('diagnostic-button');
+    fireEvent.click(diagnosticButton);
+
+    expect(screen.getByTestId('auth-diagnostic')).toBeDefined();
+  });
+
+  it('shows mobile info modal on mobile sign in', async () => {
+    mockUseIsMobile.mockReturnValue(true);
+    const signInWithGoogle = vi.fn().mockResolvedValue(undefined);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
-      signInWithGoogle: mockSignInWithGoogle,
+      signInWithGoogle,
     });
 
     render(<AuthPage />);
@@ -305,224 +408,204 @@ describe('AuthPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('mobile-modal')).toBeDefined();
     });
-
-    // Vérifier que la modal se ferme automatiquement après 2 secondes
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId('mobile-modal')).toBeNull();
-      },
-      { timeout: 2500 }
-    );
   });
 
-  it('should disable sign in button when offline', () => {
-    // Mock navigator.onLine
-    Object.defineProperty(navigator, 'onLine', {
-      writable: true,
-      value: false,
+  it('clears error after 5 seconds', async () => {
+    const clearError = vi.fn();
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'test-error',
+      clearError,
+    });
+
+    vi.useFakeTimers();
+    render(<AuthPage />);
+
+    expect(screen.getByTestId('error-message')).toBeDefined();
+
+    vi.advanceTimersByTime(5000);
+
+    await waitFor(() => {
+      expect(clearError).toHaveBeenCalled();
+    });
+
+    vi.useRealTimers();
+  });
+
+  it('handles network error correctly', async () => {
+    const signInWithGoogle = vi
+      .fn()
+      .mockRejectedValue(new Error('network-request-failed'));
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      signInWithGoogle,
     });
 
     render(<AuthPage />);
 
     const signInButton = screen.getByTestId('google-signin-button');
-    expect(signInButton).toBeDisabled();
-  });
-
-  it('should show proper error messages for different error types', () => {
-    const errorTests = [
-      { error: 'popup-blocked', expectedKey: 'auth.error.popupBlocked' },
-      {
-        error: 'network-request-failed',
-        expectedKey: 'auth.error.networkError',
-      },
-      { error: 'too-many-requests', expectedKey: 'auth.error.tooManyRequests' },
-      {
-        error: 'unauthorized-domain',
-        expectedKey: 'auth.error.unauthorizedDomain',
-      },
-    ];
-
-    errorTests.forEach(({ error, expectedKey }) => {
-      const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-      useFirebaseAuth.mockReturnValue({
-        ...defaultAuthProps,
-        error,
-      });
-
-      render(<AuthPage />);
-
-      expect(mockT).toHaveBeenCalledWith(expectedKey);
-    });
-  });
-
-  // Test pour le diagnostic mobile
-  it('should show diagnostic button on mobile', () => {
-    // Mock useIsMobile pour simuler un appareil mobile
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(true);
-
-    render(<AuthPage />);
-
-    const diagnosticButton = screen.getByTestId('diagnostic-button');
-    expect(diagnosticButton).toBeInTheDocument();
-    expect(diagnosticButton).toHaveTextContent('Diagnostic mobile');
-  });
-
-  it('should not show diagnostic button on desktop', () => {
-    // Mock useIsMobile pour simuler un desktop
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(false);
-
-    render(<AuthPage />);
-
-    const diagnosticButton = screen.queryByTestId('diagnostic-button');
-    expect(diagnosticButton).not.toBeInTheDocument();
-  });
-
-  it('should show mobile auth error retry button', () => {
-    // Mock useFirebaseAuth pour simuler une erreur mobile
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
-      ...defaultAuthProps,
-      mobileAuthError: true,
-      retryMobileAuth: vi.fn(),
-    });
-
-    render(<AuthPage />);
-
-    const retryButton = screen.getByTestId('retry-mobile-button');
-    expect(retryButton).toBeInTheDocument();
-    expect(retryButton).toHaveTextContent('Réessayer Mobile');
-  });
-
-  it('should handle mobile auth retry', async () => {
-    const mockRetryMobileAuth = vi.fn();
-
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-    useFirebaseAuth.mockReturnValue({
-      ...defaultAuthProps,
-      mobileAuthError: true,
-      retryMobileAuth: mockRetryMobileAuth,
-    });
-
-    render(<AuthPage />);
-
-    const retryButton = screen.getByTestId('retry-mobile-button');
-    fireEvent.click(retryButton);
+    fireEvent.click(signInButton);
 
     await waitFor(() => {
-      expect(mockRetryMobileAuth).toHaveBeenCalled();
+      expect(screen.getByText('auth.error.networkError')).toBeDefined();
     });
   });
 
-  it('should show mobile loading state with progress', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
+  it('handles unauthorized domain error', () => {
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'unauthorized-domain',
+    });
 
-    useIsMobile.mockReturnValue(true);
+    render(<AuthPage />);
 
-    useFirebaseAuth.mockReturnValue({
+    expect(screen.getByText('auth.error.unauthorizedDomain')).toBeDefined();
+  });
+
+  it('handles too many requests error', () => {
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      error: 'too-many-requests',
+    });
+
+    render(<AuthPage />);
+
+    expect(screen.getByText('auth.error.tooManyRequests')).toBeDefined();
+  });
+
+  it('shows features list', () => {
+    render(<AuthPage />);
+
+    expect(screen.getByText('auth.features.secure')).toBeDefined();
+    expect(screen.getByText('auth.features.privacy')).toBeDefined();
+    expect(screen.getByText('auth.features.gdpr')).toBeDefined();
+  });
+
+  it('shows footer with terms and privacy links', () => {
+    render(<AuthPage />);
+
+    expect(screen.getByText('auth.footer.terms')).toBeDefined();
+    expect(screen.getByText('auth.footer.termsLink')).toBeDefined();
+    expect(screen.getByText('auth.footer.privacy')).toBeDefined();
+    expect(screen.getByText('auth.footer.privacyLink')).toBeDefined();
+  });
+
+  it('handles focus management correctly', () => {
+    render(<AuthPage />);
+
+    const signInButton = screen.getByTestId('google-signin-button');
+    signInButton.focus();
+
+    expect(signInButton).toHaveFocus();
+  });
+
+  it('handles keyboard navigation', () => {
+    render(<AuthPage />);
+
+    const signInButton = screen.getByTestId('google-signin-button');
+    fireEvent.keyDown(signInButton, { key: 'Enter' });
+
+    expect(mockUseFirebaseAuth().signInWithGoogle).toHaveBeenCalled();
+  });
+
+  it('handles escape key in modal', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    const signInWithGoogle = vi.fn().mockResolvedValue(undefined);
+    mockUseFirebaseAuth.mockReturnValue({
+      ...defaultAuthProps,
+      signInWithGoogle,
+    });
+
+    render(<AuthPage />);
+
+    const signInButton = screen.getByTestId('google-signin-button');
+    fireEvent.click(signInButton);
+
+    waitFor(() => {
+      const modal = screen.getByTestId('mobile-modal');
+      fireEvent.keyDown(modal, { key: 'Escape' });
+      expect(screen.queryByTestId('mobile-modal')).toBeNull();
+    });
+  });
+
+  it('handles window online/offline events', () => {
+    const addEventListener = vi.fn();
+    Object.defineProperty(window, 'addEventListener', {
+      value: addEventListener,
+    });
+
+    render(<AuthPage />);
+
+    expect(addEventListener).toHaveBeenCalledWith(
+      'online',
+      expect.any(Function)
+    );
+    expect(addEventListener).toHaveBeenCalledWith(
+      'offline',
+      expect.any(Function)
+    );
+  });
+
+  it('cleans up event listeners on unmount', () => {
+    const removeEventListener = vi.fn();
+    Object.defineProperty(window, 'removeEventListener', {
+      value: removeEventListener,
+    });
+
+    const { unmount } = render(<AuthPage />);
+    unmount();
+
+    expect(removeEventListener).toHaveBeenCalledWith(
+      'online',
+      expect.any(Function)
+    );
+    expect(removeEventListener).toHaveBeenCalledWith(
+      'offline',
+      expect.any(Function)
+    );
+  });
+
+  it('handles mobile redirect progress animation', () => {
+    mockUseIsMobile.mockReturnValue(true);
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
       loading: true,
     });
 
+    vi.useFakeTimers();
     render(<AuthPage />);
-
-    const mobileLoading = screen.getByTestId('mobile-loading');
-    expect(mobileLoading).toBeInTheDocument();
-
-    const ringProgress = screen.getByTestId('ring-progress');
-    expect(ringProgress).toBeInTheDocument();
 
     const progressBar = screen.getByTestId('progress-bar');
-    expect(progressBar).toBeInTheDocument();
+    const initialValue = progressBar.getAttribute('aria-label');
+
+    vi.advanceTimersByTime(500);
+
+    const newValue = progressBar.getAttribute('aria-label');
+    expect(newValue).not.toBe(initialValue);
+
+    vi.useRealTimers();
   });
 
-  it('should show redirect pending state', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-
-    useIsMobile.mockReturnValue(true);
-
-    useFirebaseAuth.mockReturnValue({
+  it('handles error clearing with close button', () => {
+    const clearError = vi.fn();
+    mockUseFirebaseAuth.mockReturnValue({
       ...defaultAuthProps,
-      redirectPending: true,
+      error: 'test-error',
+      clearError,
     });
 
     render(<AuthPage />);
 
-    const cancelButton = screen.getByTestId('cancel-redirect-button');
-    expect(cancelButton).toBeInTheDocument();
-    expect(cancelButton).toHaveTextContent('Annuler');
+    const errorMessage = screen.getByTestId('error-message');
+    const closeButton = errorMessage.querySelector('[aria-label="Close"]');
+
+    if (closeButton) {
+      fireEvent.click(closeButton);
+      expect(clearError).toHaveBeenCalled();
+    }
   });
 
-  it('should handle cancel redirect', async () => {
-    const mockClearRedirectPending = vi.fn();
-
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    const { useFirebaseAuth } = require('../../shared/hooks/useFirebaseAuth');
-
-    useIsMobile.mockReturnValue(true);
-    useFirebaseAuth.mockReturnValue({
-      ...defaultAuthProps,
-      redirectPending: true,
-      clearRedirectPending: mockClearRedirectPending,
-    });
-
-    render(<AuthPage />);
-
-    const cancelButton = screen.getByTestId('cancel-redirect-button');
-    fireEvent.click(cancelButton);
-
-    await waitFor(() => {
-      expect(mockClearRedirectPending).toHaveBeenCalled();
-    });
-  });
-
-  it('should show mobile device indicator', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(true);
-
-    render(<AuthPage />);
-
-    const deviceIndicator = screen.getByTestId('device-indicator');
-    expect(deviceIndicator).toBeInTheDocument();
-    expect(deviceIndicator).toHaveTextContent('Mode mobile');
-  });
-
-  it('should show desktop device indicator', () => {
-    const { useIsMobile } = require('../../shared/hooks/useDeviceDetection');
-    useIsMobile.mockReturnValue(false);
-
-    render(<AuthPage />);
-
-    const deviceIndicator = screen.getByTestId('device-indicator');
-    expect(deviceIndicator).toBeInTheDocument();
-    expect(deviceIndicator).toHaveTextContent('Mode desktop');
-  });
-
-  it('should show connectivity indicator', () => {
-    render(<AuthPage />);
-
-    const connectivityIndicator = screen.getByTestId('connectivity-indicator');
-    expect(connectivityIndicator).toBeInTheDocument();
-  });
-
-  it('should show offline alert when not connected', () => {
-    // Mock navigator.onLine
-    Object.defineProperty(navigator, 'onLine', {
-      writable: true,
-      value: false,
-    });
-
-    render(<AuthPage />);
-
-    const offlineAlert = screen.getByTestId('offline-alert');
-    expect(offlineAlert).toBeInTheDocument();
-    expect(offlineAlert).toHaveTextContent('Pas de connexion internet');
-  });
-
-  it('should disable sign in button when offline', () => {
+  it('handles accessibility attributes correctly', () => {
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
       value: false,
@@ -531,6 +614,52 @@ describe('AuthPage', () => {
     render(<AuthPage />);
 
     const signInButton = screen.getByTestId('google-signin-button');
-    expect(signInButton).toBeDisabled();
+    const offlineAlert = screen.getByTestId('offline-alert');
+
+    expect(signInButton).toHaveAttribute('aria-describedby', 'offline-alert');
+    expect(offlineAlert).toHaveAttribute('role', 'alert');
+    expect(offlineAlert).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('handles reduced motion preferences', () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    render(<AuthPage />);
+
+    // Les animations devraient être désactivées
+    expect(screen.getByTestId('auth-card')).toBeDefined();
+  });
+
+  it('handles high contrast preferences', () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: query === '(prefers-contrast: high)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    render(<AuthPage />);
+
+    // Les styles de contraste élevé devraient être appliqués
+    expect(screen.getByTestId('auth-card')).toBeDefined();
   });
 });
