@@ -20,14 +20,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-[data-mantine-color-scheme="light"] .control:hover {
+[data-mantine-color-scheme='light'] .control:hover {
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-[data-mantine-color-scheme="dark"] .control:hover {
+[data-mantine-color-scheme='dark'] .control:hover {
   background-color: var(--mantine-color-dark-5);
   color: var(--mantine-color-white);
   transform: translateY(-1px);
@@ -40,13 +40,13 @@
   border-color: var(--mantine-color-blue-6);
 }
 
-[data-mantine-color-scheme="light"] .control:focus {
+[data-mantine-color-scheme='light'] .control:focus {
   outline: 3px solid var(--mantine-color-blue-6);
   outline-offset: 2px;
   border-color: var(--mantine-color-blue-6);
 }
 
-[data-mantine-color-scheme="dark"] .control:focus {
+[data-mantine-color-scheme='dark'] .control:focus {
   outline: 3px solid var(--mantine-color-blue-4);
   outline-offset: 2px;
   border-color: var(--mantine-color-blue-4);
@@ -54,7 +54,11 @@
 
 /* État actif - seulement pour l'élément vraiment actif */
 .control.active {
-  background: linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6));
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6),
+    var(--mantine-color-cyan-6)
+  );
   color: white;
   font-weight: 600;
   border-color: var(--mantine-color-blue-6);
@@ -62,7 +66,11 @@
 }
 
 .control.active:hover {
-  background: linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6));
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6),
+    var(--mantine-color-cyan-6)
+  );
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
 }
@@ -108,24 +116,24 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-[data-mantine-color-scheme="light"] .link {
+[data-mantine-color-scheme='light'] .link {
   color: var(--mantine-color-gray-7);
   border-left: 2px solid var(--mantine-color-gray-4);
 }
 
-[data-mantine-color-scheme="light"] .link:hover {
+[data-mantine-color-scheme='light'] .link:hover {
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-[data-mantine-color-scheme="dark"] .link {
+[data-mantine-color-scheme='dark'] .link {
   color: var(--mantine-color-dark-2);
   border-left: 2px solid var(--mantine-color-dark-4);
 }
 
-[data-mantine-color-scheme="dark"] .link:hover {
+[data-mantine-color-scheme='dark'] .link:hover {
   background-color: var(--mantine-color-dark-5);
   color: var(--mantine-color-white);
   transform: translateY(-1px);
@@ -138,13 +146,13 @@
   border-left-color: var(--mantine-color-blue-6);
 }
 
-[data-mantine-color-scheme="light"] .link:focus {
+[data-mantine-color-scheme='light'] .link:focus {
   outline: 3px solid var(--mantine-color-blue-6);
   outline-offset: 2px;
   border-left-color: var(--mantine-color-blue-6);
 }
 
-[data-mantine-color-scheme="dark"] .link:focus {
+[data-mantine-color-scheme='dark'] .link:focus {
   outline: 3px solid var(--mantine-color-blue-4);
   outline-offset: 2px;
   border-left-color: var(--mantine-color-blue-4);
@@ -152,7 +160,11 @@
 
 /* État actif pour les liens */
 .link.active {
-  background: linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6));
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6),
+    var(--mantine-color-cyan-6)
+  );
   color: white;
   font-weight: 600;
   border-left-color: var(--mantine-color-blue-6);
@@ -160,7 +172,11 @@
 }
 
 .link.active:hover {
-  background: linear-gradient(135deg, var(--mantine-color-blue-6), var(--mantine-color-cyan-6));
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6),
+    var(--mantine-color-cyan-6)
+  );
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
 }
@@ -180,7 +196,7 @@
   color: var(--mantine-color-gray-7);
 }
 
-[data-mantine-color-scheme="dark"] .control .icon {
+[data-mantine-color-scheme='dark'] .control .icon {
   color: var(--mantine-color-gray-3);
 }
 
@@ -192,7 +208,7 @@
   color: var(--mantine-color-gray-6);
 }
 
-[data-mantine-color-scheme="dark"] .link .icon {
+[data-mantine-color-scheme='dark'] .link .icon {
   color: var(--mantine-color-dark-2);
 }
 
@@ -206,7 +222,7 @@
   color: var(--mantine-color-gray-7);
 }
 
-[data-mantine-color-scheme="dark"] .chevron {
+[data-mantine-color-scheme='dark'] .chevron {
   color: var(--mantine-color-gray-3);
 }
 
@@ -225,13 +241,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-[data-mantine-color-scheme="light"] .control .mantine-Badge-root,
-[data-mantine-color-scheme="light"] .link .mantine-Badge-root {
+[data-mantine-color-scheme='light'] .control .mantine-Badge-root,
+[data-mantine-color-scheme='light'] .link .mantine-Badge-root {
   border-color: var(--mantine-color-gray-3);
 }
 
-[data-mantine-color-scheme="dark"] .control .mantine-Badge-root,
-[data-mantine-color-scheme="dark"] .link .mantine-Badge-root {
+[data-mantine-color-scheme='dark'] .control .mantine-Badge-root,
+[data-mantine-color-scheme='dark'] .link .mantine-Badge-root {
   border-color: var(--mantine-color-dark-3);
 }
 
@@ -243,11 +259,11 @@
 }
 
 /* Amélioration du contraste pour les textes */
-[data-mantine-color-scheme="light"] .control {
+[data-mantine-color-scheme='light'] .control {
   color: var(--mantine-color-gray-8);
 }
 
-[data-mantine-color-scheme="dark"] .control {
+[data-mantine-color-scheme='dark'] .control {
   color: var(--mantine-color-gray-2);
 }
 
@@ -257,10 +273,10 @@
   border-left: 2px solid;
 }
 
-[data-mantine-color-scheme="light"] .mantine-Collapse-root {
+[data-mantine-color-scheme='light'] .mantine-Collapse-root {
   border-left-color: var(--mantine-color-gray-3);
 }
 
-[data-mantine-color-scheme="dark"] .mantine-Collapse-root {
+[data-mantine-color-scheme='dark'] .mantine-Collapse-root {
   border-left-color: var(--mantine-color-dark-4);
-} 
+}

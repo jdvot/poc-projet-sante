@@ -85,10 +85,10 @@ const AppNavbarComponent = () => {
   const [mounted, setMounted] = useState(false);
   const [mobileOpened, setMobileOpened] = useState(false);
 
-  // Memoize the links with proper dependencies
+  // Memoize the links - mockdata is constant, so no dependencies needed
   const links = useMemo(
     () => mockdata.map((item) => <LinksGroup {...item} key={item.label} />),
-    [t] // Only recreate when translation function changes
+    [] // mockdata is constant, no dependencies needed
   );
 
   // Handle mobile menu toggle

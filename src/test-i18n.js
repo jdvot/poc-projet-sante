@@ -9,4 +9,4 @@ console.log('Available languages:', i18n.languages);
 console.log('AI Doctor EN:', i18n.t('aiDoctor.title', { lng: 'en' }));
 console.log('AI Doctor FR:', i18n.t('aiDoctor.title', { lng: 'fr' }));
 console.log('AI Chat EN:', i18n.t('aiChat.title', { lng: 'en' }));
-console.log('AI Chat FR:', i18n.t('aiChat.title', { lng: 'fr' })); 
+console.log('AI Chat FR:', i18n.t('aiChat.title', { lng: 'fr' }));

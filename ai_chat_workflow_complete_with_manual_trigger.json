@@ -7,10 +7,7 @@
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -1600,
-        -400
-      ]
+      "position": [-1600, -400]
     },
     {
       "parameters": {
@@ -31,10 +28,7 @@
       "name": "Set Input (Test)",
       "type": "n8n-nodes-base.set",
       "typeVersion": 2,
-      "position": [
-        -1400,
-        -400
-      ]
+      "position": [-1400, -400]
     },
     {
       "parameters": {
@@ -49,10 +43,7 @@
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [
-        -1424,
-        -192
-      ]
+      "position": [-1424, -192]
     }
   ],
   "connections": {

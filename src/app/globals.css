@@ -1,4 +1,4 @@
-@import "tailwindcss/preflight";
+@import 'tailwindcss/preflight';
 @tailwind utilities;
 
 /* Variables CSS globales pour l'accessibilité */
@@ -46,14 +46,14 @@
 /* Styles pour les éléments interactifs */
 button,
 a,
-[role="button"],
+[role='button'],
 [tabindex] {
   transition: all var(--transition-normal);
 }
 
 button:focus-visible,
 a:focus-visible,
-[role="button"]:focus-visible,
+[role='button']:focus-visible,
 [tabindex]:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
@@ -66,7 +66,9 @@ a:focus-visible,
 
 /* Effets de survol élégants */
 .hover-lift {
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .hover-lift:hover {
@@ -98,7 +100,8 @@ a:focus-visible,
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -109,7 +112,8 @@ a:focus-visible,
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -136,7 +140,11 @@ a:focus-visible,
 
 /* Styles pour les cartes élégantes */
 .elegant-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
   backdrop-filter: blur(10px);
   border: 1px solid rgba(226, 232, 240, 0.8);
   transition: all var(--transition-normal);
@@ -150,7 +158,11 @@ a:focus-visible,
 
 /* Styles pour les boutons élégants */
 .elegant-button {
-  background: linear-gradient(135deg, var(--mantine-color-blue-6) 0%, var(--mantine-color-cyan-6) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--mantine-color-blue-6) 0%,
+    var(--mantine-color-cyan-6) 100%
+  );
   border: none;
   border-radius: 0.75rem;
   padding: 0.875rem 2rem;
@@ -196,7 +208,12 @@ a:focus-visible,
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s ease;
   pointer-events: none;
 }
