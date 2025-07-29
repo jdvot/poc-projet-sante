@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
-  // Exclude Cypress and test files from build
+  // Exclude Cypress and test files from build testÒ
   typescript: {
     ignoreBuildErrors: true, // Temporarily ignore TypeScript errors for deployment
   },
